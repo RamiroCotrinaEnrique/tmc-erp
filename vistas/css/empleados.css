@@ -1,0 +1,126 @@
+        /* ================================================= */
+        /* ========= ESTILOS DE REPORTE PROFESIONAL ======== */
+        /* ================================================= */
+        #modalReporteEmpleado .modal-content {
+            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #modalReporteEmpleado .modal-header {
+            background-color: #EA8420; /* Color dominante personalizado */
+            color: white;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            border-bottom: 1px solid #C76F1A; /* Borde más oscuro del color dominante */
+            padding: 1rem 1.5rem;
+        }
+
+        #modalReporteEmpleado .modal-header .modal-title {
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+
+        #modalReporteEmpleado .modal-body {
+            background-color: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .reporte-card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            border: 1px solid #dee2e6;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            height: 100%; /* Para alinear las tarjetas */
+        }
+
+        .reporte-titulo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #EA8420; /* Color dominante personalizado */
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.75rem;
+        }
+        
+        .reporte-titulo i {
+            margin-right: 0.75rem;
+        }
+
+        .reporte-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Alinea verticalmente el texto y el botón */
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.95rem;
+        }
+
+        .reporte-item:last-child {
+            border-bottom: none;
+        }
+
+        .reporte-item strong {
+            font-weight: 500;
+            color: #495057;
+            margin-right: 10px;
+        }
+        
+        .reporte-item span, .text-muted {
+            text-align: right;
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        #modalReporteEmpleado .modal-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            padding: 1rem 1.5rem;
+        }
+        
+        .btn-reporte { 
+            color: white !important; 
+        }
+
+        /* Sobrescribir colores de Bootstrap para que coincidan con el color dominante */
+        #modalReporteEmpleado .btn-primary {
+            background-color: #EA8420;
+            border-color: #EA8420;
+        }
+        #modalReporteEmpleado .btn-primary:hover {
+            background-color: #C76F1A;
+            border-color: #C76F1A;
+        }
+        #reporteLoader .fa-spinner {
+            color: #EA8420;
+        }
+
+        /* ================================================= */
+        /* ========= alertas ======== */
+        /* ================================================= */
+
+        .color-fondo-personalizado {
+            background-color: #EA8420;
+            color: white;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+
+        /* --- ESTILOS AÑADIDOS PARA MEJORAR LEGIBILIDAD DE BADGES --- */
+        .badge-warning {
+            color: #212529 !important; /* Texto oscuro para fondo amarillo */
+        }
+        .badge-danger {
+            color: white !important; /* Texto blanco para fondo rojo */
+        }
+        .badge-success {
+            color: white !important; /* Texto blanco para fondo verde */
+        }
+
+
+ 

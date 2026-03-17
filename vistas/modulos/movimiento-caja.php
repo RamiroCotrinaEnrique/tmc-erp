@@ -1,0 +1,309 @@
+<?php
+if($_SESSION["usu_perfil"] == "Vendedor"){
+  echo '<script>
+    window.location = "inicio";
+  </script>';
+  return;
+}
+?>
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0"> Movimiento de Caja</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="inicio"> Inicio</a></li>
+                        <li class="breadcrumb-item active">Tablero Administrar Movimiento de Caja</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <button class="btn color-fondo-personalizado" data-toggle="modal"
+                                data-target="#modalAgregarMovimientoCaja">
+                                <i class="fa fa-plus" aria-hidden="true"></i> Nuevo Movimiento </button>
+                        </div>
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped tablas">
+
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Tipo</th>
+                                        <th>Serie</th>
+                                        <th>Número</th>
+                                        <th>Moneda</th>
+                                        <th>Fecha</th>
+                                        <th>Empleado</th> 
+                                        <th>Total</th> 
+                                        <th>Ajustes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php 
+                                            $item = null;
+                                            $valor = null;
+                                            $movimientos = ControladorMovimientoCaja::ctrMostrar($item, $valor);
+                                            
+                                            foreach ($movimientos as $key => $value) {
+                                                echo '
+                                                <tr>
+                                                <td>'.($key+1).'</td>
+                                                <td>'.$value["movi_tipo"].'</td>                                                
+                                                <td>'.$value["movi_serie"].'</td>                                                
+                                                <td>'.$value["movi_numero"].'</td>                                                
+                                                <td>'.$value["movi_moneda"].'</td>                                                
+                                                <td>'.$value["movi_fecha"].'</td>                                                
+                                                <td>'.$value["movi_emple_id"].'</td>                                                
+                                                <td>'.$value["movi_total"].'</td>                                                
+                                                <td>
+                                                <div class="btn-group">                          
+                                                    <button class="btn btn-warning btnEditarMovimientoCaja" idMovimientoCaja="'.$value["movi_id"].'" data-toggle="modal" data-target="#modalEditarMovimientoCaja"> <i class="fa fa-pencil"></i>  </button>';
+                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
+                                                        echo '
+                                                    <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="'.$value["movi_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>   </button>';
+                                            }
+                                                echo'
+                                                </div>  
+                                                </td>
+                                            </tr>
+                                                ';
+
+                                            }
+                                            ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Tipo</th>
+                                        <th>Serie</th>
+                                        <th>Número</th>
+                                        <th>Moneda</th>
+                                        <th>Fecha</th>
+                                        <th>Empleado</th> 
+                                        <th>Total</th> 
+                                        <th>Ajustes</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- /.card -->
+                </div>
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>
+
+<!--=====================================
+MODAL AGREGAR EMPRESAS
+======================================-->
+<div class="modal fade" id="modalAgregarEmpresas">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form role="form" method="post">
+
+                <div class="modal-header color-fondo-personalizado">
+                    <h4 class="modal-title">Agregar Empresas</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputRuc">RUC </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="inputRuc" name="inputRuc"
+                                        placeholder="Ingrese RUC" required maxlength="11">
+                                    <div class="input-group-append" id="loadingRuc" style="display: none;">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        </span>
+                                    </div>
+                                </div>   
+                                <span class="text-muted" style="font-size: 0.8em;"> Ingrese 11 dígitos. Se llenarán los otros campos automáticamente.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputRazonSocial">Razón Social</label>
+                                <input type="text" class="form-control" id="inputRazonSocial" name="inputRazonSocial"
+                                    placeholder="Ingrese Razón Social" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputNombreComercial">Nombre Comercial</label>
+                                <input type="text" class="form-control" id="inputNombreComercial" name="inputNombreComercial"
+                                    placeholder="Ingrese Nombre Comercial" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputDomicilioLegal">Domicilio Legal</label>
+                                <input type="text" class="form-control" id="inputDomicilioLegal" name="inputDomicilioLegal"
+                                    placeholder="Ingrese Domicilio Legal" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputNumeroContacto">Número Contacto</label>
+                                <input type="text" class="form-control" id="inputNumeroContacto" name="inputNumeroContacto"
+                                    placeholder="Ingrese Número Contacto">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEmail">Email</label>
+                                <input type="email" class="form-control" id="inputEmail" name="inputEmail"
+                                    placeholder="Ingrese Email">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Salir</button>
+                    <button type="submit" class="btn color-fondo-personalizado"> Guardar</button>
+                </div>
+
+                <?php
+            $crearEmpresa = new ControladorEmpresas();
+            $crearEmpresa -> ctrCrearEmpresa();
+            ?>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<!--=====================================
+MODAL EDITAR EMPRESAS
+======================================-->
+<div class="modal fade" id="modalEditarEmpresa">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form role="form" method="post">
+
+                <div class="modal-header color-fondo-personalizado">
+                    <h4 class="modal-title">Editar Centro de Costo</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" class="form-control" name="inputEditId" id="inputEditId">
+
+                    <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditRuc">RUC <span class="text-muted" style="font-size: 0.8em;">(se consultará automáticamente)</span></label>
+                                <input type="text" class="form-control" id="inputEditRuc" name="inputEditRuc"
+                                    placeholder="Ingrese RUC" required maxlength="11">
+                                <small class="form-text text-muted">Ingrese 11 dígitos para cargar datos automáticamente.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditRazonSocial">Razón Social</label>
+                                <input type="text" class="form-control" id="inputEditRazonSocial" name="inputEditRazonSocial"
+                                    placeholder="Ingrese Razón Social" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditNombreComercial">Nombre Comercial</label>
+                                <input type="text" class="form-control" id="inputEditNombreComercial" name="inputEditNombreComercial"
+                                    placeholder="Ingrese Nombre Comercial" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditDomicilioLegal">Domicilio Legal</label>
+                                <input type="text" class="form-control" id="inputEditDomicilioLegal" name="inputEditDomicilioLegal"
+                                    placeholder="Ingrese Domicilio Legal" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditNumeroContacto">Número Contacto</label>
+                                <input type="text" class="form-control" id="inputEditNumeroContacto" name="inputEditNumeroContacto"
+                                    placeholder="Ingrese Número Contacto">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <div class="form-group">
+                                <label for="inputEditEmail">Email</label>
+                                <input type="email" class="form-control" id="inputEditEmail" name="inputEditEmail"
+                                    placeholder="Ingrese Email">
+                            </div>
+                        </div>
+
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Salir</button>
+                    <button type="submit" class="btn color-fondo-personalizado"> Guardar</button>
+                </div>
+
+                <?php
+            $editarEmpresa = new ControladorEmpresas();
+            $editarEmpresa -> ctrEditarEmpresa();
+        ?>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<?php
+
+  $eliminarEmpresa = new ControladorEmpresas();
+  $eliminarEmpresa -> ctrEliminarEmpresa();
+
+?>
