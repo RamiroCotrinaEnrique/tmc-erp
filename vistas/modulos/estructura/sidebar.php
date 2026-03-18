@@ -1,3 +1,9 @@
+<?php
+$rutaActual = isset($_GET['ruta']) && $_GET['ruta'] !== '' ? $_GET['ruta'] : 'inicio';
+$sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
+    return $rutaActual === $rutaMenu ? 'nav-link active color-fondo-personalizado' : 'nav-link';
+};
+?>
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
@@ -45,21 +51,19 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             
-            <?php 
-            if($_SESSION["usu_perfil"] =="Administrador"){
+            <?php if ($_SESSION['usu_perfil'] == 'Administrador') { ?>
 
-                echo '
                 <li class="nav-item">
-                    <a href="inicio" class="nav-link active">
+                    <a href="inicio" class="<?php echo $sidebarNavClass('inicio'); ?>">
                         <i class="fa fa-home nav-icon"></i>
                         <p>Inicio</p>
                     </a>
                 </li>
 
-                 <li class="nav-header">GESTIÓN SIG </li>
+                <li class="nav-header">GESTIÓN SIG </li>
 
                 <li class="nav-item">
-                    <a href="sig-opt" class="nav-link">
+                    <a href="sig-opt" class="<?php echo $sidebarNavClass('sig-opt'); ?>">
                         <i class="fa fa-th nav-icon"></i>
                         <p>OPT</p>
                     </a>
@@ -68,28 +72,28 @@
                 <li class="nav-header">GESTIÓN MASTER</li>
 
                 <li class="nav-item">
-                    <a href="usuarios" class="nav-link">
+                    <a href="usuarios" class="<?php echo $sidebarNavClass('usuarios'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Usuarios</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="empresas" class="nav-link">
+                    <a href="empresas" class="<?php echo $sidebarNavClass('empresas'); ?>">
                         <i class="fa fa-building nav-icon"></i>
                         <p>Empresas</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="centro-costo" class="nav-link">
+                    <a href="centro-costo" class="<?php echo $sidebarNavClass('centro-costo'); ?>">
                         <i class="fa fa-building nav-icon"></i>
                         <p>Centro Costo</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="zona" class="nav-link">
+                    <a href="zona" class="<?php echo $sidebarNavClass('zona'); ?>">
                         <i class="fa fa-building nav-icon"></i>
                         <p>Zona</p>
                     </a>
@@ -98,51 +102,51 @@
                 <li class="nav-header">GESTIÓN HUMANA </li>
 
                 <li class="nav-item">
-                    <a href="areas" class="nav-link">
-                        <i class="fa fa-th nav-icon"></i> <p>Áreas</p>
+                    <a href="areas" class="<?php echo $sidebarNavClass('areas'); ?>">
+                        <i class="fa fa-th nav-icon"></i>
+                        <p>Áreas</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="cargos" class="nav-link">
-                        <i class="fa fa-th nav-icon"></i> <p>Cargos</p>
+                    <a href="cargos" class="<?php echo $sidebarNavClass('cargos'); ?>">
+                        <i class="fa fa-th nav-icon"></i>
+                        <p>Cargos</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="empleados" class="nav-link">
-                        <i class="fa fa-users nav-icon"></i> <p>Empleados</p>
+                    <a href="empleados" class="<?php echo $sidebarNavClass('empleados'); ?>">
+                        <i class="fa fa-users nav-icon"></i>
+                        <p>Empleados</p>
                     </a>
                 </li>
 
                 <li class="nav-header">GESTIÓN TESORERÍA</li>
 
                 <li class="nav-item">
-                    <a href="movimiento-caja" class="nav-link">
+                    <a href="movimiento-caja" class="<?php echo $sidebarNavClass('movimiento-caja'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Movimientos Caja</p>
                     </a>
                 </li>
 
-
                 <li class="nav-header">GESTIÓN MATENIMIENTO </li>
-                
+
                 <li class="nav-item">
-                    <a href="tipo-vehiculo" class="nav-link">
-                        <i class="fa fa-th nav-icon"></i> <p>Tipo de Vehículo </p>
+                    <a href="tipo-vehiculo" class="<?php echo $sidebarNavClass('tipo-vehiculo'); ?>">
+                        <i class="fa fa-th nav-icon"></i>
+                        <p>Tipo de Vehículo </p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="vehiculos" class="nav-link">
-                        <i class="fa fa-users nav-icon"></i> <p> Vehículos </p>
+                    <a href="vehiculos" class="<?php echo $sidebarNavClass('vehiculos'); ?>">
+                        <i class="fa fa-users nav-icon"></i>
+                        <p> Vehículos </p>
                     </a>
                 </li>
-                ';
-            }
-            
-                      
-            ?>              
+            <?php } ?>
 
             </ul>
             </li>

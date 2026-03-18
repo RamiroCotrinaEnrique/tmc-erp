@@ -32,74 +32,127 @@ if($_SESSION["usu_perfil"] == "Vendedor"){
                 <div class="col-lg-12">
 
                     <div class="card card-primary card-outline">
-                        <div class="card-header">
+                        <div class="card-header"> 
                             <button class="btn color-fondo-personalizado" data-toggle="modal"
                                 data-target="#modalAgregarMovimientoCaja">
                                 <i class="fa fa-plus" aria-hidden="true"></i> Nuevo Movimiento </button>
                         </div>
                         <div class="card-body">
-                            <table id="example1" class="table table-bordered table-striped tablas">
+                            <?php
+                                $item = null;
+                                $valor = null;
+                                $movimientos = ControladorMovimientoCaja::ctrMostrarMovimientoCaja($item, $valor);
+                                $movimientosPorSerie = array();
 
-                                <thead>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Tipo</th>
-                                        <th>Serie</th>
-                                        <th>Número</th>
-                                        <th>Moneda</th>
-                                        <th>Fecha</th>
-                                        <th>Empleado</th> 
-                                        <th>Total</th> 
-                                        <th>Ajustes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php 
-                                            $item = null;
-                                            $valor = null;
-                                            $movimientos = ControladorMovimientoCaja::ctrMostrar($item, $valor);
-                                            
-                                            foreach ($movimientos as $key => $value) {
-                                                echo '
-                                                <tr>
-                                                <td>'.($key+1).'</td>
-                                                <td>'.$value["movi_tipo"].'</td>                                                
-                                                <td>'.$value["movi_serie"].'</td>                                                
-                                                <td>'.$value["movi_numero"].'</td>                                                
-                                                <td>'.$value["movi_moneda"].'</td>                                                
-                                                <td>'.$value["movi_fecha"].'</td>                                                
-                                                <td>'.$value["movi_emple_id"].'</td>                                                
-                                                <td>'.$value["movi_total"].'</td>                                                
-                                                <td>
-                                                <div class="btn-group">                          
-                                                    <button class="btn btn-warning btnEditarMovimientoCaja" idMovimientoCaja="'.$value["movi_id"].'" data-toggle="modal" data-target="#modalEditarMovimientoCaja"> <i class="fa fa-pencil"></i>  </button>';
-                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
-                                                    <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="'.$value["movi_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>   </button>';
-                                            }
-                                                echo'
-                                                </div>  
-                                                </td>
-                                            </tr>
-                                                ';
+                                foreach ($movimientos as $movimiento) {
+                                    $serieMovimiento = isset($movimiento['movi_serie']) ? trim($movimiento['movi_serie']) : 'SIN-SERIE';
 
-                                            }
-                                            ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Tipo</th>
-                                        <th>Serie</th>
-                                        <th>Número</th>
-                                        <th>Moneda</th>
-                                        <th>Fecha</th>
-                                        <th>Empleado</th> 
-                                        <th>Total</th> 
-                                        <th>Ajustes</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                    if (!isset($movimientosPorSerie[$serieMovimiento])) {
+                                        $movimientosPorSerie[$serieMovimiento] = array();
+                                    }
+
+                                    $movimientosPorSerie[$serieMovimiento][] = $movimiento;
+                                }
+
+                                ksort($movimientosPorSerie);
+                            ?>
+
+                            <?php if (!empty($movimientosPorSerie)) { ?>
+                                <ul class="nav nav-tabs mb-3" id="tabSeriesMovimientoCaja" role="tablist">
+                                    <?php $indiceSerie = 0; ?>
+                                    <?php foreach ($movimientosPorSerie as $serie => $listaSerie) { ?>
+                                        <?php
+                                            $serieSlug = preg_replace('/[^A-Za-z0-9\-_]/', '-', $serie);
+                                            $tabId = 'serie-tab-' . $serieSlug;
+                                            $panelId = 'serie-panel-' . $serieSlug;
+                                        ?>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link <?php echo $indiceSerie === 0 ? 'active' : ''; ?>"
+                                               id="<?php echo $tabId; ?>"
+                                               data-toggle="tab"
+                                               href="#<?php echo $panelId; ?>"
+                                               role="tab"
+                                               aria-controls="<?php echo $panelId; ?>"
+                                               aria-selected="<?php echo $indiceSerie === 0 ? 'true' : 'false'; ?>">
+                                                Serie <?php echo htmlspecialchars($serie); ?>
+                                            </a>
+                                        </li>
+                                        <?php $indiceSerie++; ?>
+                                    <?php } ?>
+                                </ul>
+
+                                <div class="tab-content" id="tabSeriesMovimientoCajaContenido">
+                                    <?php $indiceSerie = 0; ?>
+                                    <?php foreach ($movimientosPorSerie as $serie => $listaSerie) { ?>
+                                        <?php
+                                            $serieSlug = preg_replace('/[^A-Za-z0-9\-_]/', '-', $serie);
+                                            $panelId = 'serie-panel-' . $serieSlug;
+                                            $tablaId = 'tabla-movimientos-serie-' . $serieSlug;
+                                        ?>
+                                        <div class="tab-pane fade <?php echo $indiceSerie === 0 ? 'show active' : ''; ?>"
+                                             id="<?php echo $panelId; ?>"
+                                             role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table id="<?php echo $tablaId; ?>" class="table table-bordered table-striped tablas tablaMovimientoSerie">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:10px">#</th>
+                                                            <th>Tipo</th>
+                                                            <th>Serie</th>
+                                                            <th>Número</th>
+                                                            <th>Moneda</th>
+                                                            <th>Fecha</th>
+                                                            <th>Empleado</th>
+                                                            <th>Total</th>
+                                                            <th>Ajustes</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($listaSerie as $key => $value) { ?>
+                                                            <tr>
+                                                                <td><?php echo $key + 1; ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_tipo']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_serie']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_numero']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_moneda']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_fecha']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_emple_id']); ?></td>
+                                                                <td><?php echo htmlspecialchars($value['movi_total']); ?></td>
+                                                                <td>
+                                                                    <div class="btn-group">
+                                                                        <button class="btn btn-warning btnEditarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>" data-toggle="modal" data-target="#modalEditarMovimientoCaja"> <i class="fa fa-pencil"></i> </button>
+                                                                        <?php if ($_SESSION['usu_perfil'] == 'Administrador') { ?>
+                                                                            <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>
+                                                                        <?php } ?>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th style="width:10px">#</th>
+                                                            <th>Tipo</th>
+                                                            <th>Serie</th>
+                                                            <th>Número</th>
+                                                            <th>Moneda</th>
+                                                            <th>Fecha</th>
+                                                            <th>Empleado</th>
+                                                            <th>Total</th>
+                                                            <th>Ajustes</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <?php $indiceSerie++; ?>
+                                    <?php } ?>
+                                </div>
+                            <?php } else { ?>
+                                <div class="alert alert-light border mb-0">
+                                    No hay movimientos registrados para mostrar.
+                                </div>
+                            <?php } ?>
                         </div>
                     </div>
 
@@ -113,16 +166,16 @@ if($_SESSION["usu_perfil"] == "Vendedor"){
 </div>
 
 <!--=====================================
-MODAL AGREGAR EMPRESAS
+MODAL AGREGAR MOVIMIENTO DE CAJA
 ======================================-->
-<div class="modal fade" id="modalAgregarEmpresas">
-    <div class="modal-dialog">
+<div class="modal fade" id="modalAgregarMovimientoCaja">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
-            <form role="form" method="post">
+            <form role="form" method="post" id="formAgregarMovimientoCaja">
 
                 <div class="modal-header color-fondo-personalizado">
-                    <h4 class="modal-title">Agregar Empresas</h4>
+                    <h4 class="modal-title">Nuevo Movimiento de Caja</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -132,59 +185,101 @@ MODAL AGREGAR EMPRESAS
 
                     <div class="form-row">
 
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-md-3">
                             <div class="form-group">
-                                <label for="inputRuc">RUC </label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="inputRuc" name="inputRuc"
-                                        placeholder="Ingrese RUC" required maxlength="11">
-                                    <div class="input-group-append" id="loadingRuc" style="display: none;">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-spinner fa-spin"></i>
-                                        </span>
-                                    </div>
-                                </div>   
-                                <span class="text-muted" style="font-size: 0.8em;"> Ingrese 11 dígitos. Se llenarán los otros campos automáticamente.</span>
+                                <label for="inputTipo">Tipo</label> 
+                                <select class="form-control" id="inputTipo" name="inputTipo" required>
+                                <option value="">Seleccione...</option>
+                                <option value="INGRESO">INGRESO</option>
+                                <option value="EGRESO">EGRESO</option>
+                                </select>    
+                            </div>
+                        </div> 
+
+                        <div class="form-group col-md-3">
+                            <div class="form-group">
+                                <label for="inputMoneda">Moneda</label> 
+                                <select class="form-control" id="inputMoneda" name="inputMoneda" required>
+                                <option value="">Seleccione...</option>
+                                <option value="SOLES">SOLES</option>
+                                <option value="DOLARES">DOLARES</option>
+                                </select>    
+                            </div>
+                        </div> 
+
+                        <div class="form-group col-md-3">
+                            <div class="form-group">
+                                <label for="inputSerie">Serie</label> 
+                                <select class="form-control" id="inputSerie" name="inputSerie" required>
+                                <option value="">Seleccione...</option>
+                                </select>    
+                            </div>
+                        </div> 
+
+                        
+
+                        <div class="form-group col-md-3">
+                            <div class="form-group">
+                                <label for="inputFecha">Fecha <span class="text-danger">(*)</span> </label>
+                                <div class="input-group date" id="fechaDatePicker"
+                                            data-target-input="nearest">
+                                    <input type="date" name="fecha" class="form-control" required>
+                                </div>
+
                             </div>
                         </div>
 
                         <div class="form-group col-md-12">
                             <div class="form-group">
-                                <label for="inputRazonSocial">Razón Social</label>
-                                <input type="text" class="form-control" id="inputRazonSocial" name="inputRazonSocial"
-                                    placeholder="Ingrese Razón Social" required>
+                                <label for="inputEmpleado">Empleado</label> 
+                                <select class="form-control select2" id="inputEmpleado" name="inputEmpleado" required>
+                                    <option value="">Seleccione...</option>
+                                    <?php
+                                    $item = null;
+                                    $valor = null;                                      
+                                    $empleado = ControladorEmpleados::ctrMostrarEmpleados($item, $valor); 
+                                    //var_dump($categoria);
+                                    foreach ($empleado as $key => $value) {
+                                        echo '<option value="'.$value["emple_id"].'">'.$value["emple_numero_documento"]." - ".$value["emple_apellido_paterno"]." ".$value["emple_apellido_materno"]." ".$value["emple_nombres"].'</option>';
+                                    }  
+                                    ?>
+                                </select> 
                             </div>
+                        </div>
+
+
+                        <div class="form-group col-md-12">
+                                <label>Detalle de Movimiento</label>                            
+                        </div>
+                        <div class="form-group col-md-12 text-right">
+                            <button type="button" class="btn btn-success" id="btnAgregarDetalle">Agregar detalle</button>
                         </div>
 
                         <div class="form-group col-md-12">
                             <div class="form-group">
-                                <label for="inputNombreComercial">Nombre Comercial</label>
-                                <input type="text" class="form-control" id="inputNombreComercial" name="inputNombreComercial"
-                                    placeholder="Ingrese Nombre Comercial" required>
+                                <table id="example2" class="table table-bordered table-striped tablas">
+                                    <thead>
+                                        <tr>
+                                            <th>Ítem</th>
+                                            <th>Descripción</th>
+                                            <th>Importe</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detalleMovimiento">
+                                        <!-- Aquí se agregarán los detalles dinámicamente -->
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
                         <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputDomicilioLegal">Domicilio Legal</label>
-                                <input type="text" class="form-control" id="inputDomicilioLegal" name="inputDomicilioLegal"
-                                    placeholder="Ingrese Domicilio Legal" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputNumeroContacto">Número Contacto</label>
-                                <input type="text" class="form-control" id="inputNumeroContacto" name="inputNumeroContacto"
-                                    placeholder="Ingrese Número Contacto">
-                            </div>
-                        </div>
-
-                        <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEmail">Email</label>
-                                <input type="email" class="form-control" id="inputEmail" name="inputEmail"
-                                    placeholder="Ingrese Email">
+                            <div class="row justify-content-end">
+                                <div class="col-md-4">
+                                    <label for="totalDetalleReferencial" class="mb-1"><strong>Total</strong></label>
+                                    <input type="text" id="totalDetalleReferencial" class="form-control" value="0.00" readonly>
+                                </div>
                             </div>
                         </div>
 
@@ -198,11 +293,12 @@ MODAL AGREGAR EMPRESAS
                 </div>
 
                 <?php
-            $crearEmpresa = new ControladorEmpresas();
-            $crearEmpresa -> ctrCrearEmpresa();
+            $crearMovimiento = new ControladorMovimientoCaja();
+            $crearMovimiento -> ctrCrearMovimientoCaja();
             ?>
 
             </form>
+
         </div>
         <!-- /.modal-content -->
     </div>
@@ -212,16 +308,16 @@ MODAL AGREGAR EMPRESAS
 
 
 <!--=====================================
-MODAL EDITAR EMPRESAS
+MODAL EDITAR MOVIMIENTO DE CAJA
 ======================================-->
-<div class="modal fade" id="modalEditarEmpresa">
-    <div class="modal-dialog">
+<div class="modal fade" id="modalEditarMovimientoCaja">
+    <div class="modal-dialog  modal-lg">
         <div class="modal-content">
 
-            <form role="form" method="post">
+            <form role="form" method="post" id="formEditarMovimientoCaja">
 
                 <div class="modal-header color-fondo-personalizado">
-                    <h4 class="modal-title">Editar Centro de Costo</h4>
+                    <h4 class="modal-title">Actualizar Movimiento de Caja</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -231,54 +327,82 @@ MODAL EDITAR EMPRESAS
 
                     <input type="hidden" class="form-control" name="inputEditId" id="inputEditId">
 
-                    <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditRuc">RUC <span class="text-muted" style="font-size: 0.8em;">(se consultará automáticamente)</span></label>
-                                <input type="text" class="form-control" id="inputEditRuc" name="inputEditRuc"
-                                    placeholder="Ingrese RUC" required maxlength="11">
-                                <small class="form-text text-muted">Ingrese 11 dígitos para cargar datos automáticamente.</small>
-                            </div>
+                    <div class="form-row">
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditTipo">Tipo</label>
+                            <input type="text" class="form-control" id="inputEditTipo" name="inputEditTipo"
+                                   readonly style="background-color:#e9ecef;cursor:not-allowed;"
+                                   title="El tipo no se puede modificar una vez registrado el movimiento">
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditMoneda">Moneda</label>
+                            <input type="text" class="form-control" id="inputEditMoneda" name="inputEditMoneda"
+                                   readonly style="background-color:#e9ecef;cursor:not-allowed;"
+                                   title="La moneda no se puede modificar una vez registrado el movimiento">
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditSerie">Serie</label>
+                            <input type="text" class="form-control" id="inputEditSerie" name="inputEditSerie"
+                                   readonly style="background-color:#e9ecef;cursor:not-allowed;"
+                                   title="La serie no se puede modificar una vez registrado el movimiento">
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditNumero">Numero</label>
+                            <input type="text" class="form-control" id="inputEditNumero" readonly>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditFecha">Fecha</label>
+                            <input type="date" class="form-control" id="inputEditFecha" name="inputEditFecha" required>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="inputEditTotal">Total</label>
+                            <input type="text" class="form-control" id="inputEditTotal" readonly>
                         </div>
 
                         <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditRazonSocial">Razón Social</label>
-                                <input type="text" class="form-control" id="inputEditRazonSocial" name="inputEditRazonSocial"
-                                    placeholder="Ingrese Razón Social" required>
-                            </div>
+                            <label for="inputEditEmpleado">Empleado</label>
+                            <select class="form-control select2" id="inputEditEmpleado" name="inputEditEmpleado" required>
+                                <option value="">Seleccione...</option>
+                                <?php
+                                $item = null;
+                                $valor = null;
+                                $empleado = ControladorEmpleados::ctrMostrarEmpleados($item, $valor);
+                                foreach ($empleado as $key => $value) {
+                                    echo '<option value="'.$value["emple_id"].'">'.$value["emple_numero_documento"]." - ".$value["emple_apellido_paterno"]." ".$value["emple_apellido_materno"]." ".$value["emple_nombres"].'</option>';
+                                }
+                                ?>
+                            </select>
                         </div>
 
                         <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditNombreComercial">Nombre Comercial</label>
-                                <input type="text" class="form-control" id="inputEditNombreComercial" name="inputEditNombreComercial"
-                                    placeholder="Ingrese Nombre Comercial" required>
-                            </div>
+                            <label>Detalle de Movimiento</label>
+                        </div>
+
+                        <div class="form-group col-md-12 text-right">
+                            <button type="button" class="btn btn-success" id="btnAgregarDetalleEdit">Agregar detalle</button>
                         </div>
 
                         <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditDomicilioLegal">Domicilio Legal</label>
-                                <input type="text" class="form-control" id="inputEditDomicilioLegal" name="inputEditDomicilioLegal"
-                                    placeholder="Ingrese Domicilio Legal" required>
-                            </div>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Descripcion</th>
+                                        <th>Importe</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detalleMovimientoEdit"></tbody>
+                            </table>
                         </div>
 
-                        <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditNumeroContacto">Número Contacto</label>
-                                <input type="text" class="form-control" id="inputEditNumeroContacto" name="inputEditNumeroContacto"
-                                    placeholder="Ingrese Número Contacto">
-                            </div>
-                        </div>
-
-                        <div class="form-group col-md-12">
-                            <div class="form-group">
-                                <label for="inputEditEmail">Email</label>
-                                <input type="email" class="form-control" id="inputEditEmail" name="inputEditEmail"
-                                    placeholder="Ingrese Email">
-                            </div>
-                        </div>
+                    </div>
 
                 </div>
 
@@ -288,8 +412,8 @@ MODAL EDITAR EMPRESAS
                 </div>
 
                 <?php
-            $editarEmpresa = new ControladorEmpresas();
-            $editarEmpresa -> ctrEditarEmpresa();
+            $editarMovimiento = new ControladorMovimientoCaja();
+            $editarMovimiento -> ctrEditarMovimientoCaja();
         ?>
 
             </form>
@@ -303,7 +427,7 @@ MODAL EDITAR EMPRESAS
 
 <?php
 
-  $eliminarEmpresa = new ControladorEmpresas();
-  $eliminarEmpresa -> ctrEliminarEmpresa();
+    $eliminarMovimiento = new ControladorMovimientoCaja();
+    $eliminarMovimiento -> ctrEliminarMovimientoCaja();
 
 ?>

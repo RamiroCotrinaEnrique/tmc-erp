@@ -1,8 +1,21 @@
 
 /* styles color fondo */
 .color-fondo-personalizado {
-    background: #EA8420; /* Color de fondo */
+    /*background: #E42026;*/ /* Color de fondo */
+    background: #e42026; /* Color de fondo */
     color: white;        /* Color del texto */
+}
+
+.main-sidebar .nav-sidebar .nav-link.active.color-fondo-personalizado,
+.main-sidebar .nav-sidebar .nav-link.active.color-fondo-personalizado:hover,
+.main-sidebar .nav-sidebar .nav-link.active.color-fondo-personalizado:focus {
+    background: #e42026;
+    color: #ffffff;
+}
+
+.main-sidebar .nav-sidebar .nav-link.active.color-fondo-personalizado .nav-icon,
+.main-sidebar .nav-sidebar .nav-link.active.color-fondo-personalizado p {
+    color: #ffffff;
 }
 
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-03-2026 a las 00:39:09
+-- Tiempo de generación: 18-03-2026 a las 01:30:29
 -- Versión del servidor: 10.1.38-MariaDB
 -- Versión de PHP: 7.3.3
 
@@ -125,6 +125,21 @@ CREATE TABLE `config_series` (
   `conf_seri_ultimo_numero` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `config_series`
+--
+
+INSERT INTO `config_series` (`conf_seri_id`, `conf_seri_tipo`, `conf_seri_moneda`, `conf_seri_serie`, `conf_seri_ultimo_numero`) VALUES
+(1, 'INGRESO', 'SOLES', '001', 1),
+(2, 'INGRESO', 'DOLARES', '001', 0),
+(3, 'EGRESO', 'SOLES', '001', 0),
+(4, 'EGRESO', 'DOLARES', '001', 0),
+(5, 'INGRESO', 'SOLES', '002', 0),
+(6, 'EGRESO', 'SOLES', '002', 0),
+(7, 'INGRESO', 'SOLES', '003', 1),
+(8, 'EGRESO', 'SOLES', '003', 0),
+(9, 'EGRESO', 'SOLES', '004', 3);
+
 -- --------------------------------------------------------
 
 --
@@ -138,6 +153,16 @@ CREATE TABLE `detalle_movimiento` (
   `deta_movi_descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deta_movi_importe` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `detalle_movimiento`
+--
+
+INSERT INTO `detalle_movimiento` (`deta_movi_id`, `deta_movi_movimiento_id`, `deta_movi_item`, `deta_movi_descripcion`, `deta_movi_importe`) VALUES
+(23, 13, 1, 'TACOS', '16.50'),
+(24, 14, 1, 'DGGF', '54.00'),
+(25, 15, 1, 'ingreso', '2000.00'),
+(26, 16, 1, 'aaddddd', '2000.00');
 
 -- --------------------------------------------------------
 
@@ -216,14 +241,14 @@ CREATE TABLE `empleados` (
 --
 
 INSERT INTO `empleados` (`emple_id`, `emple_codigo`, `emple_tipo_documento`, `emple_numero_documento`, `emple_apellido_paterno`, `emple_apellido_materno`, `emple_nombres`, `emple_fecha_nacimiento`, `emple_nacionalidad`, `emple_sexo`, `emple_estado_civil`, `emple_telefono_movil`, `emple_telefono_fijo`, `emple_correo`, `emple_departamento`, `emple_provincia`, `emple_distrito`, `emple_lugar_residencia`, `emple_empresa_id`, `emple_fecha_ingreso`, `emple_categoria_ocupacional`, `emple_cenco_id`, `emple_area_id`, `emple_cargo_id`, `emple_estado`, `emple_fecha_cese`, `emple_situacion_educativa`, `emple_estado_educativa`, `emple_tipo_regimen`, `emple_tipo_institucion`, `emple_institucion`, `emple_carrera`, `emple_anio`, `emple_nombre_familiar`, `emple_telefono_familiar`, `emple_parentesco`, `emple_fecha_vencimiento_documento`, `emple_archivo_documento`, `emple_licencia`, `emple_fecha_vencimiento_a1`, `emple_archivo_a1`, `emple_fecha_vencimiento_a2a`, `emple_archivo_a2a`, `emple_fecha_vencimiento_a2b`, `emple_archivo_a2b`, `emple_fecha_vencimiento_a3a`, `emple_archivo_a3a`, `emple_fecha_vencimiento_a3b`, `emple_archivo_a3b`, `emple_fecha_vencimiento_a3c`, `emple_archivo_a3c`, `emple_fecha_vencimiento_b1`, `emple_archivo_b1`, `emple_fecha_vencimiento_b2a`, `emple_archivo_b2a`, `emple_fecha_vencimiento_b2b`, `emple_archivo_b2b`, `emple_fecha_vencimiento_b2c`, `emple_archivo_b2c`, `emple_id_usuario`, `emple_fecha_create`, `emple_fecha_update`, `emple_fecha_delete`) VALUES
-(1, 'EMP0001', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTORdd', '2026-03-03', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '017778874', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2017', 'NOA', '51946515190', 'AMIGA', '2026-03-04', 'documento_70064332_20260304171927.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 18:06:35', '2026-03-04 11:19:27', NULL),
+(1, 'EMP0001', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTOR', '2026-03-03', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '017778874', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2017', 'NOA', '51946515190', 'AMIGA', '2026-03-04', 'documento_70064332_20260304171927.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 18:06:35', '2026-03-17 15:40:24', NULL),
 (2, 'EMP0002', 'DNI', '70064332', 'COCO', 'ENRIQUE', 'VICTOR', '2002-02-27', 'PERUANO', 'Masculino', 'Soltero', '9999999999', '999999999', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2025-08-20', 'Obrero', 14, 1, 1, 'Activo', NULL, 'Educación Superior de Formación Artistica', NULL, 'Pública', NULL, 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2025', 'NOA', '9999999999', 'AMIGA', '2025-08-20', 'EMP0002/emple_archivo_documento_70064332.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 22:08:29', NULL, NULL),
 (3, 'EMP0003', 'DNI', '1234567', 'COTRINA', 'ENRIQUE', 'VICTOR', '2005-07-30', 'PERUANO', 'Masculino', 'Soltero', '5112345678', '011234567', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2025-08-19', 'Ejecutivo', 15, 2, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'Privada', 'Escuela e Institutos de Educación Superior Tecnológicos de las Fuerzas Armadas', 'IBEROTEC', '  bn mnbjkhnbm', NULL, 'NOA', '0112345678', 'AMIGA', '2025-08-05', 'EMP0003/emple_archivo_documento_1234567.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 22:37:13', NULL, NULL),
 (4, 'EMP0004', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTOR', '2006-08-19', 'PERUANO', 'Masculino', 'Soltero', '5194651519', '011234567', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2025-08-19', 'Ejecutivo', 16, 1, 1, 'Activo', NULL, 'Titulado', 'Completa', 'Pública', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2018', 'NOA', '5194651519', 'AMIGA', '2025-08-19', 'documento_70064332.pdf', 'SI', '2025-08-19', 'a1_70064332.pdf', '2025-08-20', 'a2a_70064332.pdf', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 23:19:54', NULL, NULL),
 (5, 'EMP0005', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTOR', '1997-02-27', 'PERUANO', 'Masculino', 'Casado', '51946515190', '011234567', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2025-08-20', 'Ejecutivo', 16, 2, 1, 'Activo', NULL, 'Estudio de Maestría', 'Completa', 'Privada', 'Escuela e Institutos de Educación Superior Tecnológicos de las Fuerzas Armadas', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2026', 'NOA', '51946515190', 'AMIX', '2025-08-21', 'EMP0005/documento_70064332.pdf', 'SI', '2026-07-15', 'a1_70064332_20260304165452.pdf', '2026-05-06', 'a2a_70064332_20260304165452.jpeg', '2025-08-22', 'EMP0005/a2b_70064332.pdf', '2026-12-15', 'a3a_70064332_20260304172105.jpeg', '2025-08-24', 'EMP0005/a3b_70064332.pdf', '2025-08-25', 'EMP0005/a3c_70064332.pdf', '2025-08-26', 'EMP0005/b1_70064332.pdf', '2025-08-27', 'EMP0005/b2a_70064332.pdf', '2025-08-28', 'EMP0005/b2b_70064332.pdf', '2025-10-15', 'EMP0005/b2c_70064332.pdf', 1, '2025-08-20 16:13:41', '2026-03-04 11:21:05', NULL),
 (15, 'EMP0006', 'DNI', '70064331', 'COTRINA', 'ENRIQUE', 'VICTOR', '2025-08-21', 'PERUANO', 'Masculino', 'Viudo', '99999999999', '999999999', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2025-08-21', 'Ejecutivo', 14, 1, 1, 'Activo', NULL, 'Sin educación formal', 'Incompleta', 'Pública', 'Escuela e Institutos de Educación Superior Tecnológicos de las Fuerzas Armadas', 'ncg vnb vnbmnb,k', 'INFORMAATICA Y SISTEMAS', '2025', 'kkkkkkkkkk', '99999999999', 'iiiiii', '2025-08-13', 'EMP0006/documento_70064331.pdf', 'NO', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', NULL, 'EMP0006/', 1, '2025-08-21 16:46:49', NULL, NULL),
 (20, 'EMP0008', 'DNI', '70064331', 'COTRINA', 'ENRIQUE', 'VICTOR', '2025-12-10', 'PERUANO', 'Femenino', 'Soltero', '9999999999', '999999999', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'Usuario', 'AV. MAYO 2134', 1, '2025-10-15', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Sin educación formal', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2025', 'kkkkkkkkkk', '99999999999', 'AMIX', '2025-12-10', 'EMP0008/documento_70064331.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-12-10 16:29:04', NULL, NULL),
-(22, 'EMP0009', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTORdd', '2026-03-03', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '017778874', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2017', 'NOA', '51946515190', 'AMIGA', '2026-03-04', 'documento_70064332_20260304160524.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 23:06:35', '2026-03-04 10:05:24', NULL),
+(22, 'EMP0009', 'DNI', '70064332', 'ZAPATA', 'ENRIQUE', 'VICTORdd', '2026-03-03', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '017778874', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2017', 'NOA', '51946515190', 'AMIGA', '2026-03-04', 'documento_70064332_20260304160524.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 23:06:35', '2026-03-17 15:41:22', NULL),
 (23, 'EMP0007', 'DNI', '70064332', 'COTRINA', 'ENRIQUE', 'VICTORdd', '2026-03-03', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '017778874', 'VCOTRINA@GMAIL.COM', 'LIMA', 'LIMA', 'SMP', 'AV. MAYO 2134', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Eduación Especial', 'Completa', 'No aplica', 'Educación Superior de Formación Artistica', 'IBEROTEC', 'INFORMAATICA Y SISTEMAS', '2017', 'NOA', '51946515190', 'AMIGA', '2026-03-04', 'documento_70064332_20260304160524.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-08-19 23:06:35', '2026-03-04 10:05:24', NULL),
 (25, 'EMP0010', 'DNI', '123456789', 'COTRINA', 'ENRIQUE', 'VICTOR RAMIRO', '2026-03-01', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '014789546', 'cotrinaramiro@gmil.com', 'lima', 'lima', 'Santa Anita', 'av. manues de la tores', 1, '2026-03-04', 'Ejecutivo', 13, 1, 1, 'Activo', NULL, 'Sin educación formal', 'Incompleta', 'Privada', 'Educación Superior de Formación Artistica', '13', 'chistemas', '2012', '<xx', '99999999999', 'xxxx', '2026-03-04', 'documento_123456789_20260304164859.pdf', 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2026-03-04 15:48:25', '2026-03-04 10:48:59', NULL),
 (26, 'EMP0011', 'DNI', '70064335', 'COTRINA', 'ENRIQUE', 'VICTOR RAMIRO', '2026-03-04', 'PERUANO', 'Masculino', 'Soltero', '51946515190', '014789546', 'cotrinaramiro@gmil.com', 'lima', 'lima', 'Santa Anita', 'av. manues de la tores', 1, '2026-03-04', 'Ejecutivo', 13, 1, 2, 'Activo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2026-03-04 16:32:45', NULL, NULL);
@@ -275,6 +300,16 @@ CREATE TABLE `movimientos` (
   `movi_fecha_update` datetime DEFAULT NULL,
   `movi_fecha_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `movimientos`
+--
+
+INSERT INTO `movimientos` (`movi_id`, `movi_tipo`, `movi_serie`, `movi_numero`, `movi_moneda`, `movi_fecha`, `movi_emple_id`, `movi_total`, `movi_fecha_create`, `movi_fecha_update`, `movi_fecha_delete`) VALUES
+(13, 'EGRESO', '004', 2, 'SOLES', '2026-03-17', 22, '16.50', '2026-03-18 00:10:49', NULL, NULL),
+(14, 'EGRESO', '004', 3, 'SOLES', '2026-03-17', 22, '54.00', '2026-03-18 00:13:12', NULL, NULL),
+(15, 'INGRESO', '003', 1, 'SOLES', '2026-03-17', 1, '2000.00', '2026-03-18 00:16:03', NULL, NULL),
+(16, 'INGRESO', '001', 1, 'SOLES', '2026-03-17', 25, '2000.00', '2026-03-18 00:21:55', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -500,7 +535,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`usu_id`, `usu_nombre`, `usu_usuario`, `usu_password`, `usu_perfil`, `usu_foto`, `usu_estado`, `usu_ultimo_login`, `usu_fecha_create`, `usu_fecha_update`, `usu_fecha_delete`) VALUES
-(1, 'Usuario Administrado', 'admin', '$2a$07$asxx54ahjppf45sd87a5auXBm1Vr2M1NV5t/zNQtGHGpS5fFirrbG', 'Administrador', 'vistas/img/usuarios/admin/994.png', 1, '2026-03-16 15:41:20', '2026-03-16 20:41:20', NULL, NULL),
+(1, 'Usuario Administrado', 'admin', '$2a$07$asxx54ahjppf45sd87a5auXBm1Vr2M1NV5t/zNQtGHGpS5fFirrbG', 'Administrador', 'vistas/img/usuarios/admin/994.png', 1, '2026-03-17 12:44:23', '2026-03-17 17:44:23', NULL, NULL),
 (2, 'Victor Cotrina Enrique', 'vcotrina', '$2a$07$asxx54ahjppf45sd87a5auaK2UuY9I3HoWrDp0X6p.3tlEWlvSpv.', 'Especial', 'vistas/img/usuarios/vcotrina/143.png', 1, '2025-02-07 09:52:37', '2025-02-07 14:52:37', NULL, NULL),
 (3, 'Ramiro Cotrina Enrique', 'rcotrina', '$2a$07$asxx54ahjppf45sd87a5auSCG6EtWTOSpeybRK.d3z3BAMJt.7teO', 'Vendedor', 'vistas/img/usuarios/rcotrina/410.png', 1, '2025-01-15 16:30:58', '2025-01-15 21:30:58', NULL, NULL),
 (4, 'Lizandro Enrique Zuñiga Lorenzo', 'lzuniga', '$2a$07$asxx54ahjppf45sd87a5audlqe7C7op4Pg1msP3K1KXmDbjd5n86u', 'Vendedor', '', 0, '2024-12-07 19:34:34', '2024-12-12 23:48:48', NULL, NULL),
@@ -598,6 +633,7 @@ ALTER TABLE `empresas`
 --
 ALTER TABLE `movimientos`
   ADD PRIMARY KEY (`movi_id`),
+  ADD UNIQUE KEY `uq_movimientos_serie_numero` (`movi_tipo`,`movi_moneda`,`movi_serie`,`movi_numero`),
   ADD KEY `movi_emple_id` (`movi_emple_id`);
 
 --
@@ -649,13 +685,13 @@ ALTER TABLE `centro_costo`
 -- AUTO_INCREMENT de la tabla `config_series`
 --
 ALTER TABLE `config_series`
-  MODIFY `conf_seri_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `conf_seri_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_movimiento`
 --
 ALTER TABLE `detalle_movimiento`
-  MODIFY `deta_movi_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `deta_movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
@@ -673,7 +709,7 @@ ALTER TABLE `empresas`
 -- AUTO_INCREMENT de la tabla `movimientos`
 --
 ALTER TABLE `movimientos`
-  MODIFY `movi_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `opts`

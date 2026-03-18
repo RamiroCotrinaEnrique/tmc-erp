@@ -3,148 +3,218 @@
 class ControladorMovimientoCaja {
 
     /*-------------------------------------
-    LISTAR EMPRESAS
+    LISTAR MOVIMIENTOS DE CAJA
     -------------------------------------*/
-
-    static public function ctrMostrar( $item, $valor ) {
+    static public function ctrMostrarMovimientoCaja($item, $valor) {
         $tabla = 'movimientos';
-        $respuesta = ModeloMovimientoCaja::mdlMostrarMovimientoCaja( $tabla, $item, $valor );
-        return $respuesta;
+        return ModeloMovimientoCaja::mdlMostrarMovimientoCaja($tabla, $item, $valor);
     }
 
     /*-------------------------------------
-    CREAR EMPRESAS
+    LISTAR SERIES CONFIGURADAS
     -------------------------------------*/
+    static public function ctrListarSeriesConfiguradas($tipo, $moneda) {
+        return ModeloMovimientoCaja::mdlListarSeriesConfiguradas($tipo, $moneda);
+    }
 
-    public static function ctrCrearEmpresa() {
+    /*-------------------------------------
+    LISTAR DETALLE DE MOVIMIENTO
+    -------------------------------------*/
+    static public function ctrMostrarDetalleMovimiento($movimientoId) {
+        return ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($movimientoId);
+    }
 
-        if ( !isset( $_POST[ 'inputRuc' ] ) || !isset( $_POST[ 'inputRazonSocial' ] ) ) {
+    /*-------------------------------------
+    CREAR MOVIMIENTO DE CAJA + DETALLE
+    -------------------------------------*/
+    public static function ctrCrearMovimientoCaja() {
+
+        if (!isset($_POST['inputTipo']) || !isset($_POST['inputSerie']) || !isset($_POST['inputMoneda']) || !isset($_POST['inputEmpleado']) || !isset($_POST['fecha'])) {
             return;
         }
 
+        $tipo = trim($_POST['inputTipo']);
+        $serie = trim($_POST['inputSerie']);
+        $moneda = trim($_POST['inputMoneda']);
+        $fecha = trim($_POST['fecha']);
+        $empleado = (int) $_POST['inputEmpleado'];
 
-        // Sanitizar entradas
-        $ruc = trim( $_POST[ 'inputRuc' ] );
-        $razonSocial = trim( $_POST[ 'inputRazonSocial' ] );
-        $nombreComercial = trim( $_POST[ 'inputNombreComercial' ] );
-        $domicilioLegal = trim( $_POST[ 'inputDomicilioLegal' ] );
-        $contacto = trim( $_POST[ 'inputNumeroContacto' ] );
-        $email = trim( $_POST[ 'inputEmail' ] );
+        $tiposPermitidos = array('INGRESO', 'EGRESO');
+        $monedasPermitidas = array('SOLES', 'DOLARES');
 
-        // Validaciones
-        if ( !preg_match( '/^[0-9]+$/', $ruc ) ) {
-            self::mostrarAlerta( 'error', '¡El campo RUC solo permite caracteres numéricos!', 'empresas' );
+        if ($tipo === '' || $serie === '' || $moneda === '' || $fecha === '' || $empleado <= 0) {
+            self::mostrarAlerta('error', 'Complete los datos obligatorios del movimiento.', 'movimiento-caja');
             return;
         }
 
-        if ( empty( $razonSocial ) ) {
-            self::mostrarAlerta( 'error', '¡El campo razón social no puede estar vacío!', 'empresas' );
+        if (!in_array($tipo, $tiposPermitidos, true)) {
+            self::mostrarAlerta('error', 'El tipo de movimiento seleccionado no es valido.', 'movimiento-caja');
             return;
         }
 
-        // Preparar datos
-        $tabla = 'empresas';
-        $datos = array(
-            'empre_ruc' => $ruc,
-            'empre_razon_social' => $razonSocial,
-            'empre_nombre_comercial' => $nombreComercial,
-            'empre_domicilio_legal' => $domicilioLegal,
-            'empre_numero_contacto' => $contacto,
-            'empre_email_contacto' => $email
+        if (!preg_match('/^\d{3}$/', $serie)) {
+            self::mostrarAlerta('error', 'La serie del movimiento no es valida.', 'movimiento-caja');
+            return;
+        }
+
+        if (!in_array($moneda, $monedasPermitidas, true)) {
+            self::mostrarAlerta('error', 'La moneda seleccionada no es valida.', 'movimiento-caja');
+            return;
+        }
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+            self::mostrarAlerta('error', 'La fecha del movimiento no es valida.', 'movimiento-caja');
+            return;
+        }
+
+        $descripciones = isset($_POST['detalle_descripcion']) && is_array($_POST['detalle_descripcion']) ? $_POST['detalle_descripcion'] : array();
+        $importes = isset($_POST['detalle_importe']) && is_array($_POST['detalle_importe']) ? $_POST['detalle_importe'] : array();
+
+        $detalles = array();
+        $cantidad = min(count($descripciones), count($importes));
+
+        for ($i = 0; $i < $cantidad; $i++) {
+            $descripcion = trim((string) $descripciones[$i]);
+            $importe = (float) str_replace(',', '.', (string) $importes[$i]);
+
+            if ($descripcion === '') {
+                continue;
+            }
+
+            if ($importe <= 0) {
+                self::mostrarAlerta('error', 'El importe de cada detalle debe ser mayor a cero.', 'movimiento-caja');
+                return;
+            }
+
+            $detalles[] = array(
+                'descripcion' => $descripcion,
+                'importe' => round($importe, 2)
+            );
+        }
+
+        if (empty($detalles)) {
+            self::mostrarAlerta('error', 'Debe agregar al menos un detalle para registrar el movimiento.', 'movimiento-caja');
+            return;
+        }
+
+        $cabecera = array(
+            'tipo' => $tipo,
+            'serie' => $serie,
+            'moneda' => $moneda,
+            'fecha' => $fecha,
+            'empleado' => $empleado
         );
 
-        // Insertar datos en la base de datos
-        $respuesta = ModeloEmpresas::mdlCrearEmpresas( $tabla, $datos );
+        $respuesta = ModeloMovimientoCaja::mdlCrearMovimientoCajaConDetalle($cabecera, $detalles);
 
-        // Mensaje de éxito o error
-        if ( $respuesta == 'ok' ) {
-            self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'empresas' );
+        if (isset($respuesta['status']) && $respuesta['status'] === 'ok') {
+            self::mostrarAlerta('success', 'Movimiento guardado correctamente. Nro: ' . $respuesta['movi_numero'], 'movimiento-caja');
         } else {
-            self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'empresas' );
+            $mensaje = isset($respuesta['message']) ? $respuesta['message'] : 'No se pudo guardar el movimiento.';
+            self::mostrarAlerta('error', $mensaje, 'movimiento-caja');
         }
     }
 
     /*-------------------------------------
-    EDITAR EMPRESA
+    EDITAR MOVIMIENTO DE CAJA (CABECERA)
     -------------------------------------*/
+    public static function ctrEditarMovimientoCaja() {
 
-    public static function ctrEditarEmpresa() {
-        if ( !isset( $_POST[ 'inputEditId' ] ) ) {
+        if (!isset($_POST['inputEditId']) || !isset($_POST['inputEditFecha']) || !isset($_POST['inputEditEmpleado'])) {
             return;
         }
 
-        // Sanitizar entradas
-        $id = trim( $_POST[ 'inputEditId' ] ); 
-        $ruc = trim( $_POST[ 'inputEditRuc' ] );
-        $razonSocial = trim( $_POST[ 'inputEditRazonSocial' ] );
-        $nombreComercial = trim( $_POST[ 'inputEditNombreComercial' ] );
-        $domicilioLegal = trim( $_POST[ 'inputEditDomicilioLegal' ] );
-        $contacto = trim( $_POST[ 'inputEditNumeroContacto' ] );
-        $email = trim( $_POST[ 'inputEditEmail' ] );
+        $id = (int) $_POST['inputEditId'];
+        $fecha = trim($_POST['inputEditFecha']);
+        $empleado = (int) $_POST['inputEditEmpleado'];
 
-        // Validaciones
-        if ( !preg_match( '/^[0-9]+$/', $ruc ) ) {
-            self::mostrarAlerta( 'error', '¡El campo RUC solo permite caracteres numéricos!', 'empresas' );
+        if ($id <= 0 || $fecha === '' || $empleado <= 0) {
+            self::mostrarAlerta('error', 'Complete los datos obligatorios para editar el movimiento.', 'movimiento-caja');
             return;
         }
 
-        if ( empty( $razonSocial ) ) {
-            self::mostrarAlerta( 'error', '¡El campo razón social no puede estar vacío!', 'empresas' );
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+            self::mostrarAlerta('error', 'La fecha del movimiento no es valida.', 'movimiento-caja');
             return;
         }
 
-        // Registrar fecha y hora de actualización
-        date_default_timezone_set( 'America/Lima' );
-        $fechaActual = date( 'Y-m-d H:i:s' );
+        $descripciones = isset($_POST['inputEditDetalleDescripcion']) && is_array($_POST['inputEditDetalleDescripcion']) ? $_POST['inputEditDetalleDescripcion'] : array();
+        $importes = isset($_POST['inputEditDetalleImporte']) && is_array($_POST['inputEditDetalleImporte']) ? $_POST['inputEditDetalleImporte'] : array();
 
-        // Preparar datos
-        $tabla = 'empresas';
+        $detalles = array();
+        $cantidad = min(count($descripciones), count($importes));
+
+        for ($i = 0; $i < $cantidad; $i++) {
+            $descripcion = trim((string) $descripciones[$i]);
+            $importe = (float) str_replace(',', '.', (string) $importes[$i]);
+
+            if ($descripcion === '') {
+                continue;
+            }
+
+            if ($importe <= 0) {
+                self::mostrarAlerta('error', 'El importe de cada detalle debe ser mayor a cero.', 'movimiento-caja');
+                return;
+            }
+
+            $detalles[] = array(
+                'descripcion' => $descripcion,
+                'importe' => round($importe, 2)
+            );
+        }
+
+        if (empty($detalles)) {
+            self::mostrarAlerta('error', 'Debe registrar al menos un detalle en la edicion.', 'movimiento-caja');
+            return;
+        }
+
         $datos = array(
-            'empre_id' => $id,
-            'empre_ruc' => $ruc,
-            'empre_razon_social' => $razonSocial,
-            'empre_nombre_comercial' => $nombreComercial,
-            'empre_domicilio_legal' => $domicilioLegal,
-            'empre_numero_contacto' => $contacto,
-            'empre_email_contacto' => $email,
-            'empre_fecha_update' => $fechaActual 
+            'movi_id'       => $id,
+            'movi_fecha'    => $fecha,
+            'movi_emple_id' => $empleado
         );
 
-        // Ejecutar actualización
-        $respuesta = ModeloEmpresas::mdlEditarEmpresa( $tabla, $datos );
+        $respuesta = ModeloMovimientoCaja::mdlEditarMovimientoCaja($datos, $detalles);
 
-        // Mensaje de éxito o error
-        if ( $respuesta == 'ok' ) {
-            self::mostrarAlerta( 'success', 'Los datos de la empresa han sido actualizados correctamente', 'empresas' );
+        if ($respuesta === 'ok') {
+            self::mostrarAlerta('success', 'Movimiento actualizado correctamente.', 'movimiento-caja');
         } else {
-            self::mostrarAlerta( 'error', 'Hubo un problema al actualizar los datos', 'empresas' );
+            self::mostrarAlerta('error', 'No se pudo actualizar el movimiento.', 'movimiento-caja');
         }
     }
 
-
     /*-------------------------------------
-    ELIMINAR CENTRO DE COSTO
+    ELIMINAR MOVIMIENTO DE CAJA
     -------------------------------------*/
+    public static function ctrEliminarMovimientoCaja() {
 
-	static public function ctrEliminarEmpresa()
-	{
-		if (isset($_GET["idEmpresa"])) {
+        if (!isset($_GET['idMovimientoCaja'])) {
+            return;
+        }
 
-			$tabla = "empresas";
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            self::mostrarAlerta('error', 'No tiene permisos para eliminar movimientos.', 'movimiento-caja');
+            return;
+        }
 
-			$datos = $_GET["idEmpresa"];
+        $idMovimiento = (int) $_GET['idMovimientoCaja'];
 
-			$respuesta = ModeloEmpresas::mdlEliminarEmpresa($tabla, $datos);
+        if ($idMovimiento <= 0) {
+            self::mostrarAlerta('error', 'Identificador de movimiento invalido.', 'movimiento-caja');
+            return;
+        }
 
-			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Datos de la empresa ha sido borrado correctamente', 'empresas' );
-			}
-		}
-	}
+        $respuesta = ModeloMovimientoCaja::mdlEliminarMovimientoCaja($idMovimiento);
 
-	
-    // Método para mostrar alertas con SweetAlert
-    private static function mostrarAlerta( $tipo, $mensaje, $redireccion ) {
+        if ($respuesta === 'ok') {
+            self::mostrarAlerta('success', 'Movimiento eliminado correctamente.', 'movimiento-caja');
+        } else {
+            self::mostrarAlerta('error', 'No se pudo eliminar el movimiento.', 'movimiento-caja');
+        }
+    }
+    
+
+    private static function mostrarAlerta($tipo, $mensaje, $redireccion) {
         echo '<script>
             swal({
                 type: "' . $tipo . '",
@@ -158,7 +228,4 @@ class ControladorMovimientoCaja {
             });
         </script>';
     }
-
-
 }
-//Fin Class

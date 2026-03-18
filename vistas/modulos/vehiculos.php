@@ -238,7 +238,7 @@ MODAL AGREGAR EMPRESAS
                             </div>
                         </div>
 
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-4"> 
                             <div class="form-group">
                                 <label for="inputEstado">Estado</label> 
                                 <select class="form-control" id="inputEstado" name="inputEstado">

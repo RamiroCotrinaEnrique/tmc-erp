@@ -88,7 +88,7 @@ session_start();
     <!-- Bootstrap4 Duallistbox -->
     <script src="vistas/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
     <!-- InputMask -->
-    <script src="vistas/plugins/moment/moment.min.js"></script>
+    <script src="vistas/plugins/moment/moment-with-locales.min.js"></script>
     <script src="vistas/plugins/inputmask/jquery.inputmask.min.js"></script>
     <!-- date-range-picker -->
     <script src="vistas/plugins/daterangepicker/daterangepicker.js"></script>
@@ -109,7 +109,7 @@ session_start();
       <!-- iCheck 1.0.1 -->
     <script src="vistas/plugins/icheck/icheck.min.js"></script>
     <!-- InputMask -->
-    <script src="vistas/plugins/moment/moment.min.js"></script>
+    <script src="vistas/plugins/moment/moment-with-locales.min.js"></script>
     <script src="vistas/plugins/inputmask/jquery.inputmask.min.js"></script>
     <!-- daterangepicker http://www.daterangepicker.com/-->
     <script src="vistas/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
@@ -216,6 +216,7 @@ if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] != "ok"){
 <script src="vistas/js/areas.js"></script>
 <script src="vistas/js/cargos.js"></script>
 <script src="vistas/js/empleados.js"></script>
+<script src="vistas/js/movimiento-caja.js"></script>
 
 
 </body>

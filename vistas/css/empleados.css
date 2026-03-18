@@ -100,10 +100,10 @@
         /* ========= alertas ======== */
         /* ================================================= */
 
-        .color-fondo-personalizado {
+       /* .color-fondo-personalizado {
             background-color: #EA8420;
             color: white;
-        }
+        }*/
         .is-invalid {
             border-color: #dc3545 !important;
         }

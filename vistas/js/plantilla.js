@@ -60,41 +60,38 @@ $(document).ready(function () {
   });
 });
 
-/*var table = new DataTable('#example1', {
-  "responsive": true, "lengthChange": false, "autoWidth": false,
-  //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"], 
-  "buttons": ["Copiar", "PDF", "Imprimir", "Visibilidad"], 
-  language: {
-      url: '../vistas/plugins/datatables/es-ES.json',
-  },
-}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-*/
-/*
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,
-      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });*/
-
-
 //Initialize Select2 Elements
 
 $(".select2").select2();
 //Initialize Select2 Elements
 $(".select2bs4").select2({
   theme: "bootstrap4",
+});
+
+// Reinitialize Select2 controls inside any Bootstrap modal so search input can receive focus.
+$(document).on("shown.bs.modal", ".modal", function () {
+  var $modal = $(this);
+
+  $modal.find("select.select2").each(function () {
+    var $select = $(this);
+    if ($select.hasClass("select2-hidden-accessible")) {
+      $select.select2("destroy");
+    }
+    $select.select2({
+      dropdownParent: $modal,
+    });
+  });
+
+  $modal.find("select.select2bs4").each(function () {
+    var $select = $(this);
+    if ($select.hasClass("select2-hidden-accessible")) {
+      $select.select2("destroy");
+    }
+    $select.select2({
+      theme: "bootstrap4",
+      dropdownParent: $modal,
+    });
+  });
 });
 
 //Date picker
@@ -104,10 +101,16 @@ $("#reservationdate").datetimepicker({
 });
 
 
-//Date picker
-$("#editarFNacimiento").datetimepicker({
-  //format: 'L'
-  format: "YYYY-MM-DD",
+//Date picker - Movimiento de caja
+$("#fechaNacimienntoDatePicker").datetimepicker({
+  format: "DD/MM/YYYY",
+  locale: "es",
+});
+
+//Date picker - Movimiento de caja
+$("#fechaDatePicker").datetimepicker({
+  format: "DD/MM/YYYY",
+  locale: "es",
 });
 
 //Date and time picker
