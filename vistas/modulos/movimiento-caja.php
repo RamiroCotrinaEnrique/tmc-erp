@@ -120,6 +120,7 @@ if($_SESSION["usu_perfil"] == "Vendedor"){
                                                                 <td><?php echo htmlspecialchars($value['movi_total']); ?></td>
                                                                 <td>
                                                                     <div class="btn-group">
+                                                                        <button class="btn btn-primary btnImprimirMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>" > <i class="fa fa-print"></i> </button>  
                                                                         <button class="btn btn-warning btnEditarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>" data-toggle="modal" data-target="#modalEditarMovimientoCaja"> <i class="fa fa-pencil"></i> </button>
                                                                         <?php if ($_SESSION['usu_perfil'] == 'Administrador') { ?>
                                                                             <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>

@@ -8,11 +8,10 @@
         }
 
         #modalReporteEmpleado .modal-header {
-            background-color: #EA8420; /* Color dominante personalizado */
             color: white;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
-            border-bottom: 1px solid #C76F1A; /* Borde más oscuro del color dominante */
+            border-bottom: 1px solid #b21a1e; /* Borde oscuro alineado con color-fondo-personalizado */
             padding: 1rem 1.5rem;
         }
 
@@ -38,7 +37,7 @@
         .reporte-titulo {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #EA8420; /* Color dominante personalizado */
+            color: #e42026; /* Color dominante personalizado */
             margin-bottom: 1rem;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 0.75rem;
@@ -85,25 +84,21 @@
 
         /* Sobrescribir colores de Bootstrap para que coincidan con el color dominante */
         #modalReporteEmpleado .btn-primary {
-            background-color: #EA8420;
-            border-color: #EA8420;
+            background-color: #e42026;
+            border-color: #e42026;
         }
         #modalReporteEmpleado .btn-primary:hover {
-            background-color: #C76F1A;
-            border-color: #C76F1A;
+            background-color: #c76f1a;
+            border-color: #c76f1a;
         }
         #reporteLoader .fa-spinner {
-            color: #EA8420;
+            color: #e42026;
         }
 
         /* ================================================= */
         /* ========= alertas ======== */
         /* ================================================= */
 
-       /* .color-fondo-personalizado {
-            background-color: #EA8420;
-            color: white;
-        }*/
         .is-invalid {
             border-color: #dc3545 !important;
         }

@@ -139,10 +139,10 @@ if($_SESSION["usu_perfil"] == "Vendedor"){
 <!-- ============= 1. MODAL PARA MOSTRAR EL REPORTE (SIN CAMBIOS) ======== -->
 <!-- ===================================================================== -->
 
-<div class="modal fade" id="modalReporteEmpleado" tabindex="-1" aria-labelledby="tituloModalReporte" aria-hidden="true">
+<div class="modal fade " id="modalReporteEmpleado" tabindex="-1" aria-labelledby="tituloModalReporte" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header color-fondo-personalizado text-white">
                 <h5 class="modal-title" id="tituloModalReporte"><i class="fas fa-user-tie mr-2"></i>Reporte de Empleado</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
                     <span aria-hidden="true">&times;</span>
