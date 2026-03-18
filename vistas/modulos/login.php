@@ -1,7 +1,7 @@
 <div id="back"> </div>
 <div class="login-box">
     <div class="login-logo">
-        <img src="vistas/img/plantilla/logo-blanco-bloque.png" style="width: 50%;">
+        <img src="vistas/img/plantilla/logo.png" style="width: 50%;">
     </div>
     <!-- /.login-logo -->
     <div class="card">
