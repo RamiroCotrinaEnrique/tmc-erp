@@ -166,14 +166,14 @@ $(".tablas").on("click", ".btnEliminarEmpresa", function(){
     var idEmpresa = $(this).attr("idEmpresa");
 
     swal({
-        title: '¿Está seguro de borrar la empresa?',
-        text: "¡Si no lo está puede cancelar la acción!",
+        title: '¿Está seguro de eliminar la empresa?',
+        text: "La empresa no se borrará físicamente. Primero será enviada a la papelera.",
         type: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Si, borrar empresa!'
+        confirmButtonText: 'Sí, enviar a papelera'
     }).then(function(result){
 
         if(result.value){
@@ -185,4 +185,132 @@ $(".tablas").on("click", ".btnEliminarEmpresa", function(){
 
     })
 
-})
+});
+
+/*=============================================
+RESTAURAR EMPRESA DESDE PAPELERA
+=============================================*/
+$(document).on("click", ".btnRestaurarEmpresa", function(){
+
+    var idEmpresa = $(this).attr("idEmpresa");
+    var nombreEmpresa = $(this).attr("nombreEmpresa");
+
+    swal({
+        title: '¿Restaurar empresa?',
+        text: 'La empresa "' + nombreEmpresa + '" volverá a estar disponible en el sistema.',
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, restaurar'
+    }).then(function(result){
+
+        if(result.value){
+
+            var datos = new FormData();
+            datos.append("restaurarEmpresaId", idEmpresa);
+
+            $.ajax({
+                url: "ajax/empresas.ajax.php",
+                method: "POST",
+                data: datos,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Restaurada",
+                            text: "La empresa fue restaurada correctamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){
+                            if(r.value){ window.location = "empresas"; }
+                        });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo restaurar la empresa",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para restaurar la empresa.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
+        }
+    });
+});
+
+/*=============================================
+DEPURAR EMPRESA - ELIMINACION FISICA
+=============================================*/
+$(document).on("click", ".btnDepurarEmpresa", function(){
+
+    var idEmpresa = $(this).attr("idEmpresa");
+    var nombreEmpresa = $(this).attr("nombreEmpresa");
+
+    swal({
+        title: 'ELIMINACIÓN DEFINITIVA',
+        html: '<strong>' + nombreEmpresa + '</strong> será eliminada <strong>permanentemente</strong> de la base de datos.<br><br>Esta acción no se puede deshacer.',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar para siempre'
+    }).then(function(result){
+
+        if(result.value){
+
+            var datos = new FormData();
+            datos.append("depurarEmpresaId", idEmpresa);
+
+            $.ajax({
+                url: "ajax/empresas.ajax.php",
+                method: "POST",
+                data: datos,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Eliminada",
+                            text: "La empresa fue eliminada definitivamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){
+                            if(r.value){ window.location = "empresas"; }
+                        });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo eliminar la empresa",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para eliminar la empresa.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
+        }
+    });
+});

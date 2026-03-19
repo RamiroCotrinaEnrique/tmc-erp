@@ -86,11 +86,8 @@
                                                 <td>
                                                 <div class="btn-group">  
                                                     <button class="btn btn-primary btnImprimirOpt" codigoOpt="'.$value["opt_id"].'" > <i class="fa fa-print"></i> </button>                        
-                                                    <button class="btn btn-warning btnEditarOpt" idOpt="'.$value["opt_id"].'" data-toggle="modal" data-target="#modalEditarOpt"> <i class="fa fa-pencil"></i> </button>';
-                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
-                                                    <button class="btn btn-danger btnEliminarOpt" idOpt="'.$value["opt_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>';
-                                            }
+                                                    <button class="btn btn-warning btnEditarOpt" idOpt="'.$value["opt_id"].'" data-toggle="modal" data-target="#modalEditarOpt"> <i class="fa fa-pencil"></i> </button>
+                                                    <button class="btn btn-danger btnEliminarOpt" idOpt="'.$value["opt_id"].'" nombreOpt="'.htmlspecialchars($value["opt_cliente"], ENT_QUOTES).'"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>';
                                                 echo'
                                                 </div>  
                                                 </td>
@@ -121,6 +118,86 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-danger card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de OPT</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaPapeleraOpt" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr style="text-align: center">
+                                        <th style="width:10px">#</th>
+                                        <th>Operacion</th>
+                                        <th>Placa</th>
+                                        <th>Cliente</th>
+                                        <th>Lugar</th>
+                                        <th>Fecha</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $optsEliminados = ControladorOpts::ctrMostrarOptsEliminados();
+                                    if($optsEliminados && count($optsEliminados) > 0){
+                                        foreach($optsEliminados as $key => $value){
+                                            $itemCentroCosto = "cenco_codigo";
+                                            $valorCentroCosto = $value["opt_cenco_codigo"];
+                                            $centro = ControladorCentroCostos::ctrMostrarCentroCostos($itemCentroCosto, $valorCentroCosto);
+
+                                            $itemVehiculo = "vehic_id";
+                                            $valorVehiculo = $value["opt_vehiculo_id"];
+                                            $vehiculo = ControladorVehiculos::ctrMostrarVehiculos($itemVehiculo, $valorVehiculo);
+
+                                            $textoOperacion = ($centro && isset($centro["cenco_codigo"])) ? ($centro["cenco_codigo"].' - '.$centro["cenco_nombre"]) : $value["opt_cenco_codigo"];
+                                            $textoPlaca = ($vehiculo && isset($vehiculo["vehic_placa"])) ? $vehiculo["vehic_placa"] : '-';
+
+                                            echo '<tr style="text-align: center">';
+                                            echo '<td>'.($key+1).'</td>';
+                                            echo '<td>'.$textoOperacion.'</td>';
+                                            echo '<td>'.$textoPlaca.'</td>';
+                                            echo '<td>'.$value["opt_cliente"].'</td>';
+                                            echo '<td>'.$value["opt_lugar"].'</td>';
+                                            echo '<td>'.$value["opt_fecha"].'</td>';
+                                            echo '<td>'.$value["opt_fecha_delete"].'</td>';
+                                            echo '<td><button class="btn btn-success btn-xs btnRestaurarOpt" idOpt="'.$value["opt_id"].'" nombreOpt="'.htmlspecialchars($value["opt_cliente"], ENT_QUOTES).'"><i class="fa fa-undo"></i> Restaurar</button></td>';
+                                            echo '<td><button class="btn btn-danger btn-xs btnDepurarOpt" idOpt="'.$value["opt_id"].'" nombreOpt="'.htmlspecialchars($value["opt_cliente"], ENT_QUOTES).'"><i class="fa fa-times"></i> Depurar</button></td>';
+                                            echo '</tr>';
+                                        }
+                                    }else{
+                                        echo '<tr><td colspan="9" class="text-center text-muted">No hay registros OPT en la papelera</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="text-align: center">
+                                        <th style="width:10px">#</th>
+                                        <th>Operacion</th>
+                                        <th>Placa</th>
+                                        <th>Cliente</th>
+                                        <th>Lugar</th>
+                                        <th>Fecha</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

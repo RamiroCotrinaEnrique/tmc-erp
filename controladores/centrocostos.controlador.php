@@ -111,15 +111,95 @@ class ControladorCentroCostos {
 
 			$tabla = "centro_costo";
 
-			$datos = $_GET["idCentroCosto"];
+            $datos = (int) $_GET["idCentroCosto"];
 
 			$respuesta = ModeloCentroCostos::mdlEliminarCentroCosto($tabla, $datos);
 
 			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Datos del centro de costo han sido borrado correctamente', 'centro-costo' );
+                self::mostrarAlerta( 'success', 'El centro de costo fue enviado a la papelera correctamente.', 'centro-costo' );
+            } else {
+                self::mostrarAlerta( 'error', 'No se pudo eliminar el centro de costo o ya estaba eliminado.', 'centro-costo' );
 			}
 		}
 	}
+
+    /*-------------------------------------
+    MOSTRAR CENTROS DE COSTO ELIMINADOS
+    -------------------------------------*/
+
+    static public function ctrMostrarCentroCostosEliminados() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'centro_costo';
+        $respuesta = ModeloCentroCostos::mdlMostrarCentroCostosEliminados( $tabla );
+        return $respuesta;
+    }
+
+    /*-------------------------------------
+    RESTAURAR CENTRO DE COSTO
+    -------------------------------------*/
+
+    static public function ctrRestaurarCentroCosto($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden restaurar centros de costo.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de centro de costo inválido.'
+            );
+        }
+
+        $respuesta = ModeloCentroCostos::mdlRestaurarCentroCosto('centro_costo', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo restaurar el centro de costo o ya estaba activo.'
+        );
+    }
+
+    /*-------------------------------------
+    DEPURAR CENTRO DE COSTO
+    -------------------------------------*/
+
+    static public function ctrDepurarCentroCosto($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden eliminar centros de costo definitivamente.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de centro de costo inválido.'
+            );
+        }
+
+        $respuesta = ModeloCentroCostos::mdlDepurarCentroCosto('centro_costo', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo eliminar definitivamente el centro de costo.'
+        );
+    }
 
 	
     // Método para mostrar alertas con SweetAlert

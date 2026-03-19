@@ -53,11 +53,8 @@
                                                 <td>'.$value["are_nombre"].'</td>                                                
                                                 <td>
                                                 <div class="btn-group">                          
-                                                    <button class="btn btn-warning btnEditarArea" idArea="'.$value["are_id"].'" data-toggle="modal" data-target="#modalEditarArea"> <i class="fa fa-pencil"></i>  </button>';
-                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
+                                                    <button class="btn btn-warning btnEditarArea" idArea="'.$value["are_id"].'" data-toggle="modal" data-target="#modalEditarArea"> <i class="fa fa-pencil"></i>  </button>
                                                     <button class="btn btn-danger btnEliminarArea" idArea="'.$value["are_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>   </button>';
-                                            }
                                                 echo'
                                                 </div>  
                                                 </td>
@@ -82,6 +79,82 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-danger card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de Áreas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaPapeleraAreas" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Área</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                        <th>Depurar</th>
+                                        <?php } ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $areasEliminadas = ControladorAreas::ctrMostrarAreasEliminadas();
+                                    if($areasEliminadas && count($areasEliminadas) > 0){
+                                        foreach($areasEliminadas as $key => $value){
+                                            echo '<tr>';
+                                            echo '<td>'.($key+1).'</td>';
+                                            echo '<td>'.$value["are_nombre"].'</td>';
+                                            echo '<td>'.$value["are_fecha_delete"].'</td>';
+                                            echo '<td>
+                                                <button class="btn btn-success btn-xs btnRestaurarArea"
+                                                    idArea="'.$value["are_id"].'"
+                                                    nombreArea="'.htmlspecialchars($value["are_nombre"], ENT_QUOTES).'">
+                                                    <i class="fa fa-undo"></i> Restaurar
+                                                </button>
+                                            </td>';
+                                            if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){
+                                                echo '<td>
+                                                    <button class="btn btn-danger btn-xs btnDepurarArea"
+                                                        idArea="'.$value["are_id"].'"
+                                                        nombreArea="'.htmlspecialchars($value["are_nombre"], ENT_QUOTES).'">
+                                                        <i class="fa fa-times"></i> Depurar
+                                                    </button>
+                                                </td>';
+                                            }
+                                            echo '</tr>';
+                                        }
+                                    }else{
+                                        $colspanPapelera = (isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador') ? 5 : 4;
+                                        echo '<tr><td colspan="'.$colspanPapelera.'" class="text-center text-muted">No hay áreas en la papelera</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Área</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                        <th>Depurar</th>
+                                        <?php } ?>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

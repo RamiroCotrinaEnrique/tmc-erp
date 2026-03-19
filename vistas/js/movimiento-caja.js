@@ -339,16 +339,124 @@ $(document).ready(function () {
 
     swal({
       title: "Esta seguro de eliminar el movimiento?",
-      text: "Esta accion eliminara cabecera, detalle y ajustara el correlativo de la serie.",
+      text: "Esta accion enviara el movimiento a la papelera (eliminacion logica).",
       type: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       cancelButtonText: "Cancelar",
-      confirmButtonText: "Si, eliminar"
+      confirmButtonText: "Si, enviar a papelera"
     }).then(function (result) {
       if (result.value) {
         window.location = "index.php?ruta=movimiento-caja&idMovimientoCaja=" + idMovimientoCaja;
+      }
+    });
+  });
+
+  $(document).on("click", ".btnRestaurarMovimientoCaja", function () {
+    var idMovimientoCaja = $(this).attr("idMovimientoCaja");
+    var nombreMovimiento = $(this).attr("nombreMovimiento");
+
+    swal({
+      title: "Restaurar movimiento?",
+      text: 'El movimiento "' + nombreMovimiento + '" volvera al listado principal.',
+      type: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#6c757d",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Si, restaurar"
+    }).then(function (result) {
+      if (result.value) {
+        $.ajax({
+          url: "ajax/movimientocaja.ajax.php",
+          method: "POST",
+          data: { restaurarMovimientoCajaId: idMovimientoCaja },
+          dataType: "json",
+          success: function (respuesta) {
+            if (respuesta && respuesta.status === "ok") {
+              swal({
+                title: "Restaurado",
+                text: "El movimiento fue restaurado correctamente.",
+                type: "success",
+                confirmButtonText: "Cerrar"
+              }).then(function (r) {
+                if (r.value) {
+                  window.location = "movimiento-caja";
+                }
+              });
+            } else {
+              swal({
+                title: "Error",
+                text: respuesta && respuesta.message ? respuesta.message : "No se pudo restaurar el movimiento",
+                type: "error",
+                confirmButtonText: "Cerrar"
+              });
+            }
+          },
+          error: function () {
+            swal({
+              title: "Error",
+              text: "No se pudo conectar para restaurar el movimiento.",
+              type: "error",
+              confirmButtonText: "Cerrar"
+            });
+          }
+        });
+      }
+    });
+  });
+
+  $(document).on("click", ".btnDepurarMovimientoCaja", function () {
+    var idMovimientoCaja = $(this).attr("idMovimientoCaja");
+    var nombreMovimiento = $(this).attr("nombreMovimiento");
+
+    swal({
+      title: "ELIMINACION DEFINITIVA",
+      html: '<strong>' + nombreMovimiento + '</strong> sera eliminado permanentemente de la base de datos.<br><br>Esta accion no se puede deshacer.',
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Si, eliminar para siempre"
+    }).then(function (result) {
+      if (result.value) {
+        $.ajax({
+          url: "ajax/movimientocaja.ajax.php",
+          method: "POST",
+          data: { depurarMovimientoCajaId: idMovimientoCaja },
+          dataType: "json",
+          success: function (respuesta) {
+            if (respuesta && respuesta.status === "ok") {
+              swal({
+                title: "Eliminado",
+                text: "El movimiento fue eliminado definitivamente.",
+                type: "success",
+                confirmButtonText: "Cerrar"
+              }).then(function (r) {
+                if (r.value) {
+                  window.location = "movimiento-caja";
+                }
+              });
+            } else {
+              swal({
+                title: "Error",
+                text: respuesta && respuesta.message ? respuesta.message : "No se pudo eliminar el movimiento",
+                type: "error",
+                confirmButtonText: "Cerrar"
+              });
+            }
+          },
+          error: function () {
+            swal({
+              title: "Error",
+              text: "No se pudo conectar para eliminar el movimiento.",
+              type: "error",
+              confirmButtonText: "Cerrar"
+            });
+          }
+        });
       }
     });
   });

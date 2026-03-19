@@ -83,12 +83,9 @@
                                                         <i class="fas fa-file-alt btn-reporte"></i>
                                                     </button>  
                                                     <!-- BOTÓN PARA EDITAR -->                       
-                                                    <button class="btn btn-warning btnEditarEmpleado" idEmpleado="'.$value["emple_id"].'" data-toggle="modal" data-target="#modalEditarEmpleado"> <i class="fa fa-pencil"></i>  </button>';
-                                                    if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
+                                                    <button class="btn btn-warning btnEditarEmpleado" idEmpleado="'.$value["emple_id"].'" data-toggle="modal" data-target="#modalEditarEmpleado"> <i class="fa fa-pencil"></i>  </button>
                                                     <!-- BOTÓN PARA ELIMINAR -->
                                                     <button class="btn btn-danger btnEliminarEmpleado" idEmpleado="'.$value["emple_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>   </button>';
-                                                    }
                                                 echo'
                                                 </div>  
                                                 </td>
@@ -123,6 +120,91 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+            <div class="row mt-3">
+              <div class="col-lg-12">
+                <div class="card card-danger card-outline collapsed-card">
+                  <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de Empleados</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <table id="tablaPapeleraEmpleados" class="table table-bordered table-striped tablas">
+                      <thead class="text-center">
+                        <tr>
+                          <th style="width:10px">#</th>
+                          <th>Código</th>
+                          <th>Documento</th>
+                          <th>Apellidos y Nombres</th>
+                          <th>Centro Costo</th>
+                          <th>Cargo</th>
+                          <th>Área</th>
+                          <th>Fecha eliminación</th>
+                          <th>Restaurar</th>
+                          <th>Depurar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php
+                        $empleadosEliminados = ControladorEmpleados::ctrMostrarEmpleadosEliminados();
+                        if($empleadosEliminados && count($empleadosEliminados) > 0){
+                          foreach($empleadosEliminados as $key => $value){
+                            $nombreCompleto = trim($value["emple_apellido_paterno"].' '.$value["emple_apellido_materno"].' '.$value["emple_nombres"]);
+                            echo '<tr class="text-center">';
+                            echo '<td>'.($key+1).'</td>';
+                            echo '<td>'.$value["emple_codigo"].'</td>';
+                            echo '<td>'.$value["emple_numero_documento"].'</td>';
+                            echo '<td>'.$nombreCompleto.'</td>';
+                            echo '<td>'.$value["cenco_codigo"].' - '.$value["cenco_nombre"].'</td>';
+                            echo '<td>'.$value["car_nombre"].'</td>';
+                            echo '<td>'.$value["are_nombre"].'</td>';
+                            echo '<td>'.$value["emple_fecha_delete"].'</td>';
+                            echo '<td>
+                              <button class="btn btn-success btn-xs btnRestaurarEmpleado"
+                                idEmpleado="'.$value["emple_id"].'"
+                                nombreEmpleado="'.htmlspecialchars($nombreCompleto, ENT_QUOTES).'">
+                                <i class="fa fa-undo"></i> Restaurar
+                              </button>
+                            </td>';
+                            echo '<td>
+                              <button class="btn btn-danger btn-xs btnDepurarEmpleado"
+                                idEmpleado="'.$value["emple_id"].'"
+                                nombreEmpleado="'.htmlspecialchars($nombreCompleto, ENT_QUOTES).'">
+                                <i class="fa fa-times"></i> Depurar
+                              </button>
+                            </td>';
+                            echo '</tr>';
+                          }
+                        }else{
+                          echo '<tr><td colspan="10" class="text-center text-muted">No hay empleados en la papelera</td></tr>';
+                        }
+                        ?>
+                      </tbody>
+                      <tfoot class="text-center">
+                        <tr>
+                          <th style="width:10px">#</th>
+                          <th>Código</th>
+                          <th>Documento</th>
+                          <th>Apellidos y Nombres</th>
+                          <th>Centro Costo</th>
+                          <th>Cargo</th>
+                          <th>Área</th>
+                          <th>Fecha eliminación</th>
+                          <th>Restaurar</th>
+                          <th>Depurar</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php } ?>
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

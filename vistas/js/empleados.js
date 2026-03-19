@@ -608,14 +608,14 @@ $(".tablas").on("click", ".btnEliminarEmpleado", function(){
     var idEmpleado = $(this).attr("idEmpleado");
 
     swal({
-        title: '¿Está seguro de borrar los datos?',
-        text: "¡Si no lo está puede cancelar la acción!",
+        title: '¿Está seguro de eliminar el empleado?',
+        text: "El registro no se borrará físicamente. Primero será enviado a la papelera.",
         type: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Si, borrar!'
+        confirmButtonText: 'Sí, enviar a papelera'
     }).then(function(result){
 
         if(result.value){
@@ -657,6 +657,122 @@ $(".tablas").on("click", ".btnEliminarEmpleado", function(){
                 });
             }
         });
+        }
+    });
+});
+
+/*=============================================
+RESTAURAR EMPLEADO DESDE PAPELERA
+=============================================*/
+$(document).on("click", ".btnRestaurarEmpleado", function(){
+
+    var idEmpleado = $(this).attr("idEmpleado");
+    var nombreEmpleado = $(this).attr("nombreEmpleado");
+
+    swal({
+        title: '¿Restaurar empleado?',
+        text: 'El empleado "' + nombreEmpleado + '" volverá al listado principal.',
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, restaurar'
+    }).then(function(result){
+
+        if(result.value){
+
+            $.ajax({
+                url: "ajax/empleados.ajax.php",
+                method: "POST",
+                data: { restaurarEmpleadoId: idEmpleado },
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Restaurado",
+                            text: "El empleado fue restaurado correctamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){
+                            if(r.value){ window.location = "empleados"; }
+                        });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo restaurar el empleado",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para restaurar el empleado.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
+        }
+    });
+});
+
+/*=============================================
+DEPURAR EMPLEADO - ELIMINACION FISICA
+=============================================*/
+$(document).on("click", ".btnDepurarEmpleado", function(){
+
+    var idEmpleado = $(this).attr("idEmpleado");
+    var nombreEmpleado = $(this).attr("nombreEmpleado");
+
+    swal({
+        title: 'ELIMINACIÓN DEFINITIVA',
+        html: '<strong>' + nombreEmpleado + '</strong> será eliminado permanentemente de la base de datos.<br><br>Esta acción no se puede deshacer.',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar para siempre'
+    }).then(function(result){
+
+        if(result.value){
+
+            $.ajax({
+                url: "ajax/empleados.ajax.php",
+                method: "POST",
+                data: { depurarEmpleadoId: idEmpleado },
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Eliminado",
+                            text: "El empleado fue eliminado definitivamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){
+                            if(r.value){ window.location = "empleados"; }
+                        });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo eliminar el empleado",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para eliminar el empleado.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
         }
     });
 });

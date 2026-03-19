@@ -11,12 +11,12 @@ class ModeloOpts{
 
     static public function mdlMostrarOpts($tabla, $item, $valor){
 		if($item != null){
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND opt_fecha_delete IS NULL");
 			$stmt -> bindParam(":".$item, $valor, PDO::PARAM_STR );
 			$stmt -> execute();
 			return $stmt -> fetch();
 		}else{
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE opt_fecha_delete IS NULL");
 			$stmt -> execute();
 			return $stmt -> fetchAll();
 		}
@@ -836,14 +836,45 @@ class ModeloOpts{
 	=============================================*/
 
 	static public function mdlEliminarOpt($tabla, $datos){
-		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE opt_id = :opt_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET opt_fecha_delete = NOW() WHERE opt_id = :opt_id AND opt_fecha_delete IS NULL");
 		$stmt -> bindParam(":opt_id", $datos, PDO::PARAM_INT);
-		if($stmt -> execute()){
+		if($stmt -> execute() && $stmt->rowCount() > 0){
 			return "ok";		
 		}else{
 			return "error";	
 		}
 		$stmt -> close();
 		$stmt = null;
+	}
+
+	static public function mdlMostrarOptsEliminados($tabla){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE opt_fecha_delete IS NOT NULL ORDER BY opt_fecha_delete DESC");
+		$stmt -> execute();
+		return $stmt -> fetchAll();
+	}
+
+	static public function mdlRestaurarOpt($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET opt_fecha_delete = NULL WHERE opt_id = :opt_id AND opt_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":opt_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
+	}
+
+	static public function mdlObtenerOptPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE opt_id = :opt_id LIMIT 1");
+		$stmt->bindParam(":opt_id", $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch();
+	}
+
+	static public function mdlDepurarOpt($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE opt_id = :opt_id AND opt_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":opt_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
 	}
 }// Fin Class

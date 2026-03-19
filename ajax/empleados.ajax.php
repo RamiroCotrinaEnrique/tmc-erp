@@ -1,7 +1,9 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+session_start();
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
 require_once "../controladores/empleados.controlador.php";
 require_once "../modelos/empleados.modelo.php";
@@ -36,6 +38,20 @@ class AjaxEmpleados{
 		echo json_encode($respuesta); 
 	}
 
+    public $restaurarEmpleadoId;
+
+    public function ajaxRestaurarEmpleado(){
+        $respuesta = ControladorEmpleados::ctrRestaurarEmpleado($this->restaurarEmpleadoId);
+        echo json_encode($respuesta);
+    }
+
+    public $depurarEmpleadoId;
+
+    public function ajaxDepurarEmpleado(){
+        $respuesta = ControladorEmpleados::ctrDepurarEmpleado($this->depurarEmpleadoId);
+        echo json_encode($respuesta);
+    }
+
 }
 
     /*-------------------------------------
@@ -63,6 +79,26 @@ ELIMINAR EMPLEADO (POST AJAX)
 if(isset($_POST["idEmpleadoEliminar"])){
     // ctrEliminarEmpleado manejará tanto POST como GET y sabrá devolver JSON
     ControladorEmpleados::ctrEliminarEmpleado();
+    exit;
+}
+
+/*-------------------------------------
+RESTAURAR EMPLEADO (POST AJAX)
+-------------------------------------*/
+if(isset($_POST["restaurarEmpleadoId"])){
+    $ajax = new AjaxEmpleados();
+    $ajax->restaurarEmpleadoId = $_POST["restaurarEmpleadoId"];
+    $ajax->ajaxRestaurarEmpleado();
+    exit;
+}
+
+/*-------------------------------------
+DEPURAR EMPLEADO (POST AJAX)
+-------------------------------------*/
+if(isset($_POST["depurarEmpleadoId"])){
+    $ajax = new AjaxEmpleados();
+    $ajax->depurarEmpleadoId = $_POST["depurarEmpleadoId"];
+    $ajax->ajaxDepurarEmpleado();
     exit;
 }
 

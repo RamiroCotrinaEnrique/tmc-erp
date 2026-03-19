@@ -9,12 +9,12 @@ class ModeloMovimientoCaja {
     -------------------------------------*/
     static public function mdlMostrarMovimientoCaja($tabla, $item, $valor) {
         if ($item != null) {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND movi_fecha_delete IS NULL");
             $stmt->bindParam(':' . $item, $valor, PDO::PARAM_STR);
             $stmt->execute();
             $respuesta = $stmt->fetch();
         } else {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla ORDER BY movi_id DESC");
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE movi_fecha_delete IS NULL ORDER BY movi_id DESC");
             $stmt->execute();
             $respuesta = $stmt->fetchAll();
         }
@@ -269,17 +269,77 @@ class ModeloMovimientoCaja {
     }
 
     /*-------------------------------------
-    ELIMINAR MOVIMIENTO + DEPURAR DETALLE + AJUSTAR SERIE
+    ELIMINAR MOVIMIENTO (BORRADO LOGICO)
     -------------------------------------*/
     static public function mdlEliminarMovimientoCaja($idMovimiento) {
+        $stmt = Conexion::conectar()->prepare(
+            'UPDATE movimientos
+             SET movi_fecha_delete = NOW()
+             WHERE movi_id = :id
+               AND movi_fecha_delete IS NULL'
+        );
+        $stmt->bindParam(':id', $idMovimiento, PDO::PARAM_INT);
+
+        if($stmt->execute() && $stmt->rowCount() > 0){
+            return 'ok';
+        }
+
+        return 'error';
+    }
+
+    /*-------------------------------------
+    LISTAR MOVIMIENTOS ELIMINADOS
+    -------------------------------------*/
+    static public function mdlMostrarMovimientoCajaEliminados() {
+        $stmt = Conexion::conectar()->prepare(
+            'SELECT *
+             FROM movimientos
+             WHERE movi_fecha_delete IS NOT NULL
+             ORDER BY movi_fecha_delete DESC'
+        );
+
+        $stmt->execute();
+        $respuesta = $stmt->fetchAll();
+        $stmt = null;
+
+        return $respuesta;
+    }
+
+    /*-------------------------------------
+    RESTAURAR MOVIMIENTO
+    -------------------------------------*/
+    static public function mdlRestaurarMovimientoCaja($idMovimiento) {
+        $stmt = Conexion::conectar()->prepare(
+            'UPDATE movimientos
+             SET movi_fecha_delete = NULL
+             WHERE movi_id = :id
+               AND movi_fecha_delete IS NOT NULL'
+        );
+        $stmt->bindParam(':id', $idMovimiento, PDO::PARAM_INT);
+
+        if($stmt->execute() && $stmt->rowCount() > 0){
+            return 'ok';
+        }
+
+        return 'error';
+    }
+
+    /*-------------------------------------
+    DEPURAR MOVIMIENTO (ELIMINACION FISICA)
+    -------------------------------------*/
+    static public function mdlDepurarMovimientoCaja($idMovimiento) {
         $cn = Conexion::conectar();
 
         try {
             $cn->beginTransaction();
 
-            // Verificar que el movimiento exista antes de borrar
             $stmtMov = $cn->prepare(
-                'SELECT movi_id FROM movimientos WHERE movi_id = :id LIMIT 1 FOR UPDATE'
+                'SELECT movi_id
+                 FROM movimientos
+                 WHERE movi_id = :id
+                   AND movi_fecha_delete IS NOT NULL
+                 LIMIT 1
+                 FOR UPDATE'
             );
             $stmtMov->bindParam(':id', $idMovimiento, PDO::PARAM_INT);
             $stmtMov->execute();
@@ -293,13 +353,9 @@ class ModeloMovimientoCaja {
             $stmtDelDet->bindParam(':movimiento_id', $idMovimiento, PDO::PARAM_INT);
             $stmtDelDet->execute();
 
-            $stmtDelMov = $cn->prepare('DELETE FROM movimientos WHERE movi_id = :id');
+            $stmtDelMov = $cn->prepare('DELETE FROM movimientos WHERE movi_id = :id AND movi_fecha_delete IS NOT NULL');
             $stmtDelMov->bindParam(':id', $idMovimiento, PDO::PARAM_INT);
             $stmtDelMov->execute();
-
-            // NOTA: config_series NO se decrementa al eliminar.
-            // Un número emitido no se reutiliza. Puede quedar un gap en la
-            // secuencia, lo cual es contablemente aceptable.
 
             $cn->commit();
             return 'ok';

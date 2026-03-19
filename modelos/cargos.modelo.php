@@ -11,12 +11,12 @@ class ModeloCargos{
 
     static public function mdlMostrarCargos($tabla, $item, $valor){
 		if($item != null){
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND car_fecha_delete IS NULL");
 			$stmt -> bindParam(":".$item, $valor, PDO::PARAM_STR );
 			$stmt -> execute();
 			return $stmt -> fetch();
 		}else{
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE car_fecha_delete IS NULL ORDER BY car_id DESC");
 			$stmt -> execute();
 			return $stmt -> fetchAll();
 		}
@@ -69,14 +69,50 @@ class ModeloCargos{
 	=============================================*/
 
 	static public function mdlEliminarCargo($tabla, $datos){
-		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE car_id = :car_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET car_fecha_delete = NOW() WHERE car_id = :car_id AND car_fecha_delete IS NULL");
 		$stmt -> bindParam(":car_id", $datos, PDO::PARAM_INT);
-		if($stmt -> execute()){
+		if($stmt -> execute() && $stmt->rowCount() > 0){
 			return "ok";		
 		}else{
 			return "error";	
 		}
 		$stmt -> close();
 		$stmt = null;
+	}
+
+	/*=============================================
+	MOSTRAR CARGOS ELIMINADOS (PAPELERA)
+	=============================================*/
+
+	static public function mdlMostrarCargosEliminados($tabla){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE car_fecha_delete IS NOT NULL ORDER BY car_fecha_delete DESC");
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	/*=============================================
+	RESTAURAR CARGO (REVERTIR BORRADO LÓGICO)
+	=============================================*/
+
+	static public function mdlRestaurarCargo($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET car_fecha_delete = NULL WHERE car_id = :car_id AND car_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":car_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
+	}
+
+	/*=============================================
+	DEPURAR CARGO - ELIMINACION FISICA
+	=============================================*/
+
+	static public function mdlDepurarCargo($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE car_id = :car_id AND car_fecha_delete IS NOT NULL");
+		$stmt->bindParam(':car_id', $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return 'ok';
+		}
+		return 'error';
 	}
 }// Fin Class

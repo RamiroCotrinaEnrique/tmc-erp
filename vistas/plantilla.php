@@ -8,7 +8,7 @@ require_once __DIR__ . '/../config/accesos.php';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> Sistema ERP | Reparto </title>
+    <title> Sistema ERP | TMC </title>
     <link rel="icon" href="vistas/img/plantilla/icono-blanco.png">
 
     <!-- REQUIRED CSS -->

@@ -24,6 +24,14 @@ class ControladorMovimientoCaja {
         return ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($movimientoId);
     }
 
+    static public function ctrMostrarMovimientoCajaEliminados() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloMovimientoCaja::mdlMostrarMovimientoCajaEliminados();
+    }
+
     /*-------------------------------------
     CREAR MOVIMIENTO DE CAJA + DETALLE
     -------------------------------------*/
@@ -192,11 +200,6 @@ class ControladorMovimientoCaja {
             return;
         }
 
-        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
-            self::mostrarAlerta('error', 'No tiene permisos para eliminar movimientos.', 'movimiento-caja');
-            return;
-        }
-
         $idMovimiento = (int) $_GET['idMovimientoCaja'];
 
         if ($idMovimiento <= 0) {
@@ -207,10 +210,46 @@ class ControladorMovimientoCaja {
         $respuesta = ModeloMovimientoCaja::mdlEliminarMovimientoCaja($idMovimiento);
 
         if ($respuesta === 'ok') {
-            self::mostrarAlerta('success', 'Movimiento eliminado correctamente.', 'movimiento-caja');
+            self::mostrarAlerta('success', 'Movimiento enviado a papelera correctamente.', 'movimiento-caja');
         } else {
-            self::mostrarAlerta('error', 'No se pudo eliminar el movimiento.', 'movimiento-caja');
+            self::mostrarAlerta('error', 'No se pudo eliminar el movimiento o ya estaba eliminado.', 'movimiento-caja');
         }
+    }
+
+    public static function ctrRestaurarMovimientoCaja($idMovimiento) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden restaurar movimientos.');
+        }
+
+        $idMovimiento = (int) $idMovimiento;
+        if ($idMovimiento <= 0) {
+            return array('status' => 'error', 'message' => 'Identificador de movimiento invalido.');
+        }
+
+        $respuesta = ModeloMovimientoCaja::mdlRestaurarMovimientoCaja($idMovimiento);
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array('status' => 'error', 'message' => 'No se pudo restaurar el movimiento o ya estaba activo.');
+    }
+
+    public static function ctrDepurarMovimientoCaja($idMovimiento) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden eliminar movimientos definitivamente.');
+        }
+
+        $idMovimiento = (int) $idMovimiento;
+        if ($idMovimiento <= 0) {
+            return array('status' => 'error', 'message' => 'Identificador de movimiento invalido.');
+        }
+
+        $respuesta = ModeloMovimientoCaja::mdlDepurarMovimientoCaja($idMovimiento);
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array('status' => 'error', 'message' => 'No se pudo eliminar definitivamente el movimiento.');
     }
     
 

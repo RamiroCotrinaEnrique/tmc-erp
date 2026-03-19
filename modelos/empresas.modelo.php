@@ -11,12 +11,12 @@ class ModeloEmpresas{
 
     static public function mdlMostrarEmpresas($tabla, $item, $valor){
 		if($item != null){
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND empre_fecha_delete IS NULL");
 			$stmt -> bindParam(":".$item, $valor, PDO::PARAM_STR );
 			$stmt -> execute();
 			return $stmt -> fetch();
 		}else{
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE empre_fecha_delete IS NULL ORDER BY empre_id DESC");
 			$stmt -> execute();
 			return $stmt -> fetchAll();
 		}
@@ -81,14 +81,50 @@ class ModeloEmpresas{
 	=============================================*/
 
 	static public function mdlEliminarEmpresa($tabla, $datos){
-		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE empre_id = :empre_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET empre_fecha_delete = NOW() WHERE empre_id = :empre_id AND empre_fecha_delete IS NULL");
 		$stmt -> bindParam(":empre_id", $datos, PDO::PARAM_INT);
-		if($stmt -> execute()){
+		if($stmt -> execute() && $stmt->rowCount() > 0){
 			return "ok";		
 		}else{
 			return "error";	
 		}
 		$stmt -> close();
 		$stmt = null;
+	}
+
+	/*=============================================
+	MOSTRAR EMPRESAS ELIMINADAS (PAPELERA)
+	=============================================*/
+
+	static public function mdlMostrarEmpresasEliminadas($tabla){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE empre_fecha_delete IS NOT NULL ORDER BY empre_fecha_delete DESC");
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	/*=============================================
+	RESTAURAR EMPRESA (REVERTIR BORRADO LÓGICO)
+	=============================================*/
+
+	static public function mdlRestaurarEmpresa($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET empre_fecha_delete = NULL WHERE empre_id = :empre_id AND empre_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":empre_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
+	}
+
+	/*=============================================
+	DEPURAR EMPRESA - ELIMINACION FISICA
+	=============================================*/
+
+	static public function mdlDepurarEmpresa($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE empre_id = :empre_id AND empre_fecha_delete IS NOT NULL");
+		$stmt->bindParam(':empre_id', $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return 'ok';
+		}
+		return 'error';
 	}
 }// Fin Class

@@ -95,15 +95,95 @@ class ControladorAreas {
 
 			$tabla = "areas";
 
-			$datos = $_GET["idArea"];
+            $datos = (int) $_GET["idArea"];
 
 			$respuesta = ModeloAreas::mdlEliminarArea($tabla, $datos);
 
 			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Datos eliminados correctamente', 'areas' );
+                self::mostrarAlerta( 'success', 'El área fue enviada a la papelera correctamente.', 'areas' );
+            } else {
+                self::mostrarAlerta( 'error', 'No se pudo eliminar el área o ya estaba eliminada.', 'areas' );
 			}
 		}
 	}
+
+    /*-------------------------------------
+    MOSTRAR AREAS ELIMINADAS
+    -------------------------------------*/
+
+    static public function ctrMostrarAreasEliminadas() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'areas';
+        $respuesta = ModeloAreas::mdlMostrarAreasEliminadas( $tabla );
+        return $respuesta;
+    }
+
+    /*-------------------------------------
+    RESTAURAR AREA
+    -------------------------------------*/
+
+    static public function ctrRestaurarArea($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden restaurar áreas.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de área inválido.'
+            );
+        }
+
+        $respuesta = ModeloAreas::mdlRestaurarArea('areas', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo restaurar el área o ya estaba activa.'
+        );
+    }
+
+    /*-------------------------------------
+    DEPURAR AREA
+    -------------------------------------*/
+
+    static public function ctrDepurarArea($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden eliminar áreas definitivamente.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de área inválido.'
+            );
+        }
+
+        $respuesta = ModeloAreas::mdlDepurarArea('areas', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo eliminar definitivamente el área.'
+        );
+    }
 
 	
     // Método para mostrar alertas con SweetAlert

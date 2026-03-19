@@ -394,33 +394,128 @@ ELIMINAR OPT
 =============================================*/ 
 $(document).on("click", ".btnEliminarOpt", function () {
 	var idOpt = $(this).attr("idOpt");
-	var foto1 = $(this).attr("foto1");
-	var foto2 = $(this).attr("foto2");
-	var nombreCarpeta1 = $(this).attr("nombreCarpeta1");
-	var nombreCarpeta2 = $(this).attr("nombreCarpeta2");
+	var nombreOpt = $(this).attr("nombreOpt");
 
 	swal({
-		title: "¿Está seguro de borrar la OPT?",
-		text: "¡Si no lo está puede cancelar la accíón!",
+		title: "Esta seguro de eliminar la OPT?",
+		text: "Esta accion enviara el registro a la papelera (eliminacion logica).",
 		type: "warning",
 		showCancelButton: true,
 		confirmButtonColor: "#3085d6",
 		cancelButtonColor: "#d33",
 		cancelButtonText: "Cancelar",
-		confirmButtonText: "Si, borrar usuario!",
+		confirmButtonText: "Si, enviar a papelera",
 	}).then(function (result) {
 		if (result.value) {
-			window.location =
-				"index.php?ruta=sig-opt&idOpt=" +
-				idOpt +
-				"&nombreCarpeta1=" +
-				nombreCarpeta1 +
-				"&nombreCarpeta2=" +
-				nombreCarpeta2 +
-				"&foto1=" +
-				foto1 +
-				"&foto2=" +
-				foto2;
+			window.location = "index.php?ruta=sig-opt&idOpt=" + idOpt;
+		}
+	});
+});
+
+$(document).on("click", ".btnRestaurarOpt", function () {
+	var idOpt = $(this).attr("idOpt");
+	var nombreOpt = $(this).attr("nombreOpt");
+
+	swal({
+		title: "Restaurar OPT?",
+		text: 'El registro "' + nombreOpt + '" volvera al listado principal.',
+		type: "question",
+		showCancelButton: true,
+		confirmButtonColor: "#28a745",
+		cancelButtonColor: "#6c757d",
+		cancelButtonText: "Cancelar",
+		confirmButtonText: "Si, restaurar"
+	}).then(function (result) {
+		if (result.value) {
+			$.ajax({
+				url: "ajax/opts.ajax.php",
+				method: "POST",
+				data: { restaurarOptId: idOpt },
+				dataType: "json",
+				success: function (respuesta) {
+					if (respuesta && respuesta.status === "ok") {
+						swal({
+							title: "Restaurado",
+							text: "El registro fue restaurado correctamente.",
+							type: "success",
+							confirmButtonText: "Cerrar"
+						}).then(function (r) {
+							if (r.value) {
+								window.location = "sig-opt";
+							}
+						});
+					} else {
+						swal({
+							title: "Error",
+							text: respuesta && respuesta.message ? respuesta.message : "No se pudo restaurar el registro",
+							type: "error",
+							confirmButtonText: "Cerrar"
+						});
+					}
+				},
+				error: function () {
+					swal({
+						title: "Error",
+						text: "No se pudo conectar para restaurar el registro.",
+						type: "error",
+						confirmButtonText: "Cerrar"
+					});
+				}
+			});
+		}
+	});
+});
+
+$(document).on("click", ".btnDepurarOpt", function () {
+	var idOpt = $(this).attr("idOpt");
+	var nombreOpt = $(this).attr("nombreOpt");
+
+	swal({
+		title: "ELIMINACION DEFINITIVA",
+		html: '<strong>' + nombreOpt + '</strong> sera eliminado permanentemente.<br><br>Esta accion no se puede deshacer.',
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#dc3545",
+		cancelButtonColor: "#6c757d",
+		cancelButtonText: "Cancelar",
+		confirmButtonText: "Si, eliminar para siempre"
+	}).then(function (result) {
+		if (result.value) {
+			$.ajax({
+				url: "ajax/opts.ajax.php",
+				method: "POST",
+				data: { depurarOptId: idOpt },
+				dataType: "json",
+				success: function (respuesta) {
+					if (respuesta && respuesta.status === "ok") {
+						swal({
+							title: "Eliminado",
+							text: "El registro fue eliminado definitivamente.",
+							type: "success",
+							confirmButtonText: "Cerrar"
+						}).then(function (r) {
+							if (r.value) {
+								window.location = "sig-opt";
+							}
+						});
+					} else {
+						swal({
+							title: "Error",
+							text: respuesta && respuesta.message ? respuesta.message : "No se pudo eliminar el registro",
+							type: "error",
+							confirmButtonText: "Cerrar"
+						});
+					}
+				},
+				error: function () {
+					swal({
+						title: "Error",
+						text: "No se pudo conectar para eliminar el registro.",
+						type: "error",
+						confirmButtonText: "Cerrar"
+					});
+				}
+			});
 		}
 	});
 });

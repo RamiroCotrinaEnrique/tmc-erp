@@ -85,11 +85,8 @@
                                                 <td>'.$value["vehic_propietario"].'</td>                                                
                                                 <td>
                                                 <div class="btn-group">                          
-                                                    <button class="btn btn-warning btnEditarVehiculo" idVehiculo="'.$value["vehic_id"].'" data-toggle="modal" data-target="#modalEditarVehiculo"> <i class="fa fa-pencil"></i> </button>';
-                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
+                                                    <button class="btn btn-warning btnEditarVehiculo" idVehiculo="'.$value["vehic_id"].'" data-toggle="modal" data-target="#modalEditarVehiculo"> <i class="fa fa-pencil"></i> </button>
                                                     <button class="btn btn-danger btnEliminarVehiculo" idVehiculo="'.$value["vehic_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>  </button>';
-                                            }
                                                 echo'
                                                 </div>  
                                                 </td>
@@ -124,6 +121,81 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-danger card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de Vehículos</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaPapeleraVehiculos" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Placa</th>
+                                        <th>Marca</th>
+                                        <th>Modelo</th>
+                                        <th>Estado</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $vehiculosEliminados = ControladorVehiculos::ctrMostrarVehiculosEliminados();
+                                    if($vehiculosEliminados && count($vehiculosEliminados) > 0){
+                                        foreach($vehiculosEliminados as $key => $value){
+                                            $nombreVehiculo = trim($value["vehic_placa"].' '.$value["vehic_marca"].' '.$value["vehic_modelo"]);
+                                            echo '<tr>';
+                                            echo '<td>'.($key+1).'</td>';
+                                            echo '<td>'.$value["vehic_placa"].'</td>';
+                                            echo '<td>'.$value["vehic_marca"].'</td>';
+                                            echo '<td>'.$value["vehic_modelo"].'</td>';
+                                            echo '<td>'.$value["vehic_estado"].'</td>';
+                                            echo '<td>'.$value["vehic_fecha_delete"].'</td>';
+                                            echo '<td>
+                                                <button class="btn btn-success btn-xs btnRestaurarVehiculo" idVehiculo="'.$value["vehic_id"].'" nombreVehiculo="'.htmlspecialchars($nombreVehiculo, ENT_QUOTES).'">
+                                                    <i class="fa fa-undo"></i> Restaurar
+                                                </button>
+                                            </td>';
+                                            echo '<td>
+                                                <button class="btn btn-danger btn-xs btnDepurarVehiculo" idVehiculo="'.$value["vehic_id"].'" nombreVehiculo="'.htmlspecialchars($nombreVehiculo, ENT_QUOTES).'">
+                                                    <i class="fa fa-times"></i> Depurar
+                                                </button>
+                                            </td>';
+                                            echo '</tr>';
+                                        }
+                                    }else{
+                                        echo '<tr><td colspan="8" class="text-center text-muted">No hay vehículos en la papelera</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Placa</th>
+                                        <th>Marca</th>
+                                        <th>Modelo</th>
+                                        <th>Estado</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

@@ -1,7 +1,9 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+session_start();
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
 require_once "../controladores/vehiculos.controlador.php";
 require_once "../modelos/vehiculos.modelo.php";
@@ -105,6 +107,20 @@ class AjaxVehiculos{
 		echo json_encode($respuesta);
 	}
 
+	public $restaurarVehiculoId;
+
+	public function ajaxRestaurarVehiculo(){
+		$respuesta = ControladorVehiculos::ctrRestaurarVehiculo($this->restaurarVehiculoId);
+		echo json_encode($respuesta);
+	}
+
+	public $depurarVehiculoId;
+
+	public function ajaxDepurarVehiculo(){
+		$respuesta = ControladorVehiculos::ctrDepurarVehiculo($this->depurarVehiculoId);
+		echo json_encode($respuesta);
+	}
+
 }//Fin Clase
 
     /*-------------------------------------
@@ -167,6 +183,18 @@ class AjaxVehiculos{
 		$actualizarVehiculo -> inputEditEstado = $_POST["inputEditEstado"];
 		$actualizarVehiculo -> inputEditPropietario = $_POST["inputEditPropietario"];
 		$actualizarVehiculo -> ajaxActualizarVehiculo();
+	}
+
+	if(isset($_POST["restaurarVehiculoId"])){
+		$ajax = new AjaxVehiculos();
+		$ajax->restaurarVehiculoId = $_POST["restaurarVehiculoId"];
+		$ajax->ajaxRestaurarVehiculo();
+	}
+
+	if(isset($_POST["depurarVehiculoId"])){
+		$ajax = new AjaxVehiculos();
+		$ajax->depurarVehiculoId = $_POST["depurarVehiculoId"];
+		$ajax->ajaxDepurarVehiculo();
 	}
 
 

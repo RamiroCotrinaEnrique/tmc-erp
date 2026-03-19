@@ -472,8 +472,22 @@ class ControladorUsuarios {
 
 		if(isset($_GET["idUsuario"])){
 
+			// Bloquear auto-eliminación
+			if((int)$_GET["idUsuario"] === (int)$_SESSION["usu_id"]){
+				echo '<script>
+				swal({
+					type: "error",
+					title: "Operación no permitida",
+					text: "No puedes eliminar tu propio usuario.",
+					showConfirmButton: true,
+					confirmButtonText: "Cerrar"
+				}).then(function(result){ if(result.value){ window.location = "usuarios"; } });
+				</script>';
+				return;
+			}
+
 			$tabla ="usuarios";
-			$datos = $_GET["idUsuario"];
+			$datos = (int)$_GET["idUsuario"];
 			$respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $datos);
 			if($respuesta == "ok"){
 				echo'<script>

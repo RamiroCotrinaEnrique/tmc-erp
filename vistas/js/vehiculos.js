@@ -206,14 +206,14 @@ $(".tablas").on("click", ".btnEliminarVehiculo", function(){
     var idVehiculo = $(this).attr("idVehiculo");
 
     swal({
-        title: '¿Está seguro de borrar vehículo?',
-        text: "¡Si no lo está puede cancelar la acción!",
+        title: '¿Está seguro de eliminar el vehículo?',
+        text: "El registro no se borrará físicamente. Primero será enviado a la papelera.",
         type: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Si, borrar vehículo!'
+        confirmButtonText: 'Sí, enviar a papelera'
     }).then(function(result){
 
         if(result.value){
@@ -225,7 +225,107 @@ $(".tablas").on("click", ".btnEliminarVehiculo", function(){
 
     })
 
-})
+});
+
+$(document).on("click", ".btnRestaurarVehiculo", function(){
+    var idVehiculo = $(this).attr("idVehiculo");
+    var nombreVehiculo = $(this).attr("nombreVehiculo");
+
+    swal({
+        title: '¿Restaurar vehículo?',
+        text: 'El vehículo "' + nombreVehiculo + '" volverá al listado principal.',
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, restaurar'
+    }).then(function(result){
+        if(result.value){
+            $.ajax({
+                url: "ajax/vehiculos.ajax.php",
+                method: "POST",
+                data: { restaurarVehiculoId: idVehiculo },
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Restaurado",
+                            text: "El vehículo fue restaurado correctamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){ if(r.value){ window.location = "vehiculos"; } });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo restaurar el vehículo",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para restaurar el vehículo.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
+        }
+    });
+});
+
+$(document).on("click", ".btnDepurarVehiculo", function(){
+    var idVehiculo = $(this).attr("idVehiculo");
+    var nombreVehiculo = $(this).attr("nombreVehiculo");
+
+    swal({
+        title: 'ELIMINACIÓN DEFINITIVA',
+        html: '<strong>' + nombreVehiculo + '</strong> será eliminado permanentemente de la base de datos.<br><br>Esta acción no se puede deshacer.',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Sí, eliminar para siempre'
+    }).then(function(result){
+        if(result.value){
+            $.ajax({
+                url: "ajax/vehiculos.ajax.php",
+                method: "POST",
+                data: { depurarVehiculoId: idVehiculo },
+                dataType: "json",
+                success: function(respuesta){
+                    if(respuesta && respuesta.status === "ok"){
+                        swal({
+                            title: "Eliminado",
+                            text: "El vehículo fue eliminado definitivamente.",
+                            type: "success",
+                            confirmButtonText: "Cerrar"
+                        }).then(function(r){ if(r.value){ window.location = "vehiculos"; } });
+                    }else{
+                        swal({
+                            title: "Error",
+                            text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo eliminar el vehículo",
+                            type: "error",
+                            confirmButtonText: "Cerrar"
+                        });
+                    }
+                },
+                error: function(){
+                    swal({
+                        title: "Error",
+                        text: "No se pudo conectar para eliminar el vehículo.",
+                        type: "error",
+                        confirmButtonText: "Cerrar"
+                    });
+                }
+            });
+        }
+    });
+});
 
 /*=============================================
 GUARDAR CAMBIOS DE EDITAR VEHICULO VIA AJAX

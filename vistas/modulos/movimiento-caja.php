@@ -115,9 +115,7 @@
                                                                     <div class="btn-group">
                                                                         <button class="btn btn-primary btnImprimirMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>" > <i class="fa fa-print"></i> </button>  
                                                                         <button class="btn btn-warning btnEditarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>" data-toggle="modal" data-target="#modalEditarMovimientoCaja"> <i class="fa fa-pencil"></i> </button>
-                                                                        <?php if ($_SESSION['usu_perfil'] == 'Administrador') { ?>
-                                                                            <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>
-                                                                        <?php } ?>
+                                                                        <button class="btn btn-danger btnEliminarMovimientoCaja" idMovimientoCaja="<?php echo $value['movi_id']; ?>"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -154,6 +152,90 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if (isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador') { ?>
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-danger card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de Movimientos</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaPapeleraMovimientos" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Tipo</th>
+                                        <th>Serie</th>
+                                        <th>Número</th>
+                                        <th>Moneda</th>
+                                        <th>Fecha</th>
+                                        <th>Empleado</th>
+                                        <th>Total</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $movimientosEliminados = ControladorMovimientoCaja::ctrMostrarMovimientoCajaEliminados();
+                                    if($movimientosEliminados && count($movimientosEliminados) > 0){
+                                        foreach($movimientosEliminados as $key => $value){
+                                            $nombreMovimiento = trim($value['movi_tipo'].' '.$value['movi_serie'].'-'.$value['movi_numero']);
+                                            echo '<tr>';
+                                            echo '<td>'.($key+1).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_tipo']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_serie']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_numero']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_moneda']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_fecha']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_emple_id']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_total']).'</td>';
+                                            echo '<td>'.htmlspecialchars($value['movi_fecha_delete']).'</td>';
+                                            echo '<td>
+                                                <button class="btn btn-success btn-xs btnRestaurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
+                                                    <i class="fa fa-undo"></i> Restaurar
+                                                </button>
+                                            </td>';
+                                            echo '<td>
+                                                <button class="btn btn-danger btn-xs btnDepurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
+                                                    <i class="fa fa-times"></i> Depurar
+                                                </button>
+                                            </td>';
+                                            echo '</tr>';
+                                        }
+                                    } else {
+                                        echo '<tr><td colspan="11" class="text-center text-muted">No hay movimientos en la papelera</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Tipo</th>
+                                        <th>Serie</th>
+                                        <th>Número</th>
+                                        <th>Moneda</th>
+                                        <th>Fecha</th>
+                                        <th>Empleado</th>
+                                        <th>Total</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <th>Depurar</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

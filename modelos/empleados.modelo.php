@@ -30,7 +30,7 @@ class ModeloEmpleados{
 				INNER JOIN centro_costo cc ON e.emple_cenco_id = cc.cenco_id
 				INNER JOIN areas a ON e.emple_area_id = a.are_id
 				INNER JOIN cargos c ON e.emple_cargo_id = c.car_id
-				WHERE e.$item = :$item"
+				WHERE e.$item = :$item AND e.emple_fecha_delete IS NULL"
 			);
 
 			$stmt->bindParam(":".$item, $valor, PDO::PARAM_STR);
@@ -80,7 +80,8 @@ class ModeloEmpleados{
 				INNER JOIN empresas emp ON e.emple_empresa_id = emp.empre_id
 				INNER JOIN centro_costo cc ON e.emple_cenco_id = cc.cenco_id
 				INNER JOIN areas a ON e.emple_area_id = a.are_id
-				INNER JOIN cargos c ON e.emple_cargo_id = c.car_id"
+				INNER JOIN cargos c ON e.emple_cargo_id = c.car_id
+				WHERE e.emple_fecha_delete IS NULL"
 			);
 
 			$stmt->execute();
@@ -173,15 +174,69 @@ class ModeloEmpleados{
 	/* ===================== 4. ELIMINAR EMPLEADO ========================= */
 	/* ==================================================================== */
 	static public function mdlEliminarEmpleado($tabla, $id){
-		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE emple_id = :emple_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET emple_fecha_delete = NOW() WHERE emple_id = :emple_id AND emple_fecha_delete IS NULL");
 		$stmt->bindParam(":emple_id", $id, PDO::PARAM_INT);
-		if($stmt->execute()){
+		if($stmt->execute() && $stmt->rowCount() > 0){
 			return "ok";
 		}else{
 			return "error: " . implode(" - ", $stmt->errorInfo());
 		}
 		$stmt->close();
 		$stmt = null;
+	}
+
+	/* ==================================================================== */
+	/* ================== 5. MOSTRAR EMPLEADOS ELIMINADOS ================= */
+	/* ==================================================================== */
+
+	static public function mdlMostrarEmpleadosEliminados($tabla){
+		$stmt = Conexion::conectar()->prepare("
+			SELECT
+				e.*,
+				emp.empre_ruc,
+				emp.empre_razon_social,
+				cc.cenco_codigo,
+				cc.cenco_nombre,
+				a.are_nombre,
+				c.car_nombre
+			FROM
+				$tabla e
+			INNER JOIN empresas emp ON e.emple_empresa_id = emp.empre_id
+			INNER JOIN centro_costo cc ON e.emple_cenco_id = cc.cenco_id
+			INNER JOIN areas a ON e.emple_area_id = a.are_id
+			INNER JOIN cargos c ON e.emple_cargo_id = c.car_id
+			WHERE e.emple_fecha_delete IS NOT NULL
+			ORDER BY e.emple_fecha_delete DESC"
+		);
+
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/* ==================================================================== */
+	/* ===================== 6. RESTAURAR EMPLEADO ======================== */
+	/* ==================================================================== */
+
+	static public function mdlRestaurarEmpleado($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET emple_fecha_delete = NULL WHERE emple_id = :emple_id AND emple_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":emple_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
+	}
+
+	/* ==================================================================== */
+	/* ===================== 7. DEPURAR EMPLEADO ========================== */
+	/* ==================================================================== */
+
+	static public function mdlDepurarEmpleado($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE emple_id = :emple_id AND emple_fecha_delete IS NOT NULL");
+		$stmt->bindParam(':emple_id', $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return 'ok';
+		}
+		return 'error';
 	}
 
 	static public function mdlCodigoEmpleados($tabla)

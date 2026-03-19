@@ -506,21 +506,21 @@ class ControladorEmpleados {
     static public function ctrEliminarEmpleado() {
         // primero manejamos petición AJAX/POST
         if(isset($_POST["idEmpleadoEliminar"])){
-            $idEmpleado = $_POST["idEmpleadoEliminar"];
+            $idEmpleado = (int) $_POST["idEmpleadoEliminar"];
             $tabla = "empleados";
             $respuesta = ModeloEmpleados::mdlEliminarEmpleado($tabla, $idEmpleado);
             if($respuesta == "ok"){
                 echo json_encode([
                     'status' => 'success',
-                    'title' => '¡El empleado ha sido eliminado correctamente!',
-                    'message' => 'El registro ha sido eliminado.',
+                    'title' => '¡El empleado fue enviado a papelera!',
+                    'message' => 'El registro fue eliminado lógicamente.',
                     'redirect' => 'empleados'
                 ]);
             } else {
                 echo json_encode([
                     'status' => 'error',
                     'title' => '¡Error al eliminar el empleado!',
-                    'message' => 'Ocurrió un problema al eliminar el registro. Intente de nuevo.'
+                    'message' => 'No se pudo eliminar el registro o ya estaba eliminado.'
                 ]);
             }
             return;
@@ -528,14 +528,14 @@ class ControladorEmpleados {
 
         // si la llamada viene por GET (redirección tradicional) compatible con otros módulos
         if(isset($_GET["idEmpleado"])){
-            $idEmpleado = $_GET["idEmpleado"];
+            $idEmpleado = (int) $_GET["idEmpleado"];
             $tabla = "empleados";
             $respuesta = ModeloEmpleados::mdlEliminarEmpleado($tabla, $idEmpleado);
             if($respuesta == "ok"){
                 echo '<script>
                     swal({
                           type: "success",
-                          title: "¡El empleado ha sido eliminado correctamente!",
+                          title: "¡El empleado fue enviado a papelera!",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
                           }).then(function(result){
@@ -549,7 +549,7 @@ class ControladorEmpleados {
                     swal({
                           type: "error",
                           title: "¡Error al eliminar el empleado!",
-                          text: "Ocurrió un problema al eliminar el registro. Intente de nuevo.",
+                          text: "No se pudo eliminar el registro o ya estaba eliminado.",
                           showConfirmButton: true,
                           confirmButtonText: "Cerrar"
                           });
@@ -557,7 +557,70 @@ class ControladorEmpleados {
             }
             return;
         }
-    }    
+    }
+
+    static public function ctrMostrarEmpleadosEliminados(){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'empleados';
+        return ModeloEmpleados::mdlMostrarEmpleadosEliminados($tabla);
+    }
+
+    static public function ctrRestaurarEmpleado($id){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden restaurar empleados.'
+            );
+        }
+
+        $id = (int) $id;
+        if($id <= 0){
+            return array(
+                'status' => 'error',
+                'message' => 'ID de empleado inválido.'
+            );
+        }
+
+        $respuesta = ModeloEmpleados::mdlRestaurarEmpleado('empleados', $id);
+        if($respuesta === 'ok'){
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo restaurar el empleado o ya estaba activo.'
+        );
+    }
+
+    static public function ctrDepurarEmpleado($id){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden eliminar empleados definitivamente.'
+            );
+        }
+
+        $id = (int) $id;
+        if($id <= 0){
+            return array(
+                'status' => 'error',
+                'message' => 'ID de empleado inválido.'
+            );
+        }
+
+        $respuesta = ModeloEmpleados::mdlDepurarEmpleado('empleados', $id);
+        if($respuesta === 'ok'){
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo eliminar definitivamente el empleado.'
+        );
+    }
 
 
 /* ===================================================== */

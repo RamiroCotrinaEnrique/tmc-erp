@@ -132,15 +132,95 @@ class ControladorEmpresas {
 
 			$tabla = "empresas";
 
-			$datos = $_GET["idEmpresa"];
+            $datos = (int) $_GET["idEmpresa"];
 
 			$respuesta = ModeloEmpresas::mdlEliminarEmpresa($tabla, $datos);
 
 			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Datos de la empresa ha sido borrado correctamente', 'empresas' );
+                self::mostrarAlerta( 'success', 'La empresa fue enviada a la papelera correctamente.', 'empresas' );
+            } else {
+                self::mostrarAlerta( 'error', 'No se pudo eliminar la empresa o ya estaba eliminada.', 'empresas' );
 			}
 		}
 	}
+
+    /*-------------------------------------
+    MOSTRAR EMPRESAS ELIMINADAS
+    -------------------------------------*/
+
+    static public function ctrMostrarEmpresasEliminadas() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'empresas';
+        $respuesta = ModeloEmpresas::mdlMostrarEmpresasEliminadas( $tabla );
+        return $respuesta;
+    }
+
+    /*-------------------------------------
+    RESTAURAR EMPRESA
+    -------------------------------------*/
+
+    static public function ctrRestaurarEmpresa($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden restaurar empresas.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de empresa inválido.'
+            );
+        }
+
+        $respuesta = ModeloEmpresas::mdlRestaurarEmpresa('empresas', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo restaurar la empresa o ya estaba activa.'
+        );
+    }
+
+    /*-------------------------------------
+    DEPURAR EMPRESA
+    -------------------------------------*/
+
+    static public function ctrDepurarEmpresa($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden eliminar empresas definitivamente.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de empresa inválido.'
+            );
+        }
+
+        $respuesta = ModeloEmpresas::mdlDepurarEmpresa('empresas', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo eliminar definitivamente la empresa.'
+        );
+    }
 
 	
     // Método para mostrar alertas con SweetAlert

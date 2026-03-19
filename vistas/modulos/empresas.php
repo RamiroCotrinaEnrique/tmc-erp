@@ -1,4 +1,5 @@
 
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -63,18 +64,15 @@
                                                 <td>'.$value["empre_email_contacto"].'</td>                                                
                                                 <td>
                                                 <div class="btn-group">                          
-                                                    <button class="btn btn-warning btnEditarEmpresa" idEmpresa="'.$value["empre_id"].'" data-toggle="modal" data-target="#modalEditarEmpresa"> <i class="fa fa-pencil"></i>  </button>';
-                                                if($_SESSION["usu_perfil"] == "Administrador"){ 
-                                                        echo '
+                                                    <button class="btn btn-warning btnEditarEmpresa" idEmpresa="'.$value["empre_id"].'" data-toggle="modal" data-target="#modalEditarEmpresa"> <i class="fa fa-pencil"></i>  </button>
                                                     <button class="btn btn-danger btnEliminarEmpresa" idEmpresa="'.$value["empre_id"].'"> <i class="fa fa-trash-o" aria-hidden="true"></i>   </button>';
-                                            }
                                                 echo'
                                                 </div>  
                                                 </td>
                                             </tr>
                                                 ';
 
-                                            }
+                                            } 
                                             ?>
                                 </tbody>
                                 <tfoot>
@@ -97,6 +95,98 @@
                 </div>
             </div>
             <!-- /.row -->
+
+            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-danger card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-trash mr-1"></i> Papelera de Empresas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaPapeleraEmpresas" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>RUC</th>
+                                        <th>Razón Social</th>
+                                        <th>Nombre Comercial</th>
+                                        <th>Domicilio</th>
+                                        <th>Contacto</th>
+                                        <th>Correo</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                        <th>Depurar</th>
+                                        <?php } ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $empresasEliminadas = ControladorEmpresas::ctrMostrarEmpresasEliminadas();
+                                    if($empresasEliminadas && count($empresasEliminadas) > 0){
+                                        foreach($empresasEliminadas as $key => $value){
+                                            echo '<tr>';
+                                            echo '<td>'.($key+1).'</td>';
+                                            echo '<td>'.$value["empre_ruc"].'</td>';
+                                            echo '<td>'.$value["empre_razon_social"].'</td>';
+                                            echo '<td>'.$value["empre_nombre_comercial"].'</td>';
+                                            echo '<td>'.$value["empre_domicilio_legal"].'</td>';
+                                            echo '<td>'.$value["empre_numero_contacto"].'</td>';
+                                            echo '<td>'.$value["empre_email_contacto"].'</td>';
+                                            echo '<td>'.$value["empre_fecha_delete"].'</td>';
+                                            echo '<td>
+                                                <button class="btn btn-success btn-xs btnRestaurarEmpresa"
+                                                    idEmpresa="'.$value["empre_id"].'"
+                                                    nombreEmpresa="'.htmlspecialchars($value["empre_razon_social"], ENT_QUOTES).'">
+                                                    <i class="fa fa-undo"></i> Restaurar
+                                                </button>
+                                            </td>';
+                                            if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){
+                                                echo '<td>
+                                                    <button class="btn btn-danger btn-xs btnDepurarEmpresa"
+                                                        idEmpresa="'.$value["empre_id"].'"
+                                                        nombreEmpresa="'.htmlspecialchars($value["empre_razon_social"], ENT_QUOTES).'">
+                                                        <i class="fa fa-times"></i> Depurar
+                                                    </button>
+                                                </td>';
+                                            }
+                                            echo '</tr>';
+                                        }
+                                    }else{
+                                        $colspanPapelera = (isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador') ? 10 : 9;
+                                        echo '<tr><td colspan="'.$colspanPapelera.'" class="text-center text-muted">No hay empresas en la papelera</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>RUC</th>
+                                        <th>Razón Social</th>
+                                        <th>Nombre Comercial</th>
+                                        <th>Domicilio</th>
+                                        <th>Contacto</th>
+                                        <th>Correo</th>
+                                        <th>Fecha eliminación</th>
+                                        <th>Restaurar</th>
+                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                        <th>Depurar</th>
+                                        <?php } ?>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
+            
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

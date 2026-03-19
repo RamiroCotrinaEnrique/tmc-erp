@@ -101,7 +101,7 @@ $modulosRegistrados = array_values(array_filter(tmcObtenerModulosRegistrados(), 
 
                                                                 <button class="btn btn-warning btnEditarUsuario" idUsuario="'.$value["usu_id"].'" data-toggle="modal" data-target="#modalEditarUsuario"> <i class="fa fa-pencil"></i>  </button>
                                                                 
-                                                                <button class="btn btn-danger btnEliminarUsuario" idUsuario="'.$value["usu_id"].'" fotoUsuario="'.$value["usu_foto"].'" usuario="'.$value["usu_usuario"].'"><i class="fa fa-trash-o" aria-hidden="true"></i>   </button>
+                                                                '.($value["usu_id"] != $_SESSION["usu_id"] ? '<button class="btn btn-danger btnEliminarUsuario" idUsuario="'.$value["usu_id"].'" fotoUsuario="'.$value["usu_foto"].'" usuario="'.$value["usu_usuario"].'" ><i class="fa fa-trash-o" aria-hidden="true"></i></button>' : '<button class="btn btn-secondary btn-xs" disabled title="No puedes eliminar tu propio usuario"><i class="fa fa-trash-o" aria-hidden="true"></i></button>').'  
 
                                                             </div>  
                                                     </td>
@@ -452,8 +452,8 @@ MODAL EDITAR USUARIO
                 </div>
 
             <?php
-             $editarUsuario = new ControladorUsuarios();
-             $editarUsuario -> ctrEditarUsuario();
+            $editarUsuario = new ControladorUsuarios();
+            $editarUsuario -> ctrEditarUsuario();
             ?>
 
             </form>

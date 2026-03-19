@@ -11,12 +11,12 @@ class ModeloVehiculos{
 
     static public function mdlMostrarVehiculos($tabla, $item, $valor){
 		if($item != null){
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND vehic_fecha_delete IS NULL");
 			$stmt -> bindParam(":".$item, $valor, PDO::PARAM_STR );
 			$stmt -> execute();
 			return $stmt -> fetch();
 		}else{
-			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE vehic_fecha_delete IS NULL ORDER BY vehic_id DESC");
 			$stmt -> execute();
 			return $stmt -> fetchAll();
 		}
@@ -92,14 +92,50 @@ class ModeloVehiculos{
 	=============================================*/
 
 	static public function mdlEliminarVehiculo($tabla, $datos){
-		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE vehic_id = :vehic_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET vehic_fecha_delete = NOW() WHERE vehic_id = :vehic_id AND vehic_fecha_delete IS NULL");
 		$stmt -> bindParam(":vehic_id", $datos, PDO::PARAM_INT);
-		if($stmt -> execute()){
+		if($stmt -> execute() && $stmt->rowCount() > 0){
 			return "ok";		
 		}else{
 			return "error";	
 		}
 		$stmt -> close();
 		$stmt = null;
+	}
+
+	/*=============================================
+	MOSTRAR VEHICULOS ELIMINADOS (PAPELERA)
+	=============================================*/
+
+	static public function mdlMostrarVehiculosEliminados($tabla){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE vehic_fecha_delete IS NOT NULL ORDER BY vehic_fecha_delete DESC");
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	/*=============================================
+	RESTAURAR VEHICULO
+	=============================================*/
+
+	static public function mdlRestaurarVehiculo($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET vehic_fecha_delete = NULL WHERE vehic_id = :vehic_id AND vehic_fecha_delete IS NOT NULL");
+		$stmt->bindParam(":vehic_id", $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return "ok";
+		}
+		return "error";
+	}
+
+	/*=============================================
+	DEPURAR VEHICULO
+	=============================================*/
+
+	static public function mdlDepurarVehiculo($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE vehic_id = :vehic_id AND vehic_fecha_delete IS NOT NULL");
+		$stmt->bindParam(':vehic_id', $id, PDO::PARAM_INT);
+		if($stmt->execute() && $stmt->rowCount() > 0){
+			return 'ok';
+		}
+		return 'error';
 	}
 }// Fin Class

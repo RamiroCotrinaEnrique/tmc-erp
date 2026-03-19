@@ -175,15 +175,62 @@ class ControladorVehiculos {
 
 			$tabla = "vehiculos";
 
-			$datos = $_GET["idVehiculo"];
+            $datos = (int) $_GET["idVehiculo"];
 
 			$respuesta = ModeloVehiculos::mdlEliminarVehiculo($tabla, $datos);
 
 			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Los datos han sido borrado correctamente', 'vehiculos' );
+                self::mostrarAlerta( 'success', 'El vehículo fue enviado a la papelera correctamente', 'vehiculos' );
+            } else {
+                self::mostrarAlerta( 'error', 'No se pudo eliminar el vehículo o ya estaba eliminado', 'vehiculos' );
 			}
 		}
 	}
+
+    static public function ctrMostrarVehiculosEliminados(){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'vehiculos';
+        return ModeloVehiculos::mdlMostrarVehiculosEliminados($tabla);
+    }
+
+    static public function ctrRestaurarVehiculo($id){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden restaurar vehículos.');
+        }
+
+        $id = (int) $id;
+        if($id <= 0){
+            return array('status' => 'error', 'message' => 'ID de vehículo inválido.');
+        }
+
+        $respuesta = ModeloVehiculos::mdlRestaurarVehiculo('vehiculos', $id);
+        if($respuesta === 'ok'){
+            return array('status' => 'ok');
+        }
+
+        return array('status' => 'error', 'message' => 'No se pudo restaurar el vehículo o ya estaba activo.');
+    }
+
+    static public function ctrDepurarVehiculo($id){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden eliminar vehículos definitivamente.');
+        }
+
+        $id = (int) $id;
+        if($id <= 0){
+            return array('status' => 'error', 'message' => 'ID de vehículo inválido.');
+        }
+
+        $respuesta = ModeloVehiculos::mdlDepurarVehiculo('vehiculos', $id);
+        if($respuesta === 'ok'){
+            return array('status' => 'ok');
+        }
+
+        return array('status' => 'error', 'message' => 'No se pudo eliminar definitivamente el vehículo.');
+    }
 
 	
     // Método para mostrar alertas con SweetAlert

@@ -12,6 +12,15 @@ class ControladorOpts {
         return $respuesta;
     }
 
+    static public function ctrMostrarOptsEliminados() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'opts';
+        return ModeloOpts::mdlMostrarOptsEliminados($tabla);
+    }
+
     /*-------------------------------------
     CREAR OPT
     -------------------------------------*/
@@ -1084,15 +1093,6 @@ class ControladorOpts {
             $tabla = "opts";
             $datos = $_GET["idOpt"];
 
-            if ($_GET["foto1"] != "" ) {
-                unlink($_GET["foto1"]);
-                rmdir('vistas/img/sig/opt/' . $_GET["nombreCarpeta1"]);
-            }
-            if ($_GET["foto2"] != "") {
-                unlink($_GET["foto2"]);
-                rmdir('vistas/img/sig/opt/' . $_GET["nombreCarpeta2"]);
-            }            
-
             $respuesta = ModeloOpts::mdlEliminarOpt($tabla, $datos);
 
             if ($respuesta == "ok") {
@@ -1100,7 +1100,7 @@ class ControladorOpts {
                 echo '<script>
 				swal({
 					  type: "success",
-					  title: "Los datos han sido eliminados correctamente",
+					  title: "Los datos fueron enviados a la papelera",
 					  showConfirmButton: true,
 					  confirmButtonText: "Cerrar"
 					  }).then(function(result){
@@ -1109,6 +1109,74 @@ class ControladorOpts {
 								}
 							})
 				</script>';
+            }
+        }
+    }
+
+    static public function ctrRestaurarOpt($idOpt){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden restaurar OPT.');
+        }
+
+        $tabla = 'opts';
+        $idOpt = (int) $idOpt;
+        if ($idOpt <= 0) {
+            return array('status' => 'error', 'message' => 'Identificador invalido.');
+        }
+
+        $respuesta = ModeloOpts::mdlRestaurarOpt($tabla, $idOpt);
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array('status' => 'error', 'message' => 'No se pudo restaurar el registro o ya estaba activo.');
+    }
+
+    static public function ctrDepurarOpt($idOpt){
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array('status' => 'error', 'message' => 'Solo los administradores pueden eliminar definitivamente.');
+        }
+
+        $tabla = 'opts';
+        $idOpt = (int) $idOpt;
+        if ($idOpt <= 0) {
+            return array('status' => 'error', 'message' => 'Identificador invalido.');
+        }
+
+        $opt = ModeloOpts::mdlObtenerOptPorId($tabla, $idOpt);
+        if (!$opt || empty($opt['opt_fecha_delete'])) {
+            return array('status' => 'error', 'message' => 'El registro debe estar en papelera para depurarlo.');
+        }
+
+        $respuesta = ModeloOpts::mdlDepurarOpt($tabla, $idOpt);
+        if ($respuesta !== 'ok') {
+            return array('status' => 'error', 'message' => 'No se pudo depurar el registro.');
+        }
+
+        self::eliminarEvidenciaOpt($opt['opt_evidencia1']);
+        self::eliminarEvidenciaOpt($opt['opt_evidencia2']);
+
+        return array('status' => 'ok');
+    }
+
+    private static function eliminarEvidenciaOpt($rutaArchivo){
+        if (empty($rutaArchivo)) {
+            return;
+        }
+
+        if (file_exists($rutaArchivo)) {
+            @unlink($rutaArchivo);
+        }
+
+        $directorio = dirname($rutaArchivo);
+        if (
+            $directorio !== '.' &&
+            $directorio !== DIRECTORY_SEPARATOR &&
+            is_dir($directorio)
+        ) {
+            $contenido = @scandir($directorio);
+            if (is_array($contenido) && count($contenido) <= 2) {
+                @rmdir($directorio);
             }
         }
     }

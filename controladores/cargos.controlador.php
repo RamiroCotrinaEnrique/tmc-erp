@@ -43,7 +43,7 @@ class ControladorCargos {
     }
 
     /*-------------------------------------
-    EDITAR CENTRO DE COSTO
+    EDITAR CARGO
     -------------------------------------*/
 
     public static function ctrEditarCargo() {
@@ -57,7 +57,7 @@ class ControladorCargos {
 
         // Validaciones
         if ( !preg_match( '/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $nombre ) ) {
-            self::mostrarAlerta( 'error', '¡El campo nombre no pueden estar vacíos ni llevar caracteres especiales!', 'centro-costo' );
+            self::mostrarAlerta( 'error', '¡El campo nombre no pueden estar vacíos ni llevar caracteres especiales!', 'cargos' );
             return;
         }
 
@@ -86,7 +86,7 @@ class ControladorCargos {
 
 
     /*-------------------------------------
-    ELIMINAR CENTRO DE COSTO
+    ELIMINAR CARGO
     -------------------------------------*/
 
 	static public function ctrEliminarCargo()
@@ -95,15 +95,95 @@ class ControladorCargos {
 
 			$tabla = "cargos";
 
-			$datos = $_GET["idCargo"];
+            $datos = (int) $_GET["idCargo"];
 
 			$respuesta = ModeloCargos::mdlEliminarCargo($tabla, $datos);
 
 			if ($respuesta == "ok") {
-				self::mostrarAlerta( 'success', 'Datos eliminados correctamente', 'cargos' );
+                self::mostrarAlerta( 'success', 'El cargo fue enviado a la papelera correctamente.', 'cargos' );
+            } else {
+                self::mostrarAlerta( 'error', 'No se pudo eliminar el cargo o ya estaba eliminado.', 'cargos' );
 			}
 		}
 	}
+
+    /*-------------------------------------
+    MOSTRAR CARGOS ELIMINADOS
+    -------------------------------------*/
+
+    static public function ctrMostrarCargosEliminados() {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        $tabla = 'cargos';
+        $respuesta = ModeloCargos::mdlMostrarCargosEliminados( $tabla );
+        return $respuesta;
+    }
+
+    /*-------------------------------------
+    RESTAURAR CARGO
+    -------------------------------------*/
+
+    static public function ctrRestaurarCargo($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden restaurar cargos.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de cargo inválido.'
+            );
+        }
+
+        $respuesta = ModeloCargos::mdlRestaurarCargo('cargos', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo restaurar el cargo o ya estaba activo.'
+        );
+    }
+
+    /*-------------------------------------
+    DEPURAR CARGO
+    -------------------------------------*/
+
+    static public function ctrDepurarCargo($id) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array(
+                'status' => 'error',
+                'message' => 'Solo los administradores pueden eliminar cargos definitivamente.'
+            );
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            return array(
+                'status' => 'error',
+                'message' => 'ID de cargo inválido.'
+            );
+        }
+
+        $respuesta = ModeloCargos::mdlDepurarCargo('cargos', $id);
+
+        if ($respuesta === 'ok') {
+            return array('status' => 'ok');
+        }
+
+        return array(
+            'status' => 'error',
+            'message' => 'No se pudo eliminar definitivamente el cargo.'
+        );
+    }
 
 	
     // Método para mostrar alertas con SweetAlert
