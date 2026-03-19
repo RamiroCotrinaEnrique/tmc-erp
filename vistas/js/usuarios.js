@@ -170,14 +170,14 @@ $(document).on("click", ".btnEliminarUsuario", function(){
 	var usuario = $(this).attr("usuario");
   
 	swal({
-	  title: '¿Está seguro de borrar el usuario?',
-	  text: "¡Si no lo está puede cancelar la accíón!",
+	  title: '¿Está seguro de eliminar este usuario?',
+	  text: "El usuario no se borrará físicamente, quedará oculto en el listado.",
 	  type: 'warning',
 	  showCancelButton: true,
 	  confirmButtonColor: '#3085d6',
 		cancelButtonColor: '#d33',
 		cancelButtonText: 'Cancelar',
-		confirmButtonText: 'Si, borrar usuario!'
+		confirmButtonText: 'Si, eliminar usuario'
 	}).then(function(result){
   
 	  if(result.value){
@@ -189,4 +189,258 @@ $(document).on("click", ".btnEliminarUsuario", function(){
 	})
   
   })
-  
+
+/*=============================================
+EDITAR PRIVILEGIOS DE MODULOS POR USUARIO
+=============================================*/
+$(document).on("click", ".btnPrivilegiosUsuario", function(){
+
+	var idUsuario = $(this).attr("idUsuario");
+	$("#privilegiosUsuarioId").val(idUsuario);
+	$("#privilegiosUsuarioNombre").val("");
+	$(".checkModuloUsuario").prop("checked", false);
+	$("#checkTodosModulos").prop("checked", false);
+
+	var datos = new FormData();
+	datos.append("idUsuarioPrivilegios", idUsuario);
+
+	$.ajax({
+		url: "ajax/usuarios.ajax.php",
+		method: "POST",
+		data: datos,
+		cache: false,
+		contentType: false,
+		processData: false,
+		dataType: "json",
+		success: function(respuesta){
+			if(!respuesta || respuesta.status !== "ok"){
+				swal({
+					title: "Error",
+					text: (respuesta && respuesta.message) ? respuesta.message : "No se pudieron cargar los privilegios",
+					type: "error",
+					confirmButtonText: "Cerrar"
+				});
+				return;
+			}
+
+			if(respuesta.usuario && respuesta.usuario.usu_nombre){
+				$("#privilegiosUsuarioNombre").val(respuesta.usuario.usu_nombre + " (" + respuesta.usuario.usu_perfil + ")");
+			}
+
+			if(Array.isArray(respuesta.modulos)){
+				respuesta.modulos.forEach(function(modulo){
+					$(".checkModuloUsuario[value='" + modulo + "']").prop("checked", true);
+				});
+			}
+
+			actualizarEstadoCheckTodos();
+		},
+		error: function(){
+			swal({
+				title: "Error",
+				text: "No se pudo consultar los privilegios del usuario",
+				type: "error",
+				confirmButtonText: "Cerrar"
+			});
+		}
+	});
+});
+
+$(document).on("change", "#checkTodosModulos", function(){
+	$(".checkModuloUsuario").prop("checked", $(this).is(":checked"));
+});
+
+$(document).on("change", ".checkModuloUsuario", function(){
+	actualizarEstadoCheckTodos();
+});
+
+function actualizarEstadoCheckTodos(){
+	var total = $(".checkModuloUsuario").length;
+	var marcados = $(".checkModuloUsuario:checked").length;
+	$("#checkTodosModulos").prop("checked", total > 0 && total === marcados);
+}
+
+$("#formPrivilegiosUsuario").on("submit", function(e){
+	e.preventDefault();
+
+	var idUsuario = $("#privilegiosUsuarioId").val();
+	var modulos = [];
+	$(".checkModuloUsuario:checked").each(function(){
+		modulos.push($(this).val());
+	});
+
+	var datos = new FormData();
+	datos.append("guardarPrivilegiosUsuario", "1");
+	datos.append("idUsuario", idUsuario);
+	for(var i = 0; i < modulos.length; i++){
+		datos.append("modulos[]", modulos[i]);
+	}
+
+	$.ajax({
+		url: "ajax/usuarios.ajax.php",
+		method: "POST",
+		data: datos,
+		cache: false,
+		contentType: false,
+		processData: false,
+		dataType: "json",
+		success: function(respuesta){
+			if(respuesta && respuesta.status === "ok"){
+				swal({
+					title: "Correcto",
+					text: "Los privilegios fueron guardados correctamente",
+					type: "success",
+					confirmButtonText: "Cerrar"
+				}).then(function(result){
+					if(result.value){
+						window.location = "usuarios";
+					}
+				});
+				return;
+			}
+
+			swal({
+				title: "Error",
+				text: (respuesta && respuesta.message) ? respuesta.message : "No se pudieron guardar los privilegios",
+				type: "error",
+				confirmButtonText: "Cerrar"
+			});
+		},
+		error: function(){
+			swal({
+				title: "Error",
+				text: "No se pudo guardar los privilegios del usuario",
+				type: "error",
+				confirmButtonText: "Cerrar"
+			});
+		}
+	});
+});
+
+/*=============================================
+RESTAURAR USUARIO DESDE PAPELERA
+=============================================*/
+$(document).on("click", ".btnRestaurarUsuario", function(){
+
+	var idUsuario = $(this).attr("idUsuario");
+	var nombreUsuario = $(this).attr("nombreUsuario");
+
+	swal({
+		title: '¿Restaurar usuario?',
+		text: 'El usuario "' + nombreUsuario + '" volverá a estar disponible en el sistema.',
+		type: 'question',
+		showCancelButton: true,
+		confirmButtonColor: '#28a745',
+		cancelButtonColor: '#6c757d',
+		cancelButtonText: 'Cancelar',
+		confirmButtonText: 'Sí, restaurar'
+	}).then(function(result){
+
+		if(result.value){
+
+			var datos = new FormData();
+			datos.append("restaurarUsuarioId", idUsuario);
+
+			$.ajax({
+				url: "ajax/usuarios.ajax.php",
+				method: "POST",
+				data: datos,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				success: function(respuesta){
+					if(respuesta && respuesta.status === "ok"){
+						swal({
+							title: "Restaurado",
+							text: "El usuario ha sido restaurado correctamente.",
+							type: "success",
+							confirmButtonText: "Cerrar"
+						}).then(function(r){
+							if(r.value){ window.location = "usuarios"; }
+						});
+					}else{
+						swal({
+							title: "Error",
+							text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo restaurar el usuario",
+							type: "error",
+							confirmButtonText: "Cerrar"
+						});
+					}
+				},
+				error: function(){
+					swal({
+						title: "Error",
+						text: "No se pudo conectar para restaurar el usuario.",
+						type: "error",
+						confirmButtonText: "Cerrar"
+					});
+				}
+			});
+		}
+	});
+});
+
+/*=============================================
+DEPURAR USUARIO - ELIMINACION FISICA (SOLO ADMINISTRADOR)
+=============================================*/
+$(document).on("click", ".btnDepurarUsuario", function(){
+
+	var idUsuario = $(this).attr("idUsuario");
+	var nombreUsuario = $(this).attr("nombreUsuario");
+
+	swal({
+		title: '\u26a0\ufe0f ELIMINACI\u00d3N DEFINITIVA',
+		html: '<strong>' + nombreUsuario + '</strong> ser\u00e1 eliminado <strong>permanentemente</strong> de la base de datos.<br><br>Esta acci\u00f3n <u>no se puede deshacer</u>.',
+		type: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#dc3545',
+		cancelButtonColor: '#6c757d',
+		cancelButtonText: 'Cancelar',
+		confirmButtonText: 'S\u00ed, eliminar para siempre'
+	}).then(function(result){
+
+		if(result.value){
+
+			var datos = new FormData();
+			datos.append("depurarUsuarioId", idUsuario);
+
+			$.ajax({
+				url: "ajax/usuarios.ajax.php",
+				method: "POST",
+				data: datos,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				success: function(respuesta){
+					if(respuesta && respuesta.status === "ok"){
+						swal({
+							title: "Eliminado",
+							text: "El usuario ha sido eliminado definitivamente.",
+							type: "success",
+							confirmButtonText: "Cerrar"
+						}).then(function(r){
+							if(r.value){ window.location = "usuarios"; }
+						});
+					}else{
+						swal({
+							title: "Error",
+							text: (respuesta && respuesta.message) ? respuesta.message : "No se pudo eliminar al usuario",
+							type: "error",
+							confirmButtonText: "Cerrar"
+						});
+					}
+				},
+				error: function(){
+					swal({
+						title: "Error",
+						text: "No se pudo conectar para eliminar al usuario.",
+						type: "error",
+						confirmButtonText: "Cerrar"
+					});
+				}
+			});
+		}
+	});
+});

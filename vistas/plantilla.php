@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config/accesos.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -177,25 +178,16 @@ if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] != "ok"){
 
     //<!-- Content Wrapper. Contains page content -->
     //CONTENIDO
-        if(isset($_GET["ruta"])){
-            if($_GET["ruta"] == "inicio" || 
-                $_GET["ruta"] == "usuarios" ||
-                $_GET["ruta"] == "centro-costo" ||
-                $_GET["ruta"] == "empresas" ||
-                $_GET["ruta"] == "vehiculos" ||
-                $_GET["ruta"] == "sig-opt" ||  
-                $_GET["ruta"] == "areas" ||  
-                $_GET["ruta"] == "cargos" ||  
-                $_GET["ruta"] == "empleados" || 
-                $_GET["ruta"] == "movimiento-caja" || 
-                $_GET["ruta"] == "salir"){          
-            include "modulos/".$_GET["ruta"].".php";          
-            }else{          
-                include "modulos/404.php";          
-                }          
-            }else{          
-                include "modulos/inicio.php";         
-            }     
+        $rutaSolicitada = isset($_GET['ruta']) && $_GET['ruta'] !== '' ? $_GET['ruta'] : 'inicio';
+        $modulosRegistrados = tmcObtenerModulosRegistrados();
+
+        if (!in_array($rutaSolicitada, $modulosRegistrados, true)) {
+            include 'modulos/404.php';
+        } elseif (!tmcUsuarioPuedeAccederModulo($_SESSION['usu_perfil'], $rutaSolicitada)) {
+            include 'modulos/404.php';
+        } else {
+            include 'modulos/' . $rutaSolicitada . '.php';
+        }
     //<!-- /.content-wrapper -->
 
     include 'modulos/estructura/footer.php'; 

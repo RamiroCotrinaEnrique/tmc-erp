@@ -1,5 +1,8 @@
 <?php
+require_once __DIR__ . '/../../../config/accesos.php';
+
 $rutaActual = isset($_GET['ruta']) && $_GET['ruta'] !== '' ? $_GET['ruta'] : 'inicio';
+$perfilActual = isset($_SESSION['usu_perfil']) ? $_SESSION['usu_perfil'] : '';
 $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
     return $rutaActual === $rutaMenu ? 'nav-link active color-fondo-personalizado' : 'nav-link';
 };
@@ -50,8 +53,10 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            
-            <?php if ($_SESSION['usu_perfil'] == 'Administrador') { ?>
+
+                <?php 
+
+                if (tmcUsuarioPuedeAccederModulo($perfilActual, 'inicio')) { ?>
 
                 <li class="nav-item">
                     <a href="inicio" class="<?php echo $sidebarNavClass('inicio'); ?>">
@@ -59,97 +64,124 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                         <p>Inicio</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php
+                $tieneGestionSig = tmcUsuarioPuedeAccederModulo($perfilActual, 'sig-opt');
+                if ($tieneGestionSig) {
+                ?>
                 <li class="nav-header">GESTIÓN SIG </li>
-
                 <li class="nav-item">
                     <a href="sig-opt" class="<?php echo $sidebarNavClass('sig-opt'); ?>">
                         <i class="fa fa-th nav-icon"></i>
                         <p>OPT</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php
+                $tieneGestionMaster =
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'usuarios') ||
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'empresas') ||
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'centro-costo');
+
+                if ($tieneGestionMaster) {
+                ?>
                 <li class="nav-header">GESTIÓN MASTER</li>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'usuarios')) { ?>
                 <li class="nav-item">
                     <a href="usuarios" class="<?php echo $sidebarNavClass('usuarios'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Usuarios</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'empresas')) { ?>
                 <li class="nav-item">
                     <a href="empresas" class="<?php echo $sidebarNavClass('empresas'); ?>">
                         <i class="fa fa-building nav-icon"></i>
                         <p>Empresas</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'centro-costo')) { ?>
                 <li class="nav-item">
                     <a href="centro-costo" class="<?php echo $sidebarNavClass('centro-costo'); ?>">
                         <i class="fa fa-building nav-icon"></i>
                         <p>Centro Costo</p>
                     </a>
                 </li>
+                <?php } ?>
+                <?php } ?>
 
-                <li class="nav-item">
-                    <a href="zona" class="<?php echo $sidebarNavClass('zona'); ?>">
-                        <i class="fa fa-building nav-icon"></i>
-                        <p>Zona</p>
-                    </a>
-                </li>
+                <?php
+                $tieneGestionHumana =
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'areas') ||
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'cargos') ||
+                    tmcUsuarioPuedeAccederModulo($perfilActual, 'empleados');
 
+                if ($tieneGestionHumana) {
+                ?>
                 <li class="nav-header">GESTIÓN HUMANA </li>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'areas')) { ?>
                 <li class="nav-item">
                     <a href="areas" class="<?php echo $sidebarNavClass('areas'); ?>">
                         <i class="fa fa-th nav-icon"></i>
                         <p>Áreas</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'cargos')) { ?>
                 <li class="nav-item">
                     <a href="cargos" class="<?php echo $sidebarNavClass('cargos'); ?>">
                         <i class="fa fa-th nav-icon"></i>
                         <p>Cargos</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'empleados')) { ?>
                 <li class="nav-item">
                     <a href="empleados" class="<?php echo $sidebarNavClass('empleados'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Empleados</p>
                     </a>
                 </li>
+                <?php } ?>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'movimiento-caja')) { ?>
                 <li class="nav-header">GESTIÓN TESORERÍA</li>
-
                 <li class="nav-item">
                     <a href="movimiento-caja" class="<?php echo $sidebarNavClass('movimiento-caja'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Movimientos Caja</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'vehiculos')) { ?>
                 <li class="nav-header">GESTIÓN MATENIMIENTO </li>
-
-                <li class="nav-item">
-                    <a href="tipo-vehiculo" class="<?php echo $sidebarNavClass('tipo-vehiculo'); ?>">
-                        <i class="fa fa-th nav-icon"></i>
-                        <p>Tipo de Vehículo </p>
-                    </a>
-                </li>
-
                 <li class="nav-item">
                     <a href="vehiculos" class="<?php echo $sidebarNavClass('vehiculos'); ?>">
                         <i class="fa fa-users nav-icon"></i>
-                        <p> Vehículos </p>
+                        <p>Vehículos</p>
                     </a>
                 </li>
-            <?php } ?>
 
-            </ul>
-            </li>
+                <li class="nav-item">
+                    <a href="orden-servicio" class="<?php echo $sidebarNavClass('orden-servicio'); ?>">
+                        <i class="fa fa-users nav-icon"></i>
+                        <p>Orden de Servicio</p>
+                    </a>
+                </li>
+
+                <?php } ?>
 
             </ul>
         </nav>

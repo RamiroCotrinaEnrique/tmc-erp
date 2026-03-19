@@ -1,6 +1,19 @@
 <?php
 
+require_once __DIR__ . '/../config/accesos.php';
+
 class ControladorUsuarios {
+
+	private static function ctrCargarPermisosModulosSesion($usuarioId, $perfil){
+		$privilegios = ModeloUsuarios::mdlObtenerPrivilegiosModulosUsuario((int) $usuarioId);
+
+		$_SESSION['usu_permisos_personalizados'] = isset($privilegios['personalizado']) ? (bool) $privilegios['personalizado'] : false;
+		if ($_SESSION['usu_permisos_personalizados']) {
+			$_SESSION['usu_modulos_permitidos'] = isset($privilegios['modulos']) && is_array($privilegios['modulos']) ? $privilegios['modulos'] : array();
+		} else {
+			$_SESSION['usu_modulos_permitidos'] = tmcObtenerModulosPermitidosPorPerfil($perfil);
+		}
+	}
 
     /**
      * INGRESO DE USUARIO
@@ -23,9 +36,7 @@ class ControladorUsuarios {
                 if($respuesta["usu_usuario"] == $txtUsuario && password_verify($txtContrasena, $respuesta["usu_password"])){
 
 					if ($respuesta["usu_estado"] == 1) {
-
 						$_SESSION["iniciarSesion"] = "ok";
-
 						$_SESSION["usu_id"] = $respuesta["usu_id"];
 						$_SESSION["usu_nombre"] = $respuesta["usu_nombre"];
 						$_SESSION["usu_usuario"] = $respuesta["usu_usuario"];
@@ -33,6 +44,7 @@ class ControladorUsuarios {
 						$_SESSION["usu_foto"] = $respuesta["usu_foto"];
 						$_SESSION["usu_ultimo_login"] = $respuesta["usu_ultimo_login"];
 						$_SESSION['tiempo_ingreso'] = time();
+						self::ctrCargarPermisosModulosSesion($respuesta["usu_id"], $respuesta["usu_perfil"]);
 
 						/*=============================================
 						REGISTRAR FECHA PARA SABER EL ÚLTIMO LOGIN
@@ -61,10 +73,7 @@ class ControladorUsuarios {
 
 					}else{
 						echo '<br><div class="alert alert-danger">Usuario aún no esta activado</div>';  
-					}
-    
-
-    
+					}      
                 }else{
                     echo '<br><div class="alert alert-danger">Error al ingresar, vuelve a intentarlo</div>';
                 }                 
@@ -91,38 +100,26 @@ class ControladorUsuarios {
 				$ruta = "";
 
 				if( $_FILES["nuevaFoto"]["tmp_name"] != null ){
-
 					list($ancho, $alto) = getimagesize($_FILES["nuevaFoto"]["tmp_name"]);
-
 					$nuevoAncho = 500;
 					$nuevoAlto = 500;
-
 					/*=============================================
 					CREAMOS EL DIRECTORIO DONDE VAMOS A GUARDAR LA FOTO DEL USUARIO
 					=============================================*/
-
 					$directorio = "vistas/img/usuarios/".$_POST["nuevoUsuario"];
-
 					mkdir($directorio, 0755);
-
 					/*=============================================
 					DE ACUERDO AL TIPO DE IMAGEN APLICAMOS LAS FUNCIONES POR DEFECTO DE PHP
 					=============================================*/
-
 					if($_FILES["nuevaFoto"]["type"] == "image/jpeg"){
-
 						/*=============================================
 						GUARDAMOS LA IMAGEN EN EL DIRECTORIO
 						=============================================*/
-
 						$aleatorio = mt_rand(100,999);
-
 						$ruta = "vistas/img/usuarios/".$_POST["nuevoUsuario"]."/".$aleatorio.".jpg";
-
-						$origen = imagecreatefromjpeg($_FILES["nuevaFoto"]["tmp_name"]);						
+						$origen = imagecreatefromjpeg($_FILES["nuevaFoto"]["tmp_name"]);			
 
 						$destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
-
 						imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
 
 						imagejpeg($destino, $ruta);
@@ -205,6 +202,101 @@ class ControladorUsuarios {
 		$tabla = "usuarios";
 		$respuesta = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
 		return $respuesta;
+	}
+
+	static public function ctrObtenerPrivilegiosModulosUsuario($usuarioId){
+		if(!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador'){
+			return array(
+				'status' => 'error',
+				'message' => 'No tiene permisos para revisar privilegios.'
+			);
+		}
+
+		$usuarioId = (int) $usuarioId;
+		if($usuarioId <= 0){
+			return array(
+				'status' => 'error',
+				'message' => 'Usuario invalido.'
+			);
+		}
+
+		$usuario = self::ctrMostrarUsuarios('usu_id', $usuarioId);
+		if(!$usuario){
+			return array(
+				'status' => 'error',
+				'message' => 'Usuario no encontrado.'
+			);
+		}
+
+		$privilegios = ModeloUsuarios::mdlObtenerPrivilegiosModulosUsuario($usuarioId);
+		$modulosEfectivos = isset($privilegios['modulos']) ? $privilegios['modulos'] : array();
+
+		if (empty($modulosEfectivos)) {
+			$modulosPerfil = tmcObtenerModulosPermitidosPorPerfil($usuario['usu_perfil']);
+			if (in_array('*', $modulosPerfil, true)) {
+				$modulosEfectivos = tmcObtenerModulosRegistrados();
+			} else {
+				$modulosEfectivos = $modulosPerfil;
+			}
+		}
+
+		return array(
+			'status' => 'ok',
+			'usuario' => array(
+				'usu_id' => $usuario['usu_id'],
+				'usu_nombre' => $usuario['usu_nombre'],
+				'usu_perfil' => $usuario['usu_perfil']
+			),
+			'personalizado' => isset($privilegios['personalizado']) ? (bool) $privilegios['personalizado'] : false,
+			'modulos' => $modulosEfectivos
+		);
+	}
+
+	static public function ctrGuardarPrivilegiosModulosUsuario($usuarioId, $modulos){
+		if(!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador'){
+			return array(
+				'status' => 'error',
+				'message' => 'No tiene permisos para editar privilegios.'
+			);
+		}
+
+		$usuarioId = (int) $usuarioId;
+		if($usuarioId <= 0){
+			return array(
+				'status' => 'error',
+				'message' => 'Usuario invalido.'
+			);
+		}
+
+		$usuario = self::ctrMostrarUsuarios('usu_id', $usuarioId);
+		if(!$usuario){
+			return array(
+				'status' => 'error',
+				'message' => 'Usuario no encontrado.'
+			);
+		}
+
+		$modulosRegistrados = tmcObtenerModulosRegistrados();
+		$modulosEntrada = is_array($modulos) ? $modulos : array();
+		$modulosValidados = array_values(array_unique(array_intersect($modulosEntrada, $modulosRegistrados)));
+
+		if($usuario['usu_perfil'] !== 'Administrador'){
+			$modulosValidados = array_values(array_diff($modulosValidados, array('usuarios')));
+		}
+
+		$resultado = ModeloUsuarios::mdlGuardarPrivilegiosModulosUsuario($usuarioId, $modulosValidados);
+
+		if(isset($resultado['status']) && $resultado['status'] === 'ok'){
+			if(isset($_SESSION['usu_id']) && (int) $_SESSION['usu_id'] === $usuarioId){
+				$_SESSION['usu_permisos_personalizados'] = !empty($modulosValidados);
+				$_SESSION['usu_modulos_permitidos'] = !empty($modulosValidados)
+					? $modulosValidados
+					: tmcObtenerModulosPermitidosPorPerfil($usuario['usu_perfil']);
+			}
+			return array('status' => 'ok');
+		}
+
+		return $resultado;
 	}
 
 	/*=============================================
@@ -382,16 +474,12 @@ class ControladorUsuarios {
 
 			$tabla ="usuarios";
 			$datos = $_GET["idUsuario"];
-			if($_GET["fotoUsuario"] != ""){
-				unlink($_GET["fotoUsuario"]);
-				rmdir('vistas/img/usuarios/'.$_GET["usuario"]);
-			}
 			$respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $datos);
 			if($respuesta == "ok"){
 				echo'<script>
 				swal({
 					  type: "success",
-					  title: "El usuario ha sido borrado correctamente",
+					  title: "El usuario ha sido eliminado logicamente",
 					  showConfirmButton: true,
 					  confirmButtonText: "Cerrar"
 					  }).then(function(result){
@@ -400,6 +488,19 @@ class ControladorUsuarios {
 								}
 							})
 				</script>';
+			}else{
+				echo'<script>
+				swal({
+					  type: "error",
+					  title: "No se pudo eliminar el usuario o ya estaba eliminado",
+					  showConfirmButton: true,
+					  confirmButtonText: "Cerrar"
+					  }).then(function(result){
+							if (result.value) {
+							window.location = "usuarios";
+							}
+						})
+				</script>';
 			}
 		}
 	}
@@ -407,5 +508,62 @@ class ControladorUsuarios {
 
 
 
+
+
+	/*=============================================
+	MOSTRAR USUARIOS ELIMINADOS (PAPELERA)
+	=============================================*/
+
+	static public function ctrMostrarUsuariosEliminados(){
+		$tabla = 'usuarios';
+		return ModeloUsuarios::mdlMostrarUsuariosEliminados($tabla);
+	}
+
+	/*=============================================
+	RESTAURAR USUARIO (SOLO ADMINISTRADOR)
+	=============================================*/
+
+	static public function ctrRestaurarUsuario($id){
+		if(!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador'){
+			return array('status' => 'error', 'message' => 'Sin permisos para restaurar usuarios');
+		}
+		$id = (int)$id;
+		if($id <= 0){
+			return array('status' => 'error', 'message' => 'ID de usuario invalido');
+		}
+		$respuesta = ModeloUsuarios::mdlRestaurarUsuario('usuarios', $id);
+		if($respuesta === 'ok'){
+			$actorId = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+			$detalle = 'Usuario restaurado desde papelera';
+			ModeloUsuarios::mdlRegistrarAuditoriaUsuario($actorId, $id, 'RESTAURAR', $detalle);
+			return array('status' => 'ok');
+		}
+		return array('status' => 'error', 'message' => 'No se pudo restaurar el usuario o ya estaba activo');
+	}
+
+	/*=============================================
+	DEPURAR USUARIO - ELIMINACION FISICA (SOLO ADMINISTRADOR)
+	=============================================*/
+
+	static public function ctrDepurarUsuario($id){
+		if(!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador'){
+			return array('status' => 'error', 'message' => 'Solo los administradores pueden eliminar definitivamente');
+		}
+		$id = (int)$id;
+		if($id <= 0){
+			return array('status' => 'error', 'message' => 'ID de usuario invalido');
+		}
+		if(isset($_SESSION['usu_id']) && (int)$_SESSION['usu_id'] === $id){
+			return array('status' => 'error', 'message' => 'No puede eliminar su propia cuenta');
+		}
+		$respuesta = ModeloUsuarios::mdlDepurarUsuario('usuarios', $id);
+		if($respuesta === 'ok'){
+			$actorId = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+			$detalle = 'Usuario eliminado fisicamente desde papelera';
+			ModeloUsuarios::mdlRegistrarAuditoriaUsuario($actorId, $id, 'DEPURAR', $detalle);
+			return array('status' => 'ok');
+		}
+		return array('status' => 'error', 'message' => 'No se pudo eliminar definitivamente al usuario');
+	}
 
 }

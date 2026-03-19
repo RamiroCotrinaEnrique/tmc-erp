@@ -1,11 +1,4 @@
-<?php
-if($_SESSION["usu_perfil"] == "Vendedor"){
-  echo '<script>
-    window.location = "inicio";
-  </script>';
-  return;
-}
-?>
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-03-2026 a las 01:30:29
+-- Tiempo de generación: 19-03-2026 a las 01:00:11
 -- Versión del servidor: 10.1.38-MariaDB
 -- Versión de PHP: 7.3.3
 
@@ -79,7 +79,7 @@ CREATE TABLE `centro_costo` (
   `cenco_id` int(11) NOT NULL,
   `cenco_codigo` text COLLATE utf8mb4_unicode_ci,
   `cenco_nombre` text COLLATE utf8mb4_unicode_ci,
-  `cenco_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `cenco_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `cenco_fecha_update` datetime DEFAULT NULL,
   `cenco_fecha_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -131,9 +131,9 @@ CREATE TABLE `config_series` (
 
 INSERT INTO `config_series` (`conf_seri_id`, `conf_seri_tipo`, `conf_seri_moneda`, `conf_seri_serie`, `conf_seri_ultimo_numero`) VALUES
 (1, 'INGRESO', 'SOLES', '001', 1),
-(2, 'INGRESO', 'DOLARES', '001', 0),
+(2, 'INGRESO', 'DOLARES', '001', 1),
 (3, 'EGRESO', 'SOLES', '001', 0),
-(4, 'EGRESO', 'DOLARES', '001', 0),
+(4, 'EGRESO', 'DOLARES', '001', 1),
 (5, 'INGRESO', 'SOLES', '002', 0),
 (6, 'EGRESO', 'SOLES', '002', 0),
 (7, 'INGRESO', 'SOLES', '003', 1),
@@ -162,7 +162,12 @@ INSERT INTO `detalle_movimiento` (`deta_movi_id`, `deta_movi_movimiento_id`, `de
 (23, 13, 1, 'TACOS', '16.50'),
 (24, 14, 1, 'DGGF', '54.00'),
 (25, 15, 1, 'ingreso', '2000.00'),
-(26, 16, 1, 'aaddddd', '2000.00');
+(26, 16, 1, 'aaddddd', '2000.00'),
+(27, 17, 1, 'PASAJE PARA COMPRAR IMPERSORA', '15.00'),
+(28, 18, 1, 'ASDDDDD ADA  ADAD AADASDASFAASSF AS FASF', '200.00'),
+(29, 18, 2, 'FFHHA AHBDIA  ABUDH ABIA UI FIABOF', '500.00'),
+(30, 18, 3, 'JDJJFUE UJDJKD  UDJLKSF EJE', '680.00'),
+(31, 18, 4, 'UIOIJI  JSHF JJJD AJDN HHFF  JF  JFP', '980.00');
 
 -- --------------------------------------------------------
 
@@ -309,7 +314,9 @@ INSERT INTO `movimientos` (`movi_id`, `movi_tipo`, `movi_serie`, `movi_numero`, 
 (13, 'EGRESO', '004', 2, 'SOLES', '2026-03-17', 22, '16.50', '2026-03-18 00:10:49', NULL, NULL),
 (14, 'EGRESO', '004', 3, 'SOLES', '2026-03-17', 22, '54.00', '2026-03-18 00:13:12', NULL, NULL),
 (15, 'INGRESO', '003', 1, 'SOLES', '2026-03-17', 1, '2000.00', '2026-03-18 00:16:03', NULL, NULL),
-(16, 'INGRESO', '001', 1, 'SOLES', '2026-03-17', 25, '2000.00', '2026-03-18 00:21:55', NULL, NULL);
+(16, 'INGRESO', '001', 1, 'SOLES', '2026-03-17', 25, '2000.00', '2026-03-18 00:21:55', NULL, NULL),
+(17, 'EGRESO', '001', 1, 'DOLARES', '2026-03-18', 1, '15.00', '2026-03-18 19:40:45', NULL, NULL),
+(18, 'INGRESO', '001', 1, 'DOLARES', '2026-03-10', 3, '2360.00', '2026-03-18 19:52:59', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -525,22 +532,51 @@ CREATE TABLE `usuarios` (
   `usu_foto` text,
   `usu_estado` int(11) DEFAULT NULL,
   `usu_ultimo_login` datetime DEFAULT NULL,
-  `usu_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `usu_fecha_update` datetime DEFAULT NULL,
-  `usu_fecha_delete` datetime DEFAULT NULL
+  `usu_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `usu_fecha_update` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `usu_fecha_delete` datetime DEFAULT NULL,
+  `usu_es_master` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag: 1=cuenta master con permiso de eliminacion fisica'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`usu_id`, `usu_nombre`, `usu_usuario`, `usu_password`, `usu_perfil`, `usu_foto`, `usu_estado`, `usu_ultimo_login`, `usu_fecha_create`, `usu_fecha_update`, `usu_fecha_delete`) VALUES
-(1, 'Usuario Administrado', 'admin', '$2a$07$asxx54ahjppf45sd87a5auXBm1Vr2M1NV5t/zNQtGHGpS5fFirrbG', 'Administrador', 'vistas/img/usuarios/admin/994.png', 1, '2026-03-17 12:44:23', '2026-03-17 17:44:23', NULL, NULL),
-(2, 'Victor Cotrina Enrique', 'vcotrina', '$2a$07$asxx54ahjppf45sd87a5auaK2UuY9I3HoWrDp0X6p.3tlEWlvSpv.', 'Especial', 'vistas/img/usuarios/vcotrina/143.png', 1, '2025-02-07 09:52:37', '2025-02-07 14:52:37', NULL, NULL),
-(3, 'Ramiro Cotrina Enrique', 'rcotrina', '$2a$07$asxx54ahjppf45sd87a5auSCG6EtWTOSpeybRK.d3z3BAMJt.7teO', 'Vendedor', 'vistas/img/usuarios/rcotrina/410.png', 1, '2025-01-15 16:30:58', '2025-01-15 21:30:58', NULL, NULL),
-(4, 'Lizandro Enrique Zuñiga Lorenzo', 'lzuniga', '$2a$07$asxx54ahjppf45sd87a5audlqe7C7op4Pg1msP3K1KXmDbjd5n86u', 'Vendedor', '', 0, '2024-12-07 19:34:34', '2024-12-12 23:48:48', NULL, NULL),
-(5, 'John Pablo Cajamarca Nájera', 'jcajamarca', '$2a$07$asxx54ahjppf45sd87a5auYguoFiMYo/wBxfdjBdCAWMfLB5L6Y6m', 'Vendedor', '', 0, '2024-12-10 15:19:34', '2024-12-12 23:48:45', NULL, NULL),
-(6, 'Nelson', 'nvaldivia', '$2a$07$asxx54ahjppf45sd87a5auGZEtGHuyZwm.Ur.FJvWLCql3nmsMbXy', 'Especial', 'vistas/img/usuarios/nvaldivia/390.png', NULL, NULL, '2026-01-15 14:51:54', NULL, NULL);
+INSERT INTO `usuarios` (`usu_id`, `usu_nombre`, `usu_usuario`, `usu_password`, `usu_perfil`, `usu_foto`, `usu_estado`, `usu_ultimo_login`, `usu_fecha_create`, `usu_fecha_update`, `usu_fecha_delete`, `usu_es_master`) VALUES
+(1, 'Usuario Administrado', 'admin', '$2a$07$asxx54ahjppf45sd87a5auXBm1Vr2M1NV5t/zNQtGHGpS5fFirrbG', 'Administrador', 'vistas/img/usuarios/admin/994.png', 0, '2026-03-18 17:19:30', '2026-03-18 15:45:24', '2026-03-18 23:58:46', '2026-03-18 18:58:46', 0),
+(2, 'Victor Cotrina Enrique', 'vcotrina', '$2a$07$asxx54ahjppf45sd87a5auaK2UuY9I3HoWrDp0X6p.3tlEWlvSpv.', 'Usuario', 'vistas/img/usuarios/vcotrina/143.png', 1, '2026-03-18 18:28:14', '2026-03-18 21:41:18', '2026-03-18 23:28:14', NULL, 0),
+(3, 'Ramiro Cotrina Enrique', 'rcotrina', '$2a$07$asxx54ahjppf45sd87a5auSCG6EtWTOSpeybRK.d3z3BAMJt.7teO', 'Usuario', 'vistas/img/usuarios/rcotrina/410.png', 1, '2025-01-15 16:30:58', '2026-03-18 21:34:09', NULL, NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios_modulos`
+--
+
+CREATE TABLE `usuarios_modulos` (
+  `umod_id` int(10) UNSIGNED NOT NULL,
+  `usu_id` int(11) NOT NULL,
+  `modulo` varchar(80) NOT NULL,
+  `umod_fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `usuarios_modulos`
+--
+
+INSERT INTO `usuarios_modulos` (`umod_id`, `usu_id`, `modulo`, `umod_fecha_creacion`) VALUES
+(63, 1, 'inicio', '2026-03-18 21:17:12'),
+(64, 1, 'usuarios', '2026-03-18 21:17:12'),
+(65, 1, 'centro-costo', '2026-03-18 21:17:12'),
+(66, 1, 'empresas', '2026-03-18 21:17:12'),
+(67, 1, 'vehiculos', '2026-03-18 21:17:12'),
+(68, 1, 'sig-opt', '2026-03-18 21:17:12'),
+(69, 1, 'areas', '2026-03-18 21:17:12'),
+(70, 1, 'empleados', '2026-03-18 21:17:12'),
+(71, 1, 'movimiento-caja', '2026-03-18 21:17:12'),
+(93, 2, 'centro-costo', '2026-03-18 23:28:52'),
+(94, 2, 'vehiculos', '2026-03-18 23:28:52'),
+(95, 2, 'orden-servicio', '2026-03-18 23:28:52');
 
 -- --------------------------------------------------------
 
@@ -650,6 +686,14 @@ ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`usu_id`);
 
 --
+-- Indices de la tabla `usuarios_modulos`
+--
+ALTER TABLE `usuarios_modulos`
+  ADD PRIMARY KEY (`umod_id`),
+  ADD UNIQUE KEY `uk_usuario_modulo` (`usu_id`,`modulo`),
+  ADD KEY `idx_usuarios_modulos_usuario` (`usu_id`);
+
+--
 -- Indices de la tabla `vehiculos`
 --
 ALTER TABLE `vehiculos`
@@ -691,7 +735,7 @@ ALTER TABLE `config_series`
 -- AUTO_INCREMENT de la tabla `detalle_movimiento`
 --
 ALTER TABLE `detalle_movimiento`
-  MODIFY `deta_movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `deta_movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
@@ -709,7 +753,7 @@ ALTER TABLE `empresas`
 -- AUTO_INCREMENT de la tabla `movimientos`
 --
 ALTER TABLE `movimientos`
-  MODIFY `movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `movi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `opts`
@@ -721,7 +765,13 @@ ALTER TABLE `opts`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios_modulos`
+--
+ALTER TABLE `usuarios_modulos`
+  MODIFY `umod_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
 -- AUTO_INCREMENT de la tabla `vehiculos`
@@ -759,6 +809,12 @@ ALTER TABLE `movimientos`
 --
 ALTER TABLE `opts`
   ADD CONSTRAINT `opts_ibfk_1` FOREIGN KEY (`opt_vehiculo_id`) REFERENCES `vehiculos` (`vehic_id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `usuarios_modulos`
+--
+ALTER TABLE `usuarios_modulos`
+  ADD CONSTRAINT `fk_usuarios_modulos_usuario` FOREIGN KEY (`usu_id`) REFERENCES `usuarios` (`usu_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `vehiculos`
