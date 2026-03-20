@@ -64,20 +64,7 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                         <p>Inicio</p>
                     </a>
                 </li>
-                <?php } ?>
-
-                <?php
-                $tieneGestionSig = tmcUsuarioPuedeAccederModulo($perfilActual, 'sig-opt');
-                if ($tieneGestionSig) {
-                ?>
-                <li class="nav-header">GESTIÓN SIG </li>
-                <li class="nav-item">
-                    <a href="sig-opt" class="<?php echo $sidebarNavClass('sig-opt'); ?>">
-                        <i class="fa fa-th nav-icon"></i>
-                        <p>OPT</p>
-                    </a>
-                </li>
-                <?php } ?>
+                <?php } ?>                
 
                 <?php
                 $tieneGestionMaster =
@@ -115,6 +102,19 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                     </a>
                 </li>
                 <?php } ?>
+                <?php } ?>
+
+                <?php
+                $tieneGestionSig = tmcUsuarioPuedeAccederModulo($perfilActual, 'sig-opt');
+                if ($tieneGestionSig) {
+                ?>
+                <li class="nav-header">GESTIÓN SIG </li>
+                <li class="nav-item">
+                    <a href="sig-opt" class="<?php echo $sidebarNavClass('sig-opt'); ?>">
+                        <i class="fa fa-th nav-icon"></i>
+                        <p>OPT</p>
+                    </a>
+                </li>
                 <?php } ?>
 
                 <?php
