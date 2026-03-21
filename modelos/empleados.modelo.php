@@ -81,7 +81,8 @@ class ModeloEmpleados{
 				INNER JOIN centro_costo cc ON e.emple_cenco_id = cc.cenco_id
 				INNER JOIN areas a ON e.emple_area_id = a.are_id
 				INNER JOIN cargos c ON e.emple_cargo_id = c.car_id
-				WHERE e.emple_fecha_delete IS NULL"
+				WHERE e.emple_fecha_delete IS NULL
+				ORDER BY e.emple_id DESC"
 			);
 
 			$stmt->execute();

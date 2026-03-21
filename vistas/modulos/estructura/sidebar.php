@@ -118,6 +118,19 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                 <?php } ?>
 
                 <?php
+                $tieneGestionOperaciones = tmcUsuarioPuedeAccederModulo($perfilActual, 'hoja-liquidacion') || tmcUsuarioPuedeAccederModulo($perfilActual, 'orden-servicio');
+                if ($tieneGestionOperaciones) {
+                ?>
+                <li class="nav-header">GESTIÓN OPERACIONES </li>
+                <li class="nav-item">
+                    <a href="hoja-liquidacion" class="<?php echo $sidebarNavClass('hoja-liquidacion'); ?>">
+                        <i class="fa fa-th nav-icon"></i>
+                        <p>Hoja de Liquidación</p>
+                    </a>
+                </li>
+                <?php } ?>
+
+                <?php
                 $tieneGestionHumana =
                     tmcUsuarioPuedeAccederModulo($perfilActual, 'areas') ||
                     tmcUsuarioPuedeAccederModulo($perfilActual, 'cargos') ||
@@ -163,6 +176,14 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                         <p>Movimientos Caja</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="rendicion-caja-chica" class="<?php echo $sidebarNavClass('rendicion-caja-chica'); ?>">
+                        <i class="fa fa-users nav-icon"></i>
+                        <p>Rendición de Caja Chica</p>
+                    </a>
+                </li>
+
                 <?php } ?>
 
                 <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'vehiculos')) { ?>

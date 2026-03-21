@@ -446,4 +446,33 @@ CREATE TABLE config_series (
 
 
 
+-- 1. Cabecera de la liquidación (lo que arriba dice Nombre, Mes, Día)
+CREATE TABLE liquidaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigo_liq VARCHAR(20) UNIQUE, -- Ej: LIQ-2026-001
+    responsable VARCHAR(100),
+    dni VARCHAR(15),
+    fecha DATE,
+    saldo_anterior DECIMAL(10,2),
+    total_ingresos DECIMAL(10,2) DEFAULT 0.00,
+    total_egresos DECIMAL(10,2) DEFAULT 0.00,
+    saldo_final DECIMAL(10,2),
+    estado INT DEFAULT 1 -- 1: Abierto, 0: Cerrado
+);
+
+-- 2. El detalle (la tabla azul de tu Excel)
+CREATE TABLE detalle_gastos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_liquidacion INT,
+    tipo_doc VARCHAR(50),
+    nro_doc VARCHAR(50),
+    razon_social VARCHAR(200),
+    concepto TEXT,
+    monto DECIMAL(10,2),
+    tipo_movimiento ENUM('INGRESO', 'EGRESO'),
+    FOREIGN KEY (id_liquidacion) REFERENCES liquidaciones(id) ON DELETE CASCADE
+);
+
+
+
 

@@ -21,6 +21,8 @@ function tmcObtenerModulosRegistrados() {
         'cargos',
         'empleados',
         'movimiento-caja',
+        'rendicion-caja-chica',
+        'hoja-liquidacion',
         'orden-servicio',
         'salir'
     );

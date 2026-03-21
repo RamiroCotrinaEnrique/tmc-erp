@@ -48,7 +48,7 @@
                                         <th>Cargo</th>
                                         <th>Área</th>
                                         <th>Nacionalidad</th>
-                                        <th>Ajustes</th>
+                                        <th>Ajustes</th> 
                                     </tr>
                                 </thead>
                                 <tbody>
