@@ -165,7 +165,7 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
 ======================================-->
 
 <div class="modal fade" id="modalAgregarHojaLiquidacion">
-    <div class="modal-dialog modal-lg"> <div class="modal-content">
+    <div class="modal-dialog modal-xl"> <div class="modal-content">
 
             <form role="form" method="post">
 
@@ -180,12 +180,12 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                     <div class="card-body">
 
                         <div class="row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-2">
                                 <label>Número de Registro</label>
                                 <input type="text" class="form-control" id="inputNumeroRegistro" name="inputNumeroRegistro" readonly required>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label>Fecha de Salida <span class="text-danger">(*)</span> </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -195,20 +195,16 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label>Fecha de Llegada <span class="text-danger">(*)</span> </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" name="nuevaFechaLlegada" required>
+                                    <input type="date" class="form-control" id="inputFechaLlegada" name="nuevaFechaLlegada" required>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-2">
                                 <label>Tracto</label>
                                 <select class="form-control select2" id="inputPlaca" name="inputPlaca" required>
                                     <option value="">Seleccione...</option>
@@ -223,8 +219,7 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                                     ?>
                                 </select>
                             </div>
-
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-md-2">
                                 <label>Tolva</label>
                                 <select class="form-control select2" id="inputTolva" name="inputTolva" required>
                                     <option value="">Seleccione...</option>
@@ -240,6 +235,9 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                                 </select>
                             </div>
 
+                        </div>
+
+                        <div class="row">
                             <div class="form-group col-md-3">
                                 <label>Operación</label>
                                 <select class="form-control select2" id="inputOperacion" name="inputOperacion" required>
@@ -256,18 +254,15 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                             </div>
 
                             <div class="form-group col-md-3">
-                                <label>Monto (S/)</label>
+                                <label>Monto recibido </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><b>S/</b></span>
                                     </div>
-                                    <input type="number" step="0.01" min="0" class="form-control" name="nuevoMonto" placeholder="0.00" required>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputMontoRecibido" name="inputMontoRecibido" placeholder="0.00" required>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label>Empleado</label>
                                 <select class="form-control select2" id="inputEmpleado" name="inputEmpleado" required>
                                     <option value="">Seleccione...</option>
@@ -283,66 +278,154 @@ MODAL AGREGAR HOJA DE LIQUIDACIÓN
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row">
-                            <div class="form-group col-md-6">
-                                <label>Fecha Documento</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                                    </div>
-                                    <input type="date" class="form-control" name="nuevaFecha" required>
-                                </div>
+                            <div class="form-group col-md-12">
+                                <label>G.R REMISIÓN</label> 
                             </div>
 
-                            <div class="form-group col-md-6">
-                                <label>Tipo de Movimiento</label>
-                                <select class="form-control" name="nuevoTipoMov" required>
-                                    <option value="EGRESO">EGRESO (Gasto)</option>
-                                    <option value="INGRESO">INGRESO (Aporte/Reembolso)</option>
-                                </select>
+                            <div class="form-group col-md-2">
+                                <label>G.R R</label>
+                                <input type="text" class="form-control" id="inputGRRProducto" name="inputGRRProducto" placeholder="G.R R" required>
                             </div>
+                            <div class="form-group col-md-2">
+                                <label>Producto</label>
+                                <input type="text" class="form-control" id="inputProducto" name="inputProducto" placeholder="Producto" required>
+                            </div>
+
+                            <div class="form-group col-md-2">
+                                <label>G.R R</label>
+                                <input type="text" class="form-control" id="inputGRRServicioAdicional" name="inputGRRServicioAdicional" placeholder="G.R R" required>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label>Ser. Adicional</label>
+                                <input type="text" class="form-control" id="inputSerAdicional" name="inputSerAdicional" placeholder="Ser. Adicional" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>G.R TRANSPORTISTA</label>                                 
+                                <input type="text" class="form-control" id="inputGRTransportista" name="inputGRTransportista" placeholder="G.R TRANSPORTISTA" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                                                    
                         </div>
 
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label>Nombre o Razón Social</label>
-                                <input type="text" class="form-control" name="nuevaRazonSocial" placeholder="Ej. Grifo Primax S.A." required>
+                                <label>GASTOS</label> 
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="form-group col-md-4">
-                                <label>Tipo Doc.</label>
-                                <select class="form-control" name="nuevoTipoDoc">
-                                    <option value="1">Factura (1)</option>
-                                    <option value="2">Boleta (2)</option>
-                                    <option value="3">Recibo (3)</option>
-                                    <option value="4">Ticket (4)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-4">
-                                <label>Nro. Documento</label>
-                                <input type="text" class="form-control" name="nuevoNroDoc" placeholder="001-000123">
-                            </div>
-
-                            <div class="form-group col-md-4">
-                                <label>Monto (S/)</label>
+                            <div class="form-group col-md-2">
+                                <label>Peaje </label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><b>S/</b></span>
                                     </div>
-                                    <input type="number" step="0.01" min="0" class="form-control" name="nuevoMonto" placeholder="0.00" required>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputPeaje" name="inputPeaje" placeholder="0.00" required>
                                 </div>
                             </div>
+                            <div class="form-group col-md-2">
+                                <label>Boletas varias </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputBoletasVarias" name="inputBoletasVarias" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Boletas de consumo </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputBoletasConsumo" name="inputBoletasConsumo" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Planilla de movilidad </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputPlanillaMovilidad" name="inputPlanillaMovilidad" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label>Facturas varios </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputFacturasVarios" name="inputFacturasVarios" placeholder="0.00" required>
+                                </div>
+                            </div> 
                         </div>
 
-                        <div class="form-group">
-                            <label>Concepto / Descripción</label>
-                            <textarea class="form-control" name="nuevoConcepto" rows="2" placeholder="Describa el gasto..."></textarea>
+                        <div class="row"> 
+                            <div class="form-group col-md-2">
+                                <label>Reintegro </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputReintegro" name="inputReintegro" placeholder="0.00" required readonly>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label>Vuelto </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputVuelto" name="inputVuelto" placeholder="0.00" required readonly>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label>Suma Total </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><b>S/</b></span>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="inputSumaTotal" name="inputSumaTotal" placeholder="0.00" required readonly>
+                                </div>
+                            </div> 
+                            <div class="form-group col-md-6">
+                                <label>Observaciones</label>
+                            <textarea class="form-control" id="inputObservaciones" name="inputObservaciones" rows="1" placeholder="Observaciones..."></textarea>
+                            </div> 
                         </div>
 
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>DATOS DE ABASTECIMIENTO</label> 
+                            </div>
+
+                            <div class="form-group col-md-2">
+                                <label>KM Salida</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputKMSalida" name="inputKMSalida" placeholder="0.00" required> 
+                            </div> 
+                            <div class="form-group col-md-2">
+                                <label>KM Llegada</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputKMLlegada" name="inputKMLlegada" placeholder="0.00" required> 
+                            </div> 
+                            <div class="form-group col-md-2">
+                                <label>C.V Grifo</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputCVGrifo" name="inputCVGrifo" placeholder="0.00" required> 
+                            </div> 
+                            <div class="form-group col-md-2">
+                                <label>C.V EQ</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputCVEQ" name="inputCVEQ" placeholder="0.00" required> 
+                            </div> 
+                            <div class="form-group col-md-2">
+                                <label>Total KM</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputTotalKM" name="inputTotalKM" placeholder="0.00" required> 
+                            </div> 
+                            <div class="form-group col-md-2">
+                                <label>Variación</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="inputVariacion" name="inputVariacion" placeholder="0.00" required> 
+                            </div> 
+                        </div>
                     </div>
                 </div>
 

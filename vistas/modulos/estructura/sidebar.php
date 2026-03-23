@@ -118,7 +118,7 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                 <?php } ?>
 
                 <?php
-                $tieneGestionOperaciones = tmcUsuarioPuedeAccederModulo($perfilActual, 'hoja-liquidacion') || tmcUsuarioPuedeAccederModulo($perfilActual, 'orden-servicio');
+                $tieneGestionOperaciones = tmcUsuarioPuedeAccederModulo($perfilActual, 'hoja-liquidacion') ;
                 if ($tieneGestionOperaciones) {
                 ?>
                 <li class="nav-header">GESTIÓN OPERACIONES </li>
