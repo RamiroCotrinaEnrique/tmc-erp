@@ -176,6 +176,7 @@ $("#inputPlaca").change(function(){
                 $("#inputEditModelo").val(respuesta["vehic_modelo"]);
                 $("#inputEditAnio").val(respuesta["vehic_anio"]);
                 $("#inputEditClase").val(respuesta["vehic_clase"]);
+                $("#inputEditTipo").val(respuesta["vehic_tipo"]);
                 $("#inputEditNumeroVin").val(respuesta["vehic_numero_vin"]);
                 $("#inputEditNumeroMotor").val(respuesta["vehic_numero_motor"]);
                 $("#inputEditJefeOperacion").val(respuesta["vehic_jefe_operacion"]);
@@ -190,6 +191,9 @@ $("#inputPlaca").change(function(){
                 if ($("#inputEditCentro").hasClass("select2-hidden-accessible")) {
                     $("#inputEditCentro").trigger("change.select2");
                 }
+                    if ($("#inputEditTipo").hasClass("select2-hidden-accessible")) {
+                        $("#inputEditTipo").trigger("change.select2");
+                    }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log("Error en la llamada AJAX:", textStatus, errorThrown);
@@ -345,6 +349,7 @@ $("#formEditarVehiculo").on("submit", function(e){
         modelo: $("#inputEditModelo").val(),
         anio: $("#inputEditAnio").val(),
         clase: $("#inputEditClase").val(),
+        tipo: $("#inputEditTipo").val(),
         vin: $("#inputEditNumeroVin").val(),
         motor: $("#inputEditNumeroMotor").val(),
         jefe: $("#inputEditJefeOperacion").val(),

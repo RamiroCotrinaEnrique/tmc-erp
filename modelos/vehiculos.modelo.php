@@ -30,7 +30,7 @@ class ModeloVehiculos{
     -------------------------------------*/
 
 	static public function mdlCrearVehiculos($tabla, $datos){
-		$stmt = Conexion::conectar()->prepare("INSERT INTO $tabla(vehic_cenco_id, vehic_placa, vehic_marca, vehic_modelo, vehic_anio, vehic_clase, vehic_numero_vin, vehic_numero_motor, vehic_jefe_operacion, vehic_estado, vehic_propietario)  VALUES (:vehic_cenco_id, :vehic_placa, :vehic_marca, :vehic_modelo, :vehic_anio, :vehic_clase, :vehic_numero_vin, :vehic_numero_motor, :vehic_jefe_operacion, :vehic_estado, :vehic_propietario)");
+		$stmt = Conexion::conectar()->prepare("INSERT INTO $tabla(vehic_cenco_id, vehic_placa, vehic_marca, vehic_modelo, vehic_anio, vehic_clase, vehic_tipo, vehic_numero_vin, vehic_numero_motor, vehic_jefe_operacion, vehic_estado, vehic_propietario)  VALUES (:vehic_cenco_id, :vehic_placa, :vehic_marca, :vehic_modelo, :vehic_anio, :vehic_clase, :vehic_tipo, :vehic_numero_vin, :vehic_numero_motor, :vehic_jefe_operacion, :vehic_estado, :vehic_propietario)");
 
 		$stmt->bindParam(":vehic_cenco_id", $datos["vehic_cenco_id"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_placa", $datos["vehic_placa"], PDO::PARAM_STR); 
@@ -38,6 +38,7 @@ class ModeloVehiculos{
 		$stmt->bindParam(":vehic_modelo", $datos["vehic_modelo"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_anio", $datos["vehic_anio"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_clase", $datos["vehic_clase"], PDO::PARAM_STR); 
+		$stmt->bindParam(":vehic_tipo", $datos["vehic_tipo"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_numero_vin", $datos["vehic_numero_vin"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_numero_motor", $datos["vehic_numero_motor"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_jefe_operacion", $datos["vehic_jefe_operacion"], PDO::PARAM_STR); 
@@ -59,7 +60,7 @@ class ModeloVehiculos{
 
 	static public function mdlEditarVehiculo($tabla, $datos){
 
-		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET vehic_cenco_id = :vehic_cenco_id, vehic_placa = :vehic_placa, vehic_marca = :vehic_marca, vehic_modelo = :vehic_modelo, vehic_anio = :vehic_anio, vehic_clase = :vehic_clase, vehic_numero_vin = :vehic_numero_vin, vehic_numero_motor = :vehic_numero_motor, vehic_jefe_operacion = :vehic_jefe_operacion, vehic_estado = :vehic_estado, vehic_propietario = :vehic_propietario,  vehic_fecha_update = :vehic_fecha_update  WHERE vehic_id = :vehic_id");
+		$stmt = Conexion::conectar()->prepare("UPDATE $tabla SET vehic_cenco_id = :vehic_cenco_id, vehic_placa = :vehic_placa, vehic_marca = :vehic_marca, vehic_modelo = :vehic_modelo, vehic_anio = :vehic_anio, vehic_clase = :vehic_clase, vehic_tipo = :vehic_tipo, vehic_numero_vin = :vehic_numero_vin, vehic_numero_motor = :vehic_numero_motor, vehic_jefe_operacion = :vehic_jefe_operacion, vehic_estado = :vehic_estado, vehic_propietario = :vehic_propietario,  vehic_fecha_update = :vehic_fecha_update  WHERE vehic_id = :vehic_id");
 
 		$stmt->bindParam(":vehic_cenco_id", $datos["vehic_cenco_id"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_placa", $datos["vehic_placa"], PDO::PARAM_STR); 
@@ -67,6 +68,7 @@ class ModeloVehiculos{
 		$stmt->bindParam(":vehic_modelo", $datos["vehic_modelo"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_anio", $datos["vehic_anio"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_clase", $datos["vehic_clase"], PDO::PARAM_STR); 
+		$stmt->bindParam(":vehic_tipo", $datos["vehic_tipo"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_numero_vin", $datos["vehic_numero_vin"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_numero_motor", $datos["vehic_numero_motor"], PDO::PARAM_STR); 
 		$stmt->bindParam(":vehic_jefe_operacion", $datos["vehic_jefe_operacion"], PDO::PARAM_STR); 

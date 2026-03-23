@@ -42,6 +42,7 @@
                                         <th>Modelo</th>
                                         <th>Año</th>
                                         <th>Clase</th> 
+                                        <th>Tipo</th>
                                         <th>N° VIN</th> 
                                         <th>N° Motor</th> 
                                         <th>Jefe Operación</th> 
@@ -71,6 +72,7 @@
                                                 <td>'.$value["vehic_modelo"].'</td>                                                
                                                 <td>'.$value["vehic_anio"].'</td>                                                
                                                 <td>'.$value["vehic_clase"].'</td>                                                
+                                                <td>'.$value["vehic_tipo"].'</td>                                                
                                                 <td>'.$value["vehic_numero_vin"].'</td>                                                
                                                 <td>'.$value["vehic_numero_motor"].'</td>                                                
                                                 <td>'.$value["vehic_jefe_operacion"].'</td>';
@@ -105,6 +107,7 @@
                                         <th>Modelo</th>
                                         <th>Año</th>
                                         <th>Clase</th> 
+                                        <th>Tipo</th>
                                         <th>N° VIN</th> 
                                         <th>N° Motor</th> 
                                         <th>Jefe Operación</th> 
@@ -219,8 +222,7 @@ MODAL AGREGAR EMPRESAS
 
                 <div class="modal-body">
 
-                    <div class="form-row">                                             
-
+                    <div class="row"> 
                         <div class="form-group col-md-5">
                             <div class="form-group">
                                 <label for="inputCentro">Centro de costo</label> 
@@ -254,15 +256,16 @@ MODAL AGREGAR EMPRESAS
                                     placeholder="Ingrese Marca" required>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-group col-md-5">
+                    <div class="row"> 
+                        <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputModelo">Modelo</label>
                                 <input type="text" class="form-control" id="inputModelo" name="inputModelo"
                                     placeholder="Ingrese Modelo" required>
                             </div>
                         </div>
-
                         <div class="form-group col-md-2">
                             <div class="form-group">
                                 <label for="inputAnio">Año</label>
@@ -270,15 +273,26 @@ MODAL AGREGAR EMPRESAS
                                     placeholder="Ingrese Año">
                             </div>
                         </div>
-
-                        <div class="form-group col-md-5">
+                        <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputClase">Clase</label>
                                 <input type="text" class="form-control" id="inputClase" name="inputClase"
                                     placeholder="Ingrese Clase">
                             </div>
                         </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-group">
+                                <label for="inputTipo">Tipo</label> 
+                                <select class="form-control select2" id="inputTipo" name="inputTipo" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="TRACTO">TRACTO </option>
+                                    <option value="TOLVA">TOLVA </option>
+                                </select>                                
+                            </div>
+                        </div>                         
+                    </div>
 
+                    <div class="row"> 
                         <div class="form-group col-md-6">
                             <div class="form-group">
                                 <label for="inputNumeroVin">Número VIN </label>
@@ -286,7 +300,6 @@ MODAL AGREGAR EMPRESAS
                                     placeholder="Ingrese Número VIN">
                             </div>
                         </div>
-
                         <div class="form-group col-md-6">
                             <div class="form-group">
                                 <label for="inputNumeroMotor">Número Motor</label>
@@ -294,7 +307,9 @@ MODAL AGREGAR EMPRESAS
                                     placeholder="Ingrese Número Motor">
                             </div>
                         </div>
+                    </div>
 
+                    <div class="row">  
                         <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputJefeOperacion">Jefe de Operacion</label>
@@ -361,11 +376,10 @@ MODAL EDITAR VEHICULOS
                     </button>
                 </div>
 
-                <div class="modal-body">                    
-
-                    <div class="form-row">
-
-                    <input type="hidden" name="inputEditId" id="inputEditId">  
+                <div class="modal-body">    
+                    
+                    <div class="row">
+                        <input type="hidden" name="inputEditId" id="inputEditId"> 
 
                         <div class="form-group col-md-5">
                             <div class="form-group">
@@ -376,15 +390,14 @@ MODAL EDITAR VEHICULOS
                                     $item = null;
                                     $valor = null;                                      
                                     $centroCosto = ControladorCentroCostos::ctrMostrarCentroCostos($item, $valor); 
-                                    //var_dump($categoria);
+                                    
                                     foreach ($centroCosto as $key => $value) {
                                         echo '<option value="'.$value["cenco_id"].'">'.$value["cenco_nombre"].'</option>';
                                     }  
                                     ?>
                                 </select>                                
                             </div>
-                        </div>   
-                                             
+                        </div>                                                
                         <div class="form-group col-md-2">
                             <div class="form-group">
                                 <label for="inputEditPlaca">Placa</label>
@@ -401,7 +414,10 @@ MODAL EDITAR VEHICULOS
                             </div>
                         </div>
 
-                        <div class="form-group col-md-5">
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputEditModelo">Modelo</label>
                                 <input type="text" class="form-control" id="inputEditModelo" name="inputEditModelo"
@@ -417,7 +433,7 @@ MODAL EDITAR VEHICULOS
                             </div>
                         </div>
 
-                        <div class="form-group col-md-5">
+                        <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputEditClase">Clase</label>
                                 <input type="text" class="form-control" id="inputEditClase" name="inputEditClase"
@@ -425,6 +441,20 @@ MODAL EDITAR VEHICULOS
                             </div>
                         </div>
 
+                        <div class="form-group col-md-2">
+                            <div class="form-group">
+                                <label for="inputEditTipo">Tipo</label>
+                                <select class="form-control select2" id="inputEditTipo" name="inputEditTipo" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="TRACTO">TRACTO </option>
+                                    <option value="TOLVA">TOLVA </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">   
                         <div class="form-group col-md-6">
                             <div class="form-group">
                                 <label for="inputEditNumeroVin">Número VIN </label>
@@ -440,7 +470,9 @@ MODAL EDITAR VEHICULOS
                                     placeholder="Ingrese Número Motor">
                             </div>
                         </div>
+                    </div>
 
+                    <div class="row">  
                         <div class="form-group col-md-4">
                             <div class="form-group">
                                 <label for="inputEditJefeOperacion">Jefe de Operacion</label>

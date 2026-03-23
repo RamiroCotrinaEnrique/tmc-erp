@@ -209,6 +209,7 @@ if(!isset($_SESSION["iniciarSesion"]) || $_SESSION["iniciarSesion"] != "ok"){
 <script src="vistas/js/cargos.js"></script>
 <script src="vistas/js/empleados.js"></script>
 <script src="vistas/js/movimiento-caja.js"></script>
+<script src="vistas/js/hoja-liquidacion.js"></script>
 
 
 </body>

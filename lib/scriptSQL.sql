@@ -86,6 +86,7 @@ CREATE TABLE vehiculos (
     vehic_modelo VARCHAR(50) NOT NULL,
     vehic_anio VARCHAR(10) NOT NULL,
     vehic_clase VARCHAR(50) NOT NULL,
+    vehic_tipo VARCHAR(50) NOT NULL,
     vehic_numero_vin VARCHAR(50) UNIQUE NOT NULL,
     vehic_numero_motor VARCHAR(50) UNIQUE NOT NULL,
     vehic_jefe_operacion VARCHAR(50) NOT NULL,

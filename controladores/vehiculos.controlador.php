@@ -29,6 +29,7 @@ class ControladorVehiculos {
         $modelo = trim( $_POST[ 'inputModelo' ] );
         $anio = trim( $_POST[ 'inputAnio' ] );
         $clase = trim( $_POST[ 'inputClase' ] );
+        $tipo = trim( $_POST[ 'inputTipo' ] );
         $numeroVin = trim( $_POST[ 'inputNumeroVin' ] );
         $numeroMotor = trim( $_POST[ 'inputNumeroMotor' ] );
         $jefeOperacion = trim( $_POST[ 'inputJefeOperacion' ] );
@@ -50,6 +51,7 @@ class ControladorVehiculos {
             'vehic_modelo' => $modelo,
             'vehic_anio' => $anio,
             'vehic_clase' => $clase,
+            'vehic_tipo' => $tipo,
             'vehic_numero_vin' => $numeroVin,
             'vehic_numero_motor' => $numeroMotor,
             'vehic_jefe_operacion' => $jefeOperacion,
@@ -85,6 +87,7 @@ class ControladorVehiculos {
         $modelo = trim( $_POST[ 'inputEditModelo' ] );
         $anio = trim( $_POST[ 'inputEditAnio' ] );
         $clase = trim( $_POST[ 'inputEditClase' ] );
+        $tipo = trim( $_POST[ 'inputEditTipo' ] );
         $numeroVin = trim( $_POST[ 'inputEditNumeroVin' ] );
         $numeroMotor = trim( $_POST[ 'inputEditNumeroMotor' ] );
         $jefeOperacion = trim( $_POST[ 'inputEditJefeOperacion' ] );
@@ -106,6 +109,7 @@ class ControladorVehiculos {
             'vehic_modelo' => $modelo,
             'vehic_anio' => $anio,
             'vehic_clase' => $clase,
+            'vehic_tipo' => $tipo,
             'vehic_numero_vin' => $numeroVin,
             'vehic_numero_motor' => $numeroMotor,
             'vehic_jefe_operacion' => $jefeOperacion,

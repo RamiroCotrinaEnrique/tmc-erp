@@ -74,6 +74,7 @@ class AjaxVehiculos{
 	public $inputEditModelo;
 	public $inputEditAnio;
 	public $inputEditClase;
+	public $inputEditTipo;
 	public $inputEditNumeroVin;
 	public $inputEditNumeroMotor;
 	public $inputEditJefeOperacion;
@@ -96,6 +97,7 @@ class AjaxVehiculos{
 			'vehic_modelo' => $this->inputEditModelo,
 			'vehic_anio' => $this->inputEditAnio,
 			'vehic_clase' => $this->inputEditClase,
+			'vehic_tipo' => $this->inputEditTipo,
 			'vehic_numero_vin' => $this->inputEditNumeroVin,
 			'vehic_numero_motor' => $this->inputEditNumeroMotor,
 			'vehic_jefe_operacion' => $this->inputEditJefeOperacion,
@@ -177,6 +179,7 @@ class AjaxVehiculos{
 		$actualizarVehiculo -> inputEditModelo = $_POST["inputEditModelo"];
 		$actualizarVehiculo -> inputEditAnio = $_POST["inputEditAnio"];
 		$actualizarVehiculo -> inputEditClase = $_POST["inputEditClase"];
+		$actualizarVehiculo -> inputEditTipo = $_POST["inputEditTipo"];
 		$actualizarVehiculo -> inputEditNumeroVin = $_POST["inputEditNumeroVin"];
 		$actualizarVehiculo -> inputEditNumeroMotor = $_POST["inputEditNumeroMotor"];
 		$actualizarVehiculo -> inputEditJefeOperacion = $_POST["inputEditJefeOperacion"];

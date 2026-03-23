@@ -574,6 +574,7 @@ CREATE TABLE `vehiculos` (
   `vehic_modelo` varchar(50) NOT NULL,
   `vehic_anio` varchar(10) NOT NULL,
   `vehic_clase` varchar(50) NOT NULL,
+  `vehic_tipo` varchar(50) NOT NULL,
   `vehic_numero_vin` varchar(50) NOT NULL,
   `vehic_numero_motor` varchar(50) NOT NULL,
   `vehic_jefe_operacion` varchar(50) NOT NULL,
