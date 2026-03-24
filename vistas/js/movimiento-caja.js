@@ -609,10 +609,6 @@ IMPRIMIR MOVIMIENTO DE CAJA
 
 $(".tablas").on("click", ".btnImprimirMovimientoCaja", function () {
 	var codigoMovimientoCaja = $(this).attr("idMovimientoCaja");
-  
-	//window.open("extensiones/tcpdf/pdf/factura.php?codigo="+codigoVenta, "_blank");
-	window.open("lib/fpdf/report-caja.php?codigo=" + codigoMovimientoCaja, "_blank");
-	//window.open("lib/fpdf/factura.php", "_blank");
-	//window.open("vistas/modulos/factura.php", "_blank");
+	window.open("vistas/report/report-caja.php?codigo=" + codigoMovimientoCaja, "_blank");
   });
   

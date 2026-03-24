@@ -20,8 +20,8 @@ require_once "../../controladores/vehiculos.controlador.php";
 require_once "../../modelos/vehiculos.modelo.php";
 
 //Importando las librerias de FPDF y PHPQRCODE
-require_once 'fpdf.php';
-require_once '../phpqrcode/qrlib.php';
+require_once '../../lib/fpdf/fpdf.php';
+require_once '../../lib/phpqrcode/qrlib.php';
 
 class PDFConPiePagina extends FPDF
 {
@@ -90,7 +90,7 @@ class ImprimirOptPDF
         $imgY = $y + ($cellHeight * 4 - $logoHeight) / 2;
 
         // === Dibuja imagen centrada ===
-        $pdf->Image('logo-negro.png', $imgX, $imgY, $logoWidth, $logoHeight);
+        $pdf->Image('logo.png', $imgX, $imgY, $logoWidth, $logoHeight);
 
         // === Dibuja celda para el logo con borde ===
         $pdf->Cell($cellWidth, $cellHeight * 4, '', 1, 0, 'C');

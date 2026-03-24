@@ -5,7 +5,7 @@ require_once "../../modelos/movimientocaja.modelo.php";
 require_once "../../controladores/empleados.controlador.php";
 require_once "../../modelos/empleados.modelo.php";
 
-require_once "fpdf.php";
+require_once "../../lib/fpdf/fpdf.php";
 require_once "cantidad_en_letras.php";
  
 class PDFReciboCaja extends FPDF
@@ -24,7 +24,7 @@ class PDFReciboCaja extends FPDF
         // Linea separadora del pie de pagina.
         $this->Line(10, $this->GetY(), 200, $this->GetY());
 
-        $this->Cell(0, 5, '20160364719 - EMPRESA DE TRANSPORTES MANUEL JESUS CAMPOS CALLUPE S.R.L. - Formato RPER-FOR-SIG-001', 0, 1, 'L');
+        $this->Cell(0, 5, '20160364719 - EMPRESA DE TRANSPORTES MANUEL JESUS CAMPOS CALLUPE S.R.L. - Recibo de Caja', 0, 1, 'L');
         // {nb} solo se reemplaza si se llama AliasNbPages() antes de AddPage().
         $this->Cell(0, 5, utf8_decode('Página ') . $this->PageNo() . ' de {nb}', 0, 0, 'R');
     }

@@ -118,4 +118,15 @@ class ModeloCentroCostos{
 		}
 		return 'error';
 	}
+
+	/*=============================================
+	OBTENER CENTRO COSTO POR ID (SIN FILTRO FECHA_DELETE)
+	=============================================*/
+
+	static public function mdlObtenerCentroCostoPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE cenco_id = :cenco_id");
+		$stmt->bindParam(':cenco_id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
 }// Fin Class

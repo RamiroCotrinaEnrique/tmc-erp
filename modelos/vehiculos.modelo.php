@@ -140,4 +140,15 @@ class ModeloVehiculos{
 		}
 		return 'error';
 	}
+
+	/*=============================================
+	OBTENER VEHICULO POR ID (SIN FILTRO FECHA_DELETE)
+	=============================================*/
+
+	static public function mdlObtenerVehiculoPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE vehic_id = :vehic_id");
+		$stmt->bindParam(':vehic_id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
 }// Fin Class

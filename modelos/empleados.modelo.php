@@ -250,5 +250,16 @@ class ModeloEmpleados{
 		$stmt = null;
 	}
 
+	/*=============================================
+	OBTENER EMPLEADO POR ID (SIN FILTRO FECHA_DELETE)
+	=============================================*/
+
+	static public function mdlObtenerEmpleadoPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE emple_id = :emple_id");
+		$stmt->bindParam(':emple_id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+
 
 }// Fin Class

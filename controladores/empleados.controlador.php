@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorEmpleados {
 
     /*-------------------------------------
@@ -233,6 +235,7 @@ class ControladorEmpleados {
             $respuesta = ModeloEmpleados::mdlIngresarEmpleado("empleados", $datos);
 
             if($respuesta == "ok"){
+                self::registrarAuditoriaEmpleados('CREAR', '0', null, $datos);
                 echo '<script>
                     swal({
                         type: "success",
@@ -480,9 +483,11 @@ class ControladorEmpleados {
             // ============================================
             // 4. ENVIAR DATOS AL MODELO PARA ACTUALIZAR
             // ============================================
+            $empleadoAntes = ModeloEmpleados::mdlMostrarEmpleados('empleados', 'emple_id', $idEmpleado);
             $respuesta = ModeloEmpleados::mdlEditarEmpleado("empleados", $datos);
 
             if($respuesta == "ok"){
+                self::registrarAuditoriaEmpleados('EDITAR', (string) $idEmpleado, $empleadoAntes ?: null, $datos);
                 echo json_encode([
                     'status' => 'success',
                     'title' => '¡El empleado ha sido actualizado correctamente!',
@@ -508,8 +513,10 @@ class ControladorEmpleados {
         if(isset($_POST["idEmpleadoEliminar"])){
             $idEmpleado = (int) $_POST["idEmpleadoEliminar"];
             $tabla = "empleados";
+            $empleadoAntes = ModeloEmpleados::mdlMostrarEmpleados($tabla, 'emple_id', $idEmpleado);
             $respuesta = ModeloEmpleados::mdlEliminarEmpleado($tabla, $idEmpleado);
             if($respuesta == "ok"){
+                self::registrarAuditoriaEmpleados('ELIMINAR', (string) $idEmpleado, $empleadoAntes ?: null, null);
                 echo json_encode([
                     'status' => 'success',
                     'title' => '¡El empleado fue enviado a papelera!',
@@ -530,8 +537,10 @@ class ControladorEmpleados {
         if(isset($_GET["idEmpleado"])){
             $idEmpleado = (int) $_GET["idEmpleado"];
             $tabla = "empleados";
+            $empleadoAntes = ModeloEmpleados::mdlMostrarEmpleados($tabla, 'emple_id', $idEmpleado);
             $respuesta = ModeloEmpleados::mdlEliminarEmpleado($tabla, $idEmpleado);
             if($respuesta == "ok"){
+                self::registrarAuditoriaEmpleados('ELIMINAR', (string) $idEmpleado, $empleadoAntes ?: null, null);
                 echo '<script>
                     swal({
                           type: "success",
@@ -584,8 +593,12 @@ class ControladorEmpleados {
             );
         }
 
+        $empleadoAntes = ModeloEmpleados::mdlObtenerEmpleadoPorId('empleados', $id);
+
         $respuesta = ModeloEmpleados::mdlRestaurarEmpleado('empleados', $id);
         if($respuesta === 'ok'){
+            $empleadoDespues = ModeloEmpleados::mdlMostrarEmpleados('empleados', 'emple_id', $id);
+            self::registrarAuditoriaEmpleados('RESTAURAR', (string) $id, $empleadoAntes ?? null, $empleadoDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -611,8 +624,11 @@ class ControladorEmpleados {
             );
         }
 
+        $empleadoAntes = ModeloEmpleados::mdlObtenerEmpleadoPorId('empleados', $id);
+
         $respuesta = ModeloEmpleados::mdlDepurarEmpleado('empleados', $id);
         if($respuesta === 'ok'){
+            self::registrarAuditoriaEmpleados('DEPURAR', (string) $id, $empleadoAntes ?? null, null);
             return array('status' => 'ok');
         }
 
@@ -717,6 +733,41 @@ class ControladorEmpleados {
             $codigo = "EMP" .  $aumento;
         }
         return $codigo;
+    }
+
+    static public function ctrMostrarAuditoriaEmpleados($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('empleados', (int) $limit);
+    }
+
+    private static function registrarAuditoriaEmpleados($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            $camposAuditar = ['emple_nombres', 'emple_apellido_paterno', 'emple_apellido_materno',
+                'emple_estado', 'emple_cargo_id', 'emple_area_id', 'emple_cenco_id',
+                'emple_empresa_id', 'emple_fecha_ingreso', 'emple_fecha_cese'];
+            foreach ($camposAuditar as $key) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                $valueDespues = array_key_exists($key, $despues) ? $despues[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'empleados',
+            'empleados',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            array('antes' => $antes, 'despues' => $despues, 'campos_cambiados' => $camposCambiados)
+        );
     }
 
 

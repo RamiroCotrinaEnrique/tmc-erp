@@ -154,6 +154,92 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="card card-secondary card-outline collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-history mr-1"></i> Auditoria de Áreas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaAuditoriaAreas" class="table table-bordered table-striped tablas">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Fecha</th>
+                                        <th>Accion</th>
+                                        <th>Registro</th>
+                                        <th>Usuario</th>
+                                        <th>IP</th>
+                                        <th>Detalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $auditoriasAreas = ControladorAreas::ctrMostrarAuditoriaAreas(300);
+                                    if ($auditoriasAreas && count($auditoriasAreas) > 0) {
+                                        foreach ($auditoriasAreas as $key => $value) {
+                                            $usuarioTexto = 'Sistema';
+                                            if (!empty($value['usu_usuario'])) {
+                                                $usuarioTexto = $value['usu_usuario'];
+                                                if (!empty($value['usu_nombre'])) {
+                                                    $usuarioTexto .= ' - ' . $value['usu_nombre'];
+                                                }
+                                            } elseif (!empty($value['aud_usuario_id'])) {
+                                                $usuarioTexto = 'ID ' . $value['aud_usuario_id'];
+                                            }
+                                            $detalleTexto = '';
+                                            if (!empty($value['aud_detalle_json'])) {
+                                                $detalle = json_decode($value['aud_detalle_json'], true);
+                                                if (json_last_error() === JSON_ERROR_NONE && is_array($detalle)) {
+                                                    if (!empty($detalle['campos_cambiados']) && is_array($detalle['campos_cambiados'])) {
+                                                        $detalleTexto = 'Campos: ' . implode(', ', array_keys($detalle['campos_cambiados']));
+                                                    } elseif (!empty($detalle['despues'])) {
+                                                        $detalleTexto = 'Se registro estado despues del evento';
+                                                    } elseif (!empty($detalle['antes'])) {
+                                                        $detalleTexto = 'Se registro estado previo del evento';
+                                                    }
+                                                }
+                                                if ($detalleTexto === '') {
+                                                    $detalleTexto = substr($value['aud_detalle_json'], 0, 220);
+                                                }
+                                            }
+                                            echo '<tr>';
+                                            echo '<td>' . ($key + 1) . '</td>';
+                                            echo '<td>' . htmlspecialchars((string) $value['aud_fecha_evento']) . '</td>';
+                                            echo '<td><span class="badge badge-info">' . htmlspecialchars((string) $value['aud_accion']) . '</span></td>';
+                                            echo '<td>' . htmlspecialchars((string) $value['aud_entidad_id']) . '</td>';
+                                            echo '<td>' . htmlspecialchars($usuarioTexto) . '</td>';
+                                            echo '<td>' . htmlspecialchars((string) ($value['aud_ip_origen'] ?? '')) . '</td>';
+                                            echo '<td>' . htmlspecialchars($detalleTexto) . '</td>';
+                                            echo '</tr>';
+                                        }
+                                    } else {
+                                        echo '<tr><td colspan="7" class="text-center text-muted">No hay eventos de auditoria para mostrar</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th style="width:10px">#</th>
+                                        <th>Fecha</th>
+                                        <th>Accion</th>
+                                        <th>Registro</th>
+                                        <th>Usuario</th>
+                                        <th>IP</th>
+                                        <th>Detalle</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php } ?>
         </div><!-- /.container-fluid -->
     </div>

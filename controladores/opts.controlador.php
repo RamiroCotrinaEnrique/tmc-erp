@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorOpts {
 
     /*-------------------------------------
@@ -541,6 +543,7 @@ class ControladorOpts {
         
                 // Mensaje de éxito o error
                 if ( $respuesta == 'ok' ) {
+                    self::registrarAuditoriaOpts('CREAR', '0', null, $datos);
                     self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'sig-opt' );
                 } else {
                     self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'sig-opt' );
@@ -1071,10 +1074,12 @@ class ControladorOpts {
         );
 
         // Ejecutar actualización
+        $optAntes = ModeloOpts::mdlObtenerOptPorId($tabla, (int) $opt_id);
         $respuesta = ModeloOpts::mdlEditarOpt( $tabla, $datos );
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaOpts('EDITAR', (string) $opt_id, $optAntes ?: null, $datos);
             self::mostrarAlerta( 'success', 'Los datos han sido actualizados correctamente', 'sig-opt' );
         } else {
             self::mostrarAlerta( 'error', 'Hubo un problema al actualizar los datos', 'sig-opt' );
@@ -1093,10 +1098,12 @@ class ControladorOpts {
             $tabla = "opts";
             $datos = $_GET["idOpt"];
 
+            $optAntes = ModeloOpts::mdlObtenerOptPorId($tabla, (int) $datos);
+
             $respuesta = ModeloOpts::mdlEliminarOpt($tabla, $datos);
 
             if ($respuesta == "ok") {
-
+                self::registrarAuditoriaOpts('ELIMINAR', (string) $datos, $optAntes ?: null, null);
                 echo '<script>
 				swal({
 					  type: "success",
@@ -1124,8 +1131,12 @@ class ControladorOpts {
             return array('status' => 'error', 'message' => 'Identificador invalido.');
         }
 
+        $optAntes = ModeloOpts::mdlObtenerOptPorId($tabla, $idOpt);
+
         $respuesta = ModeloOpts::mdlRestaurarOpt($tabla, $idOpt);
         if ($respuesta === 'ok') {
+            $optDespues = ModeloOpts::mdlMostrarOpts($tabla, 'opt_id', $idOpt);
+            self::registrarAuditoriaOpts('RESTAURAR', (string) $idOpt, $optAntes ?? null, $optDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -1153,6 +1164,7 @@ class ControladorOpts {
             return array('status' => 'error', 'message' => 'No se pudo depurar el registro.');
         }
 
+        self::registrarAuditoriaOpts('DEPURAR', (string) $idOpt, $opt, null);
         self::eliminarEvidenciaOpt($opt['opt_evidencia1']);
         self::eliminarEvidenciaOpt($opt['opt_evidencia2']);
 
@@ -1198,6 +1210,39 @@ class ControladorOpts {
         </script>';
     }
 
+    static public function ctrMostrarAuditoriaOpts($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('opts', (int) $limit);
+    }
+
+    private static function registrarAuditoriaOpts($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            $camposAuditar = ['opt_id', 'opt_cenco_codigo', 'opt_vehiculo_id', 'opt_cliente',
+                'opt_lugar', 'opt_fecha', 'opt_observado', 'opt_observador'];
+            foreach ($camposAuditar as $key) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                $valueDespues = array_key_exists($key, $despues) ? $despues[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'opts',
+            'opts',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            array('antes' => $antes, 'despues' => $despues, 'campos_cambiados' => $camposCambiados)
+        );
+    }
 
 }
 //Fin Class

@@ -4,6 +4,21 @@ require_once __DIR__ . '/../config/conexion.php';
 
 class ModeloMovimientoCaja {
 
+    static public function mdlObtenerMovimientoCajaPorId($idMovimiento) {
+        $stmt = Conexion::conectar()->prepare(
+            'SELECT *
+             FROM movimientos
+             WHERE movi_id = :id
+             LIMIT 1'
+        );
+        $stmt->bindParam(':id', $idMovimiento, PDO::PARAM_INT);
+        $stmt->execute();
+        $respuesta = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = null;
+
+        return $respuesta;
+    }
+
     /*-------------------------------------
     LISTAR MOVIMIENTOS DE CAJA
     -------------------------------------*/

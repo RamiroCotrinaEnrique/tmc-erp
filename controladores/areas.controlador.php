@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorAreas {
 
     /*-------------------------------------
@@ -36,6 +38,7 @@ class ControladorAreas {
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaAreas('CREAR', '0', null, $datos);
             self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'areas' );
         } else {
             self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'areas' );
@@ -73,11 +76,15 @@ class ControladorAreas {
             'are_fecha_update' => $fechaActual 
         );
 
+        // Capturar estado antes de editar
+        $areaAntes = ModeloAreas::mdlMostrarAreas($tabla, 'are_id', $id);
+
         // Ejecutar actualización
         $respuesta = ModeloAreas::mdlEditarArea( $tabla, $datos );
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaAreas('EDITAR', (string) $id, $areaAntes ?: null, $datos);
             self::mostrarAlerta( 'success', 'Datos actualizados correctamente', 'areas' );
         } else {
             self::mostrarAlerta( 'error', 'Hubo un problema al actualizar los datos', 'areas' );
@@ -97,9 +104,13 @@ class ControladorAreas {
 
             $datos = (int) $_GET["idArea"];
 
+            // Capturar estado antes de eliminar
+            $areaAntes = ModeloAreas::mdlMostrarAreas($tabla, 'are_id', $datos);
+
 			$respuesta = ModeloAreas::mdlEliminarArea($tabla, $datos);
 
 			if ($respuesta == "ok") {
+                self::registrarAuditoriaAreas('ELIMINAR', (string) $datos, $areaAntes ?: null, null);
                 self::mostrarAlerta( 'success', 'El área fue enviada a la papelera correctamente.', 'areas' );
             } else {
                 self::mostrarAlerta( 'error', 'No se pudo eliminar el área o ya estaba eliminada.', 'areas' );
@@ -141,9 +152,13 @@ class ControladorAreas {
             );
         }
 
+        $areaAntes = ModeloAreas::mdlObtenerAreaPorId('areas', $id);
+
         $respuesta = ModeloAreas::mdlRestaurarArea('areas', $id);
 
         if ($respuesta === 'ok') {
+            $areaDespues = ModeloAreas::mdlMostrarAreas('areas', 'are_id', $id);
+            self::registrarAuditoriaAreas('RESTAURAR', (string) $id, $areaAntes ?? null, $areaDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -173,9 +188,12 @@ class ControladorAreas {
             );
         }
 
+        $areaAntes = ModeloAreas::mdlObtenerAreaPorId('areas', $id);
+
         $respuesta = ModeloAreas::mdlDepurarArea('areas', $id);
 
         if ($respuesta === 'ok') {
+            self::registrarAuditoriaAreas('DEPURAR', (string) $id, $areaAntes ?: null, null);
             return array('status' => 'ok');
         }
 
@@ -202,6 +220,36 @@ class ControladorAreas {
         </script>';
     }
 
+    static public function ctrMostrarAuditoriaAreas($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('areas', (int) $limit);
+    }
+
+    private static function registrarAuditoriaAreas($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            foreach ($despues as $key => $valueDespues) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'areas',
+            'areas',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            array('antes' => $antes, 'despues' => $despues, 'campos_cambiados' => $camposCambiados)
+        );
+    }
 
 }
 //Fin Class

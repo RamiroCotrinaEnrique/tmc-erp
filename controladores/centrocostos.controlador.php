@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorCentroCostos {
 
     /*-------------------------------------
@@ -21,7 +23,6 @@ class ControladorCentroCostos {
         if ( !isset( $_POST[ 'inputCodigo' ] ) || !isset( $_POST[ 'inputNombre' ] ) ) {
             return;
         }
-
         // Sanitizar entradas
         $codigo = trim( $_POST[ 'inputCodigo' ] );
         $nombre = trim( $_POST[ 'inputNombre' ] );
@@ -45,6 +46,7 @@ class ControladorCentroCostos {
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaCentroCostos('CREAR', '0', null, $datos);
             self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'centro-costo' );
         } else {
             self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'centro-costo' );
@@ -71,11 +73,6 @@ class ControladorCentroCostos {
             return;
         }
 
-        if ( !preg_match( '/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $nombre ) ) {
-            self::mostrarAlerta( 'error', '¡El campo nombre no pueden estar vacíos ni llevar caracteres especiales!', 'centro-costo' );
-            return;
-        }
-
         // Registrar fecha y hora de actualización
         date_default_timezone_set( 'America/Lima' );
         $fechaActual = date( 'Y-m-d H:i:s' );
@@ -89,11 +86,15 @@ class ControladorCentroCostos {
             'cenco_fecha_update' => $fechaActual 
         );
 
+        // Capturar estado antes de editar
+        $centroAntes = ModeloCentroCostos::mdlMostrarCentroCostos($tabla, 'cenco_id', $id);
+
         // Ejecutar actualización
         $respuesta = ModeloCentroCostos::mdlEditarCentroCosto( $tabla, $datos );
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaCentroCostos('EDITAR', (string) $id, $centroAntes ?: null, $datos);
             self::mostrarAlerta( 'success', 'Los datos del centro de costo han sido actualizados correctamente', 'centro-costo' );
         } else {
             self::mostrarAlerta( 'error', 'Hubo un problema al actualizar los datos', 'centro-costo' );
@@ -113,9 +114,13 @@ class ControladorCentroCostos {
 
             $datos = (int) $_GET["idCentroCosto"];
 
+            // Capturar estado antes de eliminar
+            $centroAntes = ModeloCentroCostos::mdlMostrarCentroCostos($tabla, 'cenco_id', $datos);
+
 			$respuesta = ModeloCentroCostos::mdlEliminarCentroCosto($tabla, $datos);
 
 			if ($respuesta == "ok") {
+                self::registrarAuditoriaCentroCostos('ELIMINAR', (string) $datos, $centroAntes ?: null, null);
                 self::mostrarAlerta( 'success', 'El centro de costo fue enviado a la papelera correctamente.', 'centro-costo' );
             } else {
                 self::mostrarAlerta( 'error', 'No se pudo eliminar el centro de costo o ya estaba eliminado.', 'centro-costo' );
@@ -157,9 +162,13 @@ class ControladorCentroCostos {
             );
         }
 
+        $centroAntes = ModeloCentroCostos::mdlObtenerCentroCostoPorId('centro_costo', $id);
+
         $respuesta = ModeloCentroCostos::mdlRestaurarCentroCosto('centro_costo', $id);
 
         if ($respuesta === 'ok') {
+            $centroDespues = ModeloCentroCostos::mdlMostrarCentroCostos('centro_costo', 'cenco_id', $id);
+            self::registrarAuditoriaCentroCostos('RESTAURAR', (string) $id, $centroAntes ?: null, $centroDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -189,9 +198,12 @@ class ControladorCentroCostos {
             );
         }
 
+        $centroAntes = ModeloCentroCostos::mdlObtenerCentroCostoPorId('centro_costo', $id);
+
         $respuesta = ModeloCentroCostos::mdlDepurarCentroCosto('centro_costo', $id);
 
         if ($respuesta === 'ok') {
+            self::registrarAuditoriaCentroCostos('DEPURAR', (string) $id, $centroAntes ?: null, null);
             return array('status' => 'ok');
         }
 
@@ -218,6 +230,37 @@ class ControladorCentroCostos {
         </script>';
     }
 
+    static public function ctrMostrarAuditoriaCentroCostos($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('centrocostos', (int) $limit);
+    }
+
+    private static function registrarAuditoriaCentroCostos($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            foreach ($despues as $key => $valueDespues) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'centrocostos',
+            'centro_costo',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            array('antes' => $antes, 'despues' => $despues, 'campos_cambiados' => $camposCambiados)
+        );
+    }
 
 }
+//Fin Class
 //Fin Class

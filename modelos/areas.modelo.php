@@ -115,4 +115,15 @@ class ModeloAreas{
 		}
 		return 'error';
 	}
+
+	/*=============================================
+	OBTENER AREA POR ID (SIN FILTRO FECHA_DELETE)
+	=============================================*/
+
+	static public function mdlObtenerAreaPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE are_id = :are_id");
+		$stmt->bindParam(':are_id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
 }// Fin Class

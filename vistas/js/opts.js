@@ -529,7 +529,7 @@ $(".tablas").on("click", ".btnImprimirOpt", function () {
 	var codigoOpt = $(this).attr("codigoOpt");
   
 	//window.open("extensiones/tcpdf/pdf/factura.php?codigo="+codigoVenta, "_blank");
-	window.open("lib/fpdf/opt.php?codigo=" + codigoOpt, "_blank");
+	window.open("vistas/report/opt.php?codigo=" + codigoOpt, "_blank");
 	//window.open("lib/fpdf/factura.php", "_blank");
 	//window.open("vistas/modulos/factura.php", "_blank");
   });

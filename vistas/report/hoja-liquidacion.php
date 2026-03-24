@@ -7,7 +7,7 @@ require_once "../../controladores/empleados.controlador.php";
 require_once "../../modelos/empleados.modelo.php";
 require_once "../../controladores/centrocostos.controlador.php";
 require_once "../../modelos/centrocostos.modelo.php";
-require_once "fpdf.php";
+require_once "../../lib/fpdf/fpdf.php";
 
 class PDFHojaLiquidacion extends FPDF 
 { 
@@ -21,7 +21,7 @@ class PDFHojaLiquidacion extends FPDF
         $this->SetY(-12); 
         $this->SetFont("Arial", "I", 8); 
         $this->Line(10, $this->GetY(), 200, $this->GetY()); 
-        $this->Cell(0, 5, utf8_decode("Hoja de Liquidación - TMC ERP"), 0, 0, "L"); 
+        $this->Cell(0, 5, utf8_decode("20160364719 - EMPRESA DE TRANSPORTES MANUEL JESUS CAMPOS CALLUPE S.R.L. - Hoja de Liquidación"), 0, 0, "L"); 
         $this->Cell(0, 5, utf8_decode("Pagina ") . $this->PageNo() . " de {nb}", 0, 0, "R"); 
     } 
 } 
@@ -229,6 +229,7 @@ class ImprimirHojaLiquidacionPDF
             array("Boletas consumo", $hoja["hoja_boletas_consumo"] ?? 0, "moneda"), 
             array("Planilla movilidad", $hoja["hoja_planilla_movilidad"] ?? 0, "moneda"), 
             array("Facturas varios", $hoja["hoja_facturas_varios"] ?? 0, "moneda"), 
+            array(utf8_decode("Carga y desc. ladrillo"), $hoja["hoja_carga_descarga_ladrillo"] ?? 0, "moneda"), 
             array("Suma total", $hoja["hoja_suma_total"] ?? 0, "moneda"), 
             array("Vuelto", $hoja["hoja_vuelto"] ?? 0, "moneda"), 
             array("Reintegro", $hoja["hoja_reintegro"] ?? 0, "moneda") 

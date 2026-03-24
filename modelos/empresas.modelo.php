@@ -127,4 +127,15 @@ class ModeloEmpresas{
 		}
 		return 'error';
 	}
+
+        /*=============================================
+        OBTENER EMPRESA POR ID (sin filtro fecha_delete)
+        =============================================*/
+
+        static public function mdlObtenerEmpresaPorId($tabla, $id){
+                $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE empre_id = :empre_id");
+                $stmt->bindParam(':empre_id', $id, PDO::PARAM_INT);
+                $stmt->execute();
+                return $stmt->fetch();
+        }
 }// Fin Class

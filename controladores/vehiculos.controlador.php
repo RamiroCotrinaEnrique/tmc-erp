@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorVehiculos {
 
     /*-------------------------------------
@@ -64,6 +66,7 @@ class ControladorVehiculos {
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaVehiculos('CREAR', '0', null, $datos);
             self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'vehiculos' );
         } else {
             self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'vehiculos' );
@@ -98,7 +101,7 @@ class ControladorVehiculos {
         date_default_timezone_set( 'America/Lima' );
         $fechaActual = date( 'Y-m-d H:i:s' );
 
-        // Preparar datos        
+        // Preparar datos
         $tabla = 'vehiculos';
 
         $datos = array(
@@ -118,11 +121,15 @@ class ControladorVehiculos {
             'vehic_fecha_update' => $fechaActual  
         );
 
+        // Capturar estado antes de editar
+        $vehiculoAntes = ModeloVehiculos::mdlMostrarVehiculos($tabla, 'vehic_id', $id);
+
         // Ejecutar actualización
         $respuesta = ModeloVehiculos::mdlEditarVehiculo( $tabla, $datos );
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            self::registrarAuditoriaVehiculos('EDITAR', (string) $id, $vehiculoAntes ?: null, $datos);
             self::mostrarAlerta( 'success', 'Los datos se actualizaron correctamente.', 'vehiculos' );
         } else {
             self::mostrarAlerta( 'error', 'Ocurrió un error al intentar actualizar los datos. Por favor, inténtelo nuevamente.', 'vehiculos' );
@@ -181,9 +188,13 @@ class ControladorVehiculos {
 
             $datos = (int) $_GET["idVehiculo"];
 
+            // Capturar estado antes de eliminar
+            $vehiculoAntes = ModeloVehiculos::mdlMostrarVehiculos($tabla, 'vehic_id', $datos);
+
 			$respuesta = ModeloVehiculos::mdlEliminarVehiculo($tabla, $datos);
 
 			if ($respuesta == "ok") {
+                self::registrarAuditoriaVehiculos('ELIMINAR', (string) $datos, $vehiculoAntes ?: null, null);
                 self::mostrarAlerta( 'success', 'El vehículo fue enviado a la papelera correctamente', 'vehiculos' );
             } else {
                 self::mostrarAlerta( 'error', 'No se pudo eliminar el vehículo o ya estaba eliminado', 'vehiculos' );
@@ -210,8 +221,12 @@ class ControladorVehiculos {
             return array('status' => 'error', 'message' => 'ID de vehículo inválido.');
         }
 
+        $vehiculoAntes = ModeloVehiculos::mdlObtenerVehiculoPorId('vehiculos', $id);
+
         $respuesta = ModeloVehiculos::mdlRestaurarVehiculo('vehiculos', $id);
         if($respuesta === 'ok'){
+            $vehiculoDespues = ModeloVehiculos::mdlMostrarVehiculos('vehiculos', 'vehic_id', $id);
+            self::registrarAuditoriaVehiculos('RESTAURAR', (string) $id, $vehiculoAntes ?: null, $vehiculoDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -228,8 +243,11 @@ class ControladorVehiculos {
             return array('status' => 'error', 'message' => 'ID de vehículo inválido.');
         }
 
+        $vehiculoAntes = ModeloVehiculos::mdlObtenerVehiculoPorId('vehiculos', $id);
+
         $respuesta = ModeloVehiculos::mdlDepurarVehiculo('vehiculos', $id);
         if($respuesta === 'ok'){
+            self::registrarAuditoriaVehiculos('DEPURAR', (string) $id, $vehiculoAntes ?: null, null);
             return array('status' => 'ok');
         }
 
@@ -253,6 +271,36 @@ class ControladorVehiculos {
         </script>';
     }
 
+    static public function ctrMostrarAuditoriaVehiculos($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('vehiculos', (int) $limit);
+    }
+
+    private static function registrarAuditoriaVehiculos($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            foreach ($despues as $key => $valueDespues) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'vehiculos',
+            'vehiculos',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            array('antes' => $antes, 'despues' => $despues, 'campos_cambiados' => $camposCambiados)
+        );
+    }
 
 }
 //Fin Class

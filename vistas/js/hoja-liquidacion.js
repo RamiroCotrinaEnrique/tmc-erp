@@ -15,8 +15,9 @@ function calcularTotalesLiquidacion(isEdit){
     var boletasConsumo = toNumber($(prefix + 'BoletasConsumo').val());
     var planillaMovilidad = toNumber($(prefix + 'PlanillaMovilidad').val());
     var facturasVarios = toNumber($(prefix + 'FacturasVarios').val());
+    var cargaDescargaLadrillo = toNumber($(prefix + 'CargaDescargaLadrillo').val());
 
-    var sumaTotal = peaje + boletasVarias + boletasConsumo + planillaMovilidad + facturasVarios;
+    var sumaTotal = peaje + boletasVarias + boletasConsumo + planillaMovilidad + facturasVarios + cargaDescargaLadrillo;
     var diferencia = montoRecibido - sumaTotal;
 
     var vuelto = 0;
@@ -39,7 +40,8 @@ var camposCalculoCrear = [
     '#inputBoletasVarias',
     '#inputBoletasConsumo',
     '#inputPlanillaMovilidad',
-    '#inputFacturasVarios'
+    '#inputFacturasVarios',
+    '#inputCargaDescargaLadrillo'
 ];
 
 var camposCalculoEditar = [
@@ -48,7 +50,8 @@ var camposCalculoEditar = [
     '#inputEditBoletasVarias',
     '#inputEditBoletasConsumo',
     '#inputEditPlanillaMovilidad',
-    '#inputEditFacturasVarios'
+    '#inputEditFacturasVarios',
+    '#inputEditCargaDescargaLadrillo'
 ];
 
 camposCalculoCrear.forEach(function(selector){
@@ -76,7 +79,7 @@ $('.tablas').on('click', '.btnImprimirHojaLiquidacion', function(){
         return;
     }
 
-    window.open('lib/fpdf/hoja-liquidacion.php?codigo=' + idHojaLiquidacion, '_blank');
+    window.open('vistas/report/hoja-liquidacion.php?codigo=' + idHojaLiquidacion, '_blank');
 });
 
 /*=============================================
@@ -120,6 +123,7 @@ $('.tablas').on('click', '.btnEditarHojaLiquidacion', function(){
             $('#inputEditBoletasConsumo').val(respuesta['hoja_boletas_consumo']);
             $('#inputEditPlanillaMovilidad').val(respuesta['hoja_planilla_movilidad']);
             $('#inputEditFacturasVarios').val(respuesta['hoja_facturas_varios']);
+            $('#inputEditCargaDescargaLadrillo').val(respuesta['hoja_carga_descarga_ladrillo']);
             $('#inputEditReintegro').val(respuesta['hoja_reintegro']);
             $('#inputEditVuelto').val(respuesta['hoja_vuelto']);
             $('#inputEditSumaTotal').val(respuesta['hoja_suma_total']);

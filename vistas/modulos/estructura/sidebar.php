@@ -168,21 +168,29 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                 <?php } ?>
                 <?php } ?>
 
-                <?php if (tmcUsuarioPuedeAccederModulo($perfilActual, 'movimiento-caja')) { ?>
+                <?php
+                $puedeMovimientoCaja = tmcUsuarioPuedeAccederModulo($perfilActual, 'movimiento-caja');
+                $puedeRendicionCajaChica = tmcUsuarioPuedeAccederModulo($perfilActual, 'rendicion-caja-chica');
+                if ($puedeMovimientoCaja || $puedeRendicionCajaChica) { ?>
                 <li class="nav-header">GESTIÓN TESORERÍA</li>
+
+                <?php if ($puedeMovimientoCaja) { ?>
                 <li class="nav-item">
                     <a href="movimiento-caja" class="<?php echo $sidebarNavClass('movimiento-caja'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Movimientos Caja</p>
                     </a>
                 </li>
+                <?php } ?>
 
+                <?php if ($puedeRendicionCajaChica) { ?>
                 <li class="nav-item">
                     <a href="rendicion-caja-chica" class="<?php echo $sidebarNavClass('rendicion-caja-chica'); ?>">
                         <i class="fa fa-users nav-icon"></i>
                         <p>Rendición de Caja Chica</p>
                     </a>
                 </li>
+                <?php } ?>
 
                 <?php } ?>
 

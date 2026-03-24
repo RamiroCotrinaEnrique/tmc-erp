@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorHojaLiquidacion {
 
     static public function ctrObtenerSiguienteNumeroRegistro() {
@@ -29,8 +31,9 @@ class ControladorHojaLiquidacion {
         $boletasConsumo = (float) trim($_POST['inputBoletasConsumo']);
         $planillaMovilidad = (float) trim($_POST['inputPlanillaMovilidad']);
         $facturasVarios = (float) trim($_POST['inputFacturasVarios']);
+        $cargaDescargaLadrillo = (float) trim($_POST['inputCargaDescargaLadrillo']);
 
-        $sumaTotal = $peaje + $boletasVarias + $boletasConsumo + $planillaMovilidad + $facturasVarios;
+        $sumaTotal = $peaje + $boletasVarias + $boletasConsumo + $planillaMovilidad + $facturasVarios + $cargaDescargaLadrillo;
         $diferencia = $montoRecibido - $sumaTotal;
         $vuelto = $diferencia >= 0 ? $diferencia : 0;
         $reintegro = $diferencia < 0 ? abs($diferencia) : 0;
@@ -54,6 +57,7 @@ class ControladorHojaLiquidacion {
             'hoja_boletas_consumo' => $boletasConsumo,
             'hoja_planilla_movilidad' => $planillaMovilidad,
             'hoja_facturas_varios' => $facturasVarios,
+            'hoja_carga_descarga_ladrillo' => $cargaDescargaLadrillo,
             'hoja_reintegro' => $reintegro,
             'hoja_vuelto' => $vuelto,
             'hoja_suma_total' => $sumaTotal,
@@ -69,6 +73,8 @@ class ControladorHojaLiquidacion {
         $respuesta = ModeloHojaLiquidacion::mdlCrearHojaLiquidacion($tabla, $datos);
 
         if ($respuesta === 'ok') {
+            $hojaDespues = ModeloHojaLiquidacion::mdlMostrarHojasLiquidacion('hoja_liquidacion', 'hoja_numero_registro', $numeroRegistro);
+            self::registrarAuditoriaHojaLiquidacion('CREAR', (string) ($hojaDespues['hoja_id'] ?? ''), null, $hojaDespues ?: null);
             self::mostrarAlerta('success', 'La hoja de liquidación se registró correctamente.', 'hoja-liquidacion');
         } else {
             self::mostrarAlerta('error', 'No se pudo registrar la hoja de liquidación.', 'hoja-liquidacion');
@@ -91,8 +97,9 @@ class ControladorHojaLiquidacion {
         $boletasConsumo = (float) trim($_POST['inputEditBoletasConsumo']);
         $planillaMovilidad = (float) trim($_POST['inputEditPlanillaMovilidad']);
         $facturasVarios = (float) trim($_POST['inputEditFacturasVarios']);
+        $cargaDescargaLadrillo = (float) trim($_POST['inputEditCargaDescargaLadrillo']);
 
-        $sumaTotal = $peaje + $boletasVarias + $boletasConsumo + $planillaMovilidad + $facturasVarios;
+        $sumaTotal = $peaje + $boletasVarias + $boletasConsumo + $planillaMovilidad + $facturasVarios + $cargaDescargaLadrillo;
         $diferencia = $montoRecibido - $sumaTotal;
         $vuelto = $diferencia >= 0 ? $diferencia : 0;
         $reintegro = $diferencia < 0 ? abs($diferencia) : 0;
@@ -116,6 +123,7 @@ class ControladorHojaLiquidacion {
             'hoja_boletas_consumo' => $boletasConsumo,
             'hoja_planilla_movilidad' => $planillaMovilidad,
             'hoja_facturas_varios' => $facturasVarios,
+            'hoja_carga_descarga_ladrillo' => $cargaDescargaLadrillo,
             'hoja_reintegro' => $reintegro,
             'hoja_vuelto' => $vuelto,
             'hoja_suma_total' => $sumaTotal,
@@ -129,9 +137,12 @@ class ControladorHojaLiquidacion {
             'hoja_fecha_update' => $fechaActual
         );
 
+        $hojaAntes = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId($tabla, (int) $datos['hoja_id']);
         $respuesta = ModeloHojaLiquidacion::mdlEditarHojaLiquidacion($tabla, $datos);
 
         if ($respuesta === 'ok') {
+            $hojaDespues = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId($tabla, (int) $datos['hoja_id']);
+            self::registrarAuditoriaHojaLiquidacion('EDITAR', (string) $datos['hoja_id'], $hojaAntes, $hojaDespues);
             self::mostrarAlerta('success', 'La hoja de liquidación se actualizó correctamente.', 'hoja-liquidacion');
         } else {
             self::mostrarAlerta('error', 'No se pudo actualizar la hoja de liquidación.', 'hoja-liquidacion');
@@ -145,10 +156,13 @@ class ControladorHojaLiquidacion {
 
         $tabla = 'hoja_liquidacion';
         $id = (int) $_GET['idHojaLiquidacion'];
+        $hojaAntes = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId($tabla, $id);
 
         $respuesta = ModeloHojaLiquidacion::mdlEliminarHojaLiquidacion($tabla, $id);
 
         if ($respuesta === 'ok') {
+            $hojaDespues = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId($tabla, $id);
+            self::registrarAuditoriaHojaLiquidacion('ELIMINAR', (string) $id, $hojaAntes, $hojaDespues);
             self::mostrarAlerta('success', 'La hoja de liquidación fue enviada a la papelera.', 'hoja-liquidacion');
         } else {
             self::mostrarAlerta('error', 'No se pudo eliminar la hoja de liquidación o ya estaba eliminada.', 'hoja-liquidacion');
@@ -173,8 +187,11 @@ class ControladorHojaLiquidacion {
             return array('status' => 'error', 'message' => 'ID inválido.');
         }
 
+        $hojaAntes = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId('hoja_liquidacion', $id);
         $respuesta = ModeloHojaLiquidacion::mdlRestaurarHojaLiquidacion('hoja_liquidacion', $id);
         if ($respuesta === 'ok') {
+            $hojaDespues = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId('hoja_liquidacion', $id);
+            self::registrarAuditoriaHojaLiquidacion('RESTAURAR', (string) $id, $hojaAntes, $hojaDespues);
             return array('status' => 'ok');
         }
 
@@ -191,12 +208,43 @@ class ControladorHojaLiquidacion {
             return array('status' => 'error', 'message' => 'ID inválido.');
         }
 
+        $hojaAntes = ModeloHojaLiquidacion::mdlObtenerHojaLiquidacionPorId('hoja_liquidacion', $id);
         $respuesta = ModeloHojaLiquidacion::mdlDepurarHojaLiquidacion('hoja_liquidacion', $id);
         if ($respuesta === 'ok') {
+            self::registrarAuditoriaHojaLiquidacion('DEPURAR', (string) $id, $hojaAntes, null);
             return array('status' => 'ok');
         }
 
         return array('status' => 'error', 'message' => 'No se pudo eliminar definitivamente el registro.');
+    }
+
+    private static function registrarAuditoriaHojaLiquidacion($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $camposCambiados = array();
+        if (is_array($antes) && is_array($despues)) {
+            foreach ($despues as $key => $valueDespues) {
+                $valueAntes = array_key_exists($key, $antes) ? $antes[$key] : null;
+                if ((string) $valueAntes !== (string) $valueDespues) {
+                    $camposCambiados[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+                }
+            }
+        }
+
+        $detalle = array(
+            'antes' => $antes,
+            'despues' => $despues,
+            'campos_cambiados' => $camposCambiados
+        );
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'hoja-liquidacion',
+            'hoja_liquidacion',
+            $entidadId,
+            $accion,
+            $usuarioActor,
+            $detalle
+        );
     }
 
     private static function mostrarAlerta($tipo, $mensaje, $redireccion) {
@@ -212,5 +260,13 @@ class ControladorHojaLiquidacion {
                 }
             });
         </script>';
+    }
+
+    static public function ctrMostrarAuditoriaHojaLiquidacion($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('hoja-liquidacion', (int) $limit);
     }
 }

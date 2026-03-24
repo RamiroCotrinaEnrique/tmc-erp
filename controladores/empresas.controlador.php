@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorEmpresas {
 
     /*-------------------------------------
@@ -57,8 +59,7 @@ class ControladorEmpresas {
         $respuesta = ModeloEmpresas::mdlCrearEmpresas( $tabla, $datos );
 
         // Mensaje de éxito o error
-        if ( $respuesta == 'ok' ) {
-            self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'empresas' );
+        if ( $respuesta == 'ok' ) {            self::registrarAuditoriaEmpresas('CREAR', '0', null, $datos);            self::mostrarAlerta( 'success', 'El registro se ha realizado correctamente.', 'empresas' );
         } else {
             self::mostrarAlerta( 'error', 'Ocurrió un error al guardar los datos. Por favor, intente nuevamente.', 'empresas' );
         }
@@ -110,11 +111,16 @@ class ControladorEmpresas {
             'empre_fecha_update' => $fechaActual 
         );
 
+        // Snapshot antes de editar
+        $empresaAntes = ModeloEmpresas::mdlMostrarEmpresas($tabla, 'empre_id', $id);
+
         // Ejecutar actualización
-        $respuesta = ModeloEmpresas::mdlEditarEmpresa( $tabla, $datos );
+        $respuesta = ModeloEmpresas::mdlEditarEmpresa( $tabla, $datos );        
 
         // Mensaje de éxito o error
         if ( $respuesta == 'ok' ) {
+            $empresaDespues = ModeloEmpresas::mdlMostrarEmpresas($tabla, 'empre_id', $id);
+            self::registrarAuditoriaEmpresas('EDITAR', $id, $empresaAntes ?: null, $empresaDespues ?: null);
             self::mostrarAlerta( 'success', 'Los datos de la empresa han sido actualizados correctamente', 'empresas' );
         } else {
             self::mostrarAlerta( 'error', 'Hubo un problema al actualizar los datos', 'empresas' );
@@ -134,9 +140,12 @@ class ControladorEmpresas {
 
             $datos = (int) $_GET["idEmpresa"];
 
+            $empresaAntes = ModeloEmpresas::mdlMostrarEmpresas($tabla, 'empre_id', $datos);
+
 			$respuesta = ModeloEmpresas::mdlEliminarEmpresa($tabla, $datos);
 
 			if ($respuesta == "ok") {
+                self::registrarAuditoriaEmpresas('ELIMINAR', $datos, $empresaAntes ?: null, null);
                 self::mostrarAlerta( 'success', 'La empresa fue enviada a la papelera correctamente.', 'empresas' );
             } else {
                 self::mostrarAlerta( 'error', 'No se pudo eliminar la empresa o ya estaba eliminada.', 'empresas' );
@@ -178,9 +187,13 @@ class ControladorEmpresas {
             );
         }
 
+        $empresaAntes = ModeloEmpresas::mdlObtenerEmpresaPorId('empresas', $id);
+
         $respuesta = ModeloEmpresas::mdlRestaurarEmpresa('empresas', $id);
 
         if ($respuesta === 'ok') {
+            $empresaDespues = ModeloEmpresas::mdlMostrarEmpresas('empresas', 'empre_id', $id);
+            self::registrarAuditoriaEmpresas('RESTAURAR', $id, $empresaAntes ?: null, $empresaDespues ?: null);
             return array('status' => 'ok');
         }
 
@@ -210,9 +223,12 @@ class ControladorEmpresas {
             );
         }
 
+        $empresaAntes = ModeloEmpresas::mdlObtenerEmpresaPorId('empresas', $id);
+
         $respuesta = ModeloEmpresas::mdlDepurarEmpresa('empresas', $id);
 
         if ($respuesta === 'ok') {
+            self::registrarAuditoriaEmpresas('DEPURAR', $id, $empresaAntes ?: null, null);
             return array('status' => 'ok');
         }
 
@@ -239,6 +255,44 @@ class ControladorEmpresas {
         </script>';
     }
 
+
+    /*-------------------------------------
+    MOSTRAR AUDITORIA EMPRESAS
+    -------------------------------------*/
+
+    public static function ctrMostrarAuditoriaEmpresas($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('empresas', $limit);
+    }
+
+    /*-------------------------------------
+    REGISTRAR AUDITORIA EMPRESAS (privado)
+    -------------------------------------*/
+
+    private static function registrarAuditoriaEmpresas($accion, $entidadId, $antes, $despues) {
+        $usuarioId = isset($_SESSION['usu_id']) ? (int)$_SESSION['usu_id'] : null;
+        $detalle = array();
+        if ($accion === 'EDITAR' && $antes && $despues) {
+            $camposCambiados = array();
+            $campos = ['empre_ruc','empre_razon_social','empre_nombre_comercial','empre_domicilio_legal','empre_numero_contacto','empre_email_contacto'];
+            foreach ($campos as $campo) {
+                if (isset($antes[$campo], $despues[$campo]) && (string)$antes[$campo] !== (string)$despues[$campo]) {
+                    $camposCambiados[$campo] = array('antes' => $antes[$campo], 'despues' => $despues[$campo]);
+                }
+            }
+            if (!empty($camposCambiados)) {
+                $detalle['campos_cambiados'] = $camposCambiados;
+            }
+        } elseif ($antes) {
+            $detalle['antes'] = $antes;
+        }
+        if ($despues && $accion !== 'EDITAR') {
+            $detalle['despues'] = $despues;
+        }
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral('empresas', 'empresas', (string)$entidadId, $accion, $usuarioId, $detalle);
+    }
 
 }
 //Fin Class

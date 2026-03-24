@@ -26,6 +26,13 @@ class ModeloHojaLiquidacion {
         return $stmt->fetchAll();
     }
 
+    static public function mdlObtenerHojaLiquidacionPorId($tabla, $id) {
+        $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE hoja_id = :hoja_id LIMIT 1");
+        $stmt->bindParam(':hoja_id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     static public function mdlCrearHojaLiquidacion($tabla, $datos) {
         $stmt = Conexion::conectar()->prepare("INSERT INTO $tabla(
             hoja_numero_registro,
@@ -46,6 +53,7 @@ class ModeloHojaLiquidacion {
             hoja_boletas_consumo,
             hoja_planilla_movilidad,
             hoja_facturas_varios,
+            hoja_carga_descarga_ladrillo,
             hoja_reintegro,
             hoja_vuelto,
             hoja_suma_total,
@@ -75,6 +83,7 @@ class ModeloHojaLiquidacion {
             :hoja_boletas_consumo,
             :hoja_planilla_movilidad,
             :hoja_facturas_varios,
+            :hoja_carga_descarga_ladrillo,
             :hoja_reintegro,
             :hoja_vuelto,
             :hoja_suma_total,
@@ -116,6 +125,7 @@ class ModeloHojaLiquidacion {
             hoja_boletas_consumo = :hoja_boletas_consumo,
             hoja_planilla_movilidad = :hoja_planilla_movilidad,
             hoja_facturas_varios = :hoja_facturas_varios,
+            hoja_carga_descarga_ladrillo = :hoja_carga_descarga_ladrillo,
             hoja_reintegro = :hoja_reintegro,
             hoja_vuelto = :hoja_vuelto,
             hoja_suma_total = :hoja_suma_total,

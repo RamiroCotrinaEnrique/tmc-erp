@@ -115,4 +115,15 @@ class ModeloCargos{
 		}
 		return 'error';
 	}
+
+	/*=============================================
+	OBTENER CARGO POR ID (SIN FILTRO FECHA_DELETE)
+	=============================================*/
+
+	static public function mdlObtenerCargoPorId($tabla, $id){
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE car_id = :car_id");
+		$stmt->bindParam(':car_id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC);
+	}
 }// Fin Class

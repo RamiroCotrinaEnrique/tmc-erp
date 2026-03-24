@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../modelos/auditoria.modelo.php';
+
 class ControladorMovimientoCaja {
 
     /*-------------------------------------
@@ -30,6 +32,14 @@ class ControladorMovimientoCaja {
         }
 
         return ModeloMovimientoCaja::mdlMostrarMovimientoCajaEliminados();
+    }
+
+    static public function ctrMostrarAuditoriaMovimientoCaja($limit = 200) {
+        if (!isset($_SESSION['usu_perfil']) || $_SESSION['usu_perfil'] !== 'Administrador') {
+            return array();
+        }
+
+        return ModeloAuditoria::mdlMostrarAuditoriaGeneral('movimiento-caja', (int) $limit);
     }
 
     /*-------------------------------------
@@ -116,6 +126,18 @@ class ControladorMovimientoCaja {
         $respuesta = ModeloMovimientoCaja::mdlCrearMovimientoCajaConDetalle($cabecera, $detalles);
 
         if (isset($respuesta['status']) && $respuesta['status'] === 'ok') {
+            $movimientoCreado = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId((int) $respuesta['movi_id']);
+            $detalleCreado = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento((int) $respuesta['movi_id']);
+            self::registrarAuditoriaMovimientoCaja(
+                'CREAR',
+                (int) $respuesta['movi_id'],
+                null,
+                array(
+                    'movimiento' => $movimientoCreado,
+                    'detalle' => $detalleCreado
+                )
+            );
+
             self::mostrarAlerta('success', 'Movimiento guardado correctamente. Nro: ' . $respuesta['movi_numero'], 'movimiento-caja');
         } else {
             $mensaje = isset($respuesta['message']) ? $respuesta['message'] : 'No se pudo guardar el movimiento.';
@@ -182,9 +204,28 @@ class ControladorMovimientoCaja {
             'movi_emple_id' => $empleado
         );
 
+        $movimientoAntes = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($id);
+        $detalleAntes = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($id);
+
         $respuesta = ModeloMovimientoCaja::mdlEditarMovimientoCaja($datos, $detalles);
 
         if ($respuesta === 'ok') {
+            $movimientoDespues = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($id);
+            $detalleDespues = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($id);
+
+            self::registrarAuditoriaMovimientoCaja(
+                'EDITAR',
+                $id,
+                array(
+                    'movimiento' => $movimientoAntes,
+                    'detalle' => $detalleAntes
+                ),
+                array(
+                    'movimiento' => $movimientoDespues,
+                    'detalle' => $detalleDespues
+                )
+            );
+
             self::mostrarAlerta('success', 'Movimiento actualizado correctamente.', 'movimiento-caja');
         } else {
             self::mostrarAlerta('error', 'No se pudo actualizar el movimiento.', 'movimiento-caja');
@@ -207,9 +248,25 @@ class ControladorMovimientoCaja {
             return;
         }
 
+        $movimientoAntes = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($idMovimiento);
+        $detalleAntes = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($idMovimiento);
+
         $respuesta = ModeloMovimientoCaja::mdlEliminarMovimientoCaja($idMovimiento);
 
         if ($respuesta === 'ok') {
+            $movimientoDespues = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($idMovimiento);
+            self::registrarAuditoriaMovimientoCaja(
+                'ELIMINAR',
+                $idMovimiento,
+                array(
+                    'movimiento' => $movimientoAntes,
+                    'detalle' => $detalleAntes
+                ),
+                array(
+                    'movimiento' => $movimientoDespues
+                )
+            );
+
             self::mostrarAlerta('success', 'Movimiento enviado a papelera correctamente.', 'movimiento-caja');
         } else {
             self::mostrarAlerta('error', 'No se pudo eliminar el movimiento o ya estaba eliminado.', 'movimiento-caja');
@@ -226,8 +283,25 @@ class ControladorMovimientoCaja {
             return array('status' => 'error', 'message' => 'Identificador de movimiento invalido.');
         }
 
+        $movimientoAntes = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($idMovimiento);
+        $detalleAntes = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($idMovimiento);
+
         $respuesta = ModeloMovimientoCaja::mdlRestaurarMovimientoCaja($idMovimiento);
         if ($respuesta === 'ok') {
+            $movimientoDespues = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($idMovimiento);
+            self::registrarAuditoriaMovimientoCaja(
+                'RESTAURAR',
+                $idMovimiento,
+                array(
+                    'movimiento' => $movimientoAntes,
+                    'detalle' => $detalleAntes
+                ),
+                array(
+                    'movimiento' => $movimientoDespues,
+                    'detalle' => $detalleAntes
+                )
+            );
+
             return array('status' => 'ok');
         }
 
@@ -244,12 +318,69 @@ class ControladorMovimientoCaja {
             return array('status' => 'error', 'message' => 'Identificador de movimiento invalido.');
         }
 
+        $movimientoAntes = ModeloMovimientoCaja::mdlObtenerMovimientoCajaPorId($idMovimiento);
+        $detalleAntes = ModeloMovimientoCaja::mdlMostrarDetalleMovimiento($idMovimiento);
+
         $respuesta = ModeloMovimientoCaja::mdlDepurarMovimientoCaja($idMovimiento);
         if ($respuesta === 'ok') {
+            self::registrarAuditoriaMovimientoCaja(
+                'DEPURAR',
+                $idMovimiento,
+                array(
+                    'movimiento' => $movimientoAntes,
+                    'detalle' => $detalleAntes
+                ),
+                null
+            );
+
             return array('status' => 'ok');
         }
 
         return array('status' => 'error', 'message' => 'No se pudo eliminar definitivamente el movimiento.');
+    }
+
+    private static function registrarAuditoriaMovimientoCaja($accion, $entidadId, $antes = null, $despues = null) {
+        $usuarioActor = isset($_SESSION['usu_id']) ? (int) $_SESSION['usu_id'] : null;
+
+        $detalle = array(
+            'antes' => $antes,
+            'despues' => $despues,
+            'campos_cambiados' => self::obtenerCamposCambiadosMovimiento($antes, $despues)
+        );
+
+        ModeloAuditoria::mdlRegistrarAuditoriaGeneral(
+            'movimiento-caja',
+            'movimientos',
+            (string) $entidadId,
+            $accion,
+            $usuarioActor,
+            $detalle
+        );
+    }
+
+    private static function obtenerCamposCambiadosMovimiento($antes, $despues) {
+        if (!is_array($antes) || !is_array($despues)) {
+            return array();
+        }
+
+        $movAntes = isset($antes['movimiento']) && is_array($antes['movimiento']) ? $antes['movimiento'] : array();
+        $movDesp = isset($despues['movimiento']) && is_array($despues['movimiento']) ? $despues['movimiento'] : array();
+
+        $campos = array();
+        foreach ($movDesp as $key => $valueDespues) {
+            $valueAntes = array_key_exists($key, $movAntes) ? $movAntes[$key] : null;
+            if ((string) $valueAntes !== (string) $valueDespues) {
+                $campos[$key] = array('antes' => $valueAntes, 'despues' => $valueDespues);
+            }
+        }
+
+        $detAntes = isset($antes['detalle']) && is_array($antes['detalle']) ? $antes['detalle'] : array();
+        $detDesp = isset($despues['detalle']) && is_array($despues['detalle']) ? $despues['detalle'] : array();
+        if (json_encode($detAntes) !== json_encode($detDesp)) {
+            $campos['detalle'] = array('antes' => $detAntes, 'despues' => $detDesp);
+        }
+
+        return $campos;
     }
     
 
