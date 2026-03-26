@@ -51,6 +51,8 @@
                                         $tracto = ControladorVehiculos::ctrMostrarVehiculos('vehic_id', $value['hoja_vehic_tracto_id']);
                                         $tolva = ControladorVehiculos::ctrMostrarVehiculos('vehic_id', $value['hoja_vehic_tolva_id']);
                                         $empleado = ControladorEmpleados::ctrMostrarEmpleados('emple_id', $value['hoja_empleado_id']);
+                                        $centroCostoHoja = ControladorCentroCostos::ctrMostrarCentroCostos('cenco_id', $value['hoja_operacion']);
+                                        $operacionLabel = $centroCostoHoja ? ($centroCostoHoja['cenco_codigo'] . ' ' . $centroCostoHoja['cenco_nombre']) : 'N/A';
 
                                         $nombreEmpleado = 'N/A';
                                         if ($empleado) {
@@ -67,7 +69,7 @@
                                         echo '<td>' . $value['hoja_fecha_llegada'] . '</td>';
                                         echo '<td>' . ($tracto['vehic_placa'] ?? 'N/A') . '</td>';
                                         echo '<td>' . ($tolva['vehic_placa'] ?? 'N/A') . '</td>';
-                                        echo '<td>' . $value['hoja_operacion'] . '</td>';
+                                        echo '<td>' . htmlspecialchars($operacionLabel) . '</td>';
                                         echo '<td>S/ ' . number_format((float) $value['hoja_monto_recibido'], 2) . '</td>';
                                         echo '<td>' . $nombreEmpleado . '</td>';
                                         echo '<td>
@@ -348,7 +350,7 @@
                                     $valor = null;
                                     $operacion = ControladorCentroCostos::ctrMostrarCentroCostos($item, $valor);
                                     foreach ($operacion as $key => $value) {
-                                        echo '<option value="tabla' . $value['cenco_codigo'] . '">' . $value['cenco_codigo'] . ' ' . $value['cenco_nombre'] . '</option>';
+                                        echo '<option value="' . $value['cenco_id'] . '">' . $value['cenco_codigo'] . ' ' . $value['cenco_nombre'] . '</option>';
                                     }
                                     ?>
                                 </select>
@@ -566,7 +568,7 @@
                                     $valor = null;
                                     $operacion = ControladorCentroCostos::ctrMostrarCentroCostos($item, $valor);
                                     foreach ($operacion as $key => $value) {
-                                        echo '<option value="tabla' . $value['cenco_codigo'] . '">' . $value['cenco_codigo'] . ' ' . $value['cenco_nombre'] . '</option>';
+                                        echo '<option value="' . $value['cenco_id'] . '">' . $value['cenco_codigo'] . ' ' . $value['cenco_nombre'] . '</option>';
                                     }
                                     ?>
                                 </select>

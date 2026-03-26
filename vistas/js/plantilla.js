@@ -60,6 +60,13 @@ $(document).ready(function () {
   });
 });
 
+$(document).ready(function () {
+  $("#tablaAuditoriaEmpleados").DataTable({      
+    //para usar los botones
+    responsive: "true",
+  });
+});
+
 //Initialize Select2 Elements
 
 $(".select2").select2();

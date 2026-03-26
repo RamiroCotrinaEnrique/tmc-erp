@@ -383,18 +383,13 @@ class ImprimirHojaLiquidacionPDF
     private function resolverOperacion($operacion) 
     {
         $operacion = trim((string) $operacion); 
-        if ($operacion === "") { 
+        if ($operacion === "" || $operacion === "0") { 
             return "NO REGISTRADO"; 
         } 
         
-        $codigo = $operacion; 
-        if (stripos($operacion, "tabla") === 0) { 
-            $codigo = substr($operacion, 5); 
-        } 
-        
-        $centroCosto = ControladorCentroCostos::ctrMostrarCentroCostos("cenco_codigo", $codigo); 
+        $centroCosto = ControladorCentroCostos::ctrMostrarCentroCostos("cenco_id", (int) $operacion); 
         if (!empty($centroCosto) && is_array($centroCosto)) { 
-            $codigoTexto = trim((string) ($centroCosto["cenco_codigo"] ?? $codigo)); 
+            $codigoTexto = trim((string) ($centroCosto["cenco_codigo"] ?? "")); 
             $nombreTexto = trim((string) ($centroCosto["cenco_nombre"] ?? "")); 
             if ($nombreTexto !== "") { 
                 return $codigoTexto . " - " . $nombreTexto; 

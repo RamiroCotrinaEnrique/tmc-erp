@@ -93,63 +93,65 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="tablaPapeleraAreas" class="table table-bordered table-striped tablas">
-                                <thead>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Área</th>
-                                        <th>Fecha eliminación</th>
-                                        <th>Restaurar</th>
-                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
-                                        <th>Depurar</th>
-                                        <?php } ?>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $areasEliminadas = ControladorAreas::ctrMostrarAreasEliminadas();
-                                    if($areasEliminadas && count($areasEliminadas) > 0){
-                                        foreach($areasEliminadas as $key => $value){
-                                            echo '<tr>';
-                                            echo '<td>'.($key+1).'</td>';
-                                            echo '<td>'.$value["are_nombre"].'</td>';
-                                            echo '<td>'.$value["are_fecha_delete"].'</td>';
-                                            echo '<td>
-                                                <button class="btn btn-success btn-xs btnRestaurarArea"
-                                                    idArea="'.$value["are_id"].'"
-                                                    nombreArea="'.htmlspecialchars($value["are_nombre"], ENT_QUOTES).'">
-                                                    <i class="fa fa-undo"></i> Restaurar
-                                                </button>
-                                            </td>';
-                                            if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){
+                            <div class="table-responsive"> 
+                                <table id="tablaPapeleraAreas" class="table table-bordered table-striped tablas">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Área</th>
+                                            <th>Fecha eliminación</th>
+                                            <th>Restaurar</th>
+                                            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                            <th>Depurar</th>
+                                            <?php } ?>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $areasEliminadas = ControladorAreas::ctrMostrarAreasEliminadas();
+                                        if($areasEliminadas && count($areasEliminadas) > 0){
+                                            foreach($areasEliminadas as $key => $value){
+                                                echo '<tr>';
+                                                echo '<td>'.($key+1).'</td>';
+                                                echo '<td>'.$value["are_nombre"].'</td>';
+                                                echo '<td>'.$value["are_fecha_delete"].'</td>';
                                                 echo '<td>
-                                                    <button class="btn btn-danger btn-xs btnDepurarArea"
+                                                    <button class="btn btn-success btn-xs btnRestaurarArea"
                                                         idArea="'.$value["are_id"].'"
                                                         nombreArea="'.htmlspecialchars($value["are_nombre"], ENT_QUOTES).'">
-                                                        <i class="fa fa-times"></i> Depurar
+                                                        <i class="fa fa-undo"></i> Restaurar
                                                     </button>
                                                 </td>';
+                                                if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){
+                                                    echo '<td>
+                                                        <button class="btn btn-danger btn-xs btnDepurarArea"
+                                                            idArea="'.$value["are_id"].'"
+                                                            nombreArea="'.htmlspecialchars($value["are_nombre"], ENT_QUOTES).'">
+                                                            <i class="fa fa-times"></i> Depurar
+                                                        </button>
+                                                    </td>';
+                                                }
+                                                echo '</tr>';
                                             }
-                                            echo '</tr>';
+                                        }else{
+                                            $colspanPapelera = (isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador') ? 5 : 4;
+                                            echo '<tr><td colspan="'.$colspanPapelera.'" class="text-center text-muted">No hay áreas en la papelera</td></tr>';
                                         }
-                                    }else{
-                                        $colspanPapelera = (isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador') ? 5 : 4;
-                                        echo '<tr><td colspan="'.$colspanPapelera.'" class="text-center text-muted">No hay áreas en la papelera</td></tr>';
-                                    }
-                                    ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Área</th>
-                                        <th>Fecha eliminación</th>
-                                        <th>Restaurar</th>
-                                        <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
-                                        <th>Depurar</th>
-                                        <?php } ?>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                        ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Área</th>
+                                            <th>Fecha eliminación</th>
+                                            <th>Restaurar</th>
+                                            <?php if(isset($_SESSION['usu_perfil']) && $_SESSION['usu_perfil'] === 'Administrador'){ ?>
+                                            <th>Depurar</th>
+                                            <?php } ?>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>                            
                         </div>
                     </div>
                 </div>

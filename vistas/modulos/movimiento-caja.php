@@ -166,71 +166,74 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="tablaPapeleraMovimientos" class="table table-bordered table-striped tablas">
-                                <thead>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Tipo</th>
-                                        <th>Serie</th>
-                                        <th>Número</th>
-                                        <th>Moneda</th>
-                                        <th>Fecha</th>
-                                        <th>Empleado</th>
-                                        <th>Total</th>
-                                        <th>Fecha eliminación</th>
-                                        <th>Restaurar</th>
-                                        <th>Depurar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $movimientosEliminados = ControladorMovimientoCaja::ctrMostrarMovimientoCajaEliminados();
-                                    if($movimientosEliminados && count($movimientosEliminados) > 0){
-                                        foreach($movimientosEliminados as $key => $value){
-                                            $nombreMovimiento = trim($value['movi_tipo'].' '.$value['movi_serie'].'-'.$value['movi_numero']);
-                                            echo '<tr>';
-                                            echo '<td>'.($key+1).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_tipo']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_serie']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_numero']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_moneda']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_fecha']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_emple_id']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_total']).'</td>';
-                                            echo '<td>'.htmlspecialchars($value['movi_fecha_delete']).'</td>';
-                                            echo '<td>
-                                                <button class="btn btn-success btn-xs btnRestaurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
-                                                    <i class="fa fa-undo"></i> Restaurar
-                                                </button>
-                                            </td>';
-                                            echo '<td>
-                                                <button class="btn btn-danger btn-xs btnDepurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
-                                                    <i class="fa fa-times"></i> Depurar
-                                                </button>
-                                            </td>';
-                                            echo '</tr>';
+                            <div class="table-responsive"> 
+                                <table id="tablaPapeleraMovimientos" class="table table-bordered table-striped tablas">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Tipo</th>
+                                            <th>Serie</th>
+                                            <th>Número</th>
+                                            <th>Moneda</th>
+                                            <th>Fecha</th>
+                                            <th>Empleado</th>
+                                            <th>Total</th>
+                                            <th>Fecha eliminación</th>
+                                            <th>Restaurar</th>
+                                            <th>Depurar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $movimientosEliminados = ControladorMovimientoCaja::ctrMostrarMovimientoCajaEliminados();
+                                        if($movimientosEliminados && count($movimientosEliminados) > 0){
+                                            foreach($movimientosEliminados as $key => $value){
+                                                $nombreMovimiento = trim($value['movi_tipo'].' '.$value['movi_serie'].'-'.$value['movi_numero']);
+                                                echo '<tr>';
+                                                echo '<td>'.($key+1).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_tipo']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_serie']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_numero']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_moneda']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_fecha']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_emple_id']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_total']).'</td>';
+                                                echo '<td>'.htmlspecialchars($value['movi_fecha_delete']).'</td>';
+                                                echo '<td>
+                                                    <button class="btn btn-success btn-xs btnRestaurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
+                                                        <i class="fa fa-undo"></i> Restaurar
+                                                    </button>
+                                                </td>';
+                                                echo '<td>
+                                                    <button class="btn btn-danger btn-xs btnDepurarMovimientoCaja" idMovimientoCaja="'.$value['movi_id'].'" nombreMovimiento="'.htmlspecialchars($nombreMovimiento, ENT_QUOTES).'">
+                                                        <i class="fa fa-times"></i> Depurar
+                                                    </button>
+                                                </td>';
+                                                echo '</tr>';
+                                            }
+                                        } else {
+                                            echo '<tr><td colspan="11" class="text-center text-muted">No hay movimientos en la papelera</td></tr>';
                                         }
-                                    } else {
-                                        echo '<tr><td colspan="11" class="text-center text-muted">No hay movimientos en la papelera</td></tr>';
-                                    }
-                                    ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Tipo</th>
-                                        <th>Serie</th>
-                                        <th>Número</th>
-                                        <th>Moneda</th>
-                                        <th>Fecha</th>
-                                        <th>Empleado</th>
-                                        <th>Total</th>
-                                        <th>Fecha eliminación</th>
-                                        <th>Restaurar</th>
-                                        <th>Depurar</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                        ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Tipo</th>
+                                            <th>Serie</th>
+                                            <th>Número</th>
+                                            <th>Moneda</th>
+                                            <th>Fecha</th>
+                                            <th>Empleado</th>
+                                            <th>Total</th>
+                                            <th>Fecha eliminación</th>
+                                            <th>Restaurar</th>
+                                            <th>Depurar</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                
+                            </div>                            
                         </div>
                     </div>
                 </div>
@@ -248,78 +251,81 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="tablaAuditoriaMovimientoCaja" class="table table-bordered table-striped tablas">
-                                <thead>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Fecha</th>
-                                        <th>Accion</th>
-                                        <th>Registro</th>
-                                        <th>Usuario</th>
-                                        <th>IP</th>
-                                        <th>Detalle</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $auditoriasMovimiento = ControladorMovimientoCaja::ctrMostrarAuditoriaMovimientoCaja(300);
-                                    if ($auditoriasMovimiento && count($auditoriasMovimiento) > 0) {
-                                        foreach ($auditoriasMovimiento as $key => $value) {
-                                            $usuarioTexto = 'Sistema';
-                                            if (!empty($value['usu_usuario'])) {
-                                                $usuarioTexto = $value['usu_usuario'];
-                                                if (!empty($value['usu_nombre'])) {
-                                                    $usuarioTexto .= ' - ' . $value['usu_nombre'];
+                            <div class="table-responsive"> 
+                                <table id="tablaAuditoriaMovimientoCaja" class="table table-bordered table-striped tablas">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Fecha</th>
+                                            <th>Accion</th>
+                                            <th>Registro</th>
+                                            <th>Usuario</th>
+                                            <th>IP</th>
+                                            <th>Detalle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $auditoriasMovimiento = ControladorMovimientoCaja::ctrMostrarAuditoriaMovimientoCaja(300);
+                                        if ($auditoriasMovimiento && count($auditoriasMovimiento) > 0) {
+                                            foreach ($auditoriasMovimiento as $key => $value) {
+                                                $usuarioTexto = 'Sistema';
+                                                if (!empty($value['usu_usuario'])) {
+                                                    $usuarioTexto = $value['usu_usuario'];
+                                                    if (!empty($value['usu_nombre'])) {
+                                                        $usuarioTexto .= ' - ' . $value['usu_nombre'];
+                                                    }
+                                                } elseif (!empty($value['aud_usuario_id'])) {
+                                                    $usuarioTexto = 'ID ' . $value['aud_usuario_id'];
                                                 }
-                                            } elseif (!empty($value['aud_usuario_id'])) {
-                                                $usuarioTexto = 'ID ' . $value['aud_usuario_id'];
-                                            }
 
-                                            $detalleTexto = '';
-                                            if (!empty($value['aud_detalle_json'])) {
-                                                $detalle = json_decode($value['aud_detalle_json'], true);
-                                                if (json_last_error() === JSON_ERROR_NONE && is_array($detalle)) {
-                                                    if (!empty($detalle['campos_cambiados']) && is_array($detalle['campos_cambiados'])) {
-                                                        $detalleTexto = 'Campos: ' . implode(', ', array_keys($detalle['campos_cambiados']));
-                                                    } elseif (!empty($detalle['despues'])) {
-                                                        $detalleTexto = 'Se registro estado despues del evento';
-                                                    } elseif (!empty($detalle['antes'])) {
-                                                        $detalleTexto = 'Se registro estado previo del evento';
+                                                $detalleTexto = '';
+                                                if (!empty($value['aud_detalle_json'])) {
+                                                    $detalle = json_decode($value['aud_detalle_json'], true);
+                                                    if (json_last_error() === JSON_ERROR_NONE && is_array($detalle)) {
+                                                        if (!empty($detalle['campos_cambiados']) && is_array($detalle['campos_cambiados'])) {
+                                                            $detalleTexto = 'Campos: ' . implode(', ', array_keys($detalle['campos_cambiados']));
+                                                        } elseif (!empty($detalle['despues'])) {
+                                                            $detalleTexto = 'Se registro estado despues del evento';
+                                                        } elseif (!empty($detalle['antes'])) {
+                                                            $detalleTexto = 'Se registro estado previo del evento';
+                                                        }
+                                                    }
+
+                                                    if ($detalleTexto === '') {
+                                                        $detalleTexto = substr($value['aud_detalle_json'], 0, 220);
                                                     }
                                                 }
 
-                                                if ($detalleTexto === '') {
-                                                    $detalleTexto = substr($value['aud_detalle_json'], 0, 220);
-                                                }
+                                                echo '<tr>';
+                                                echo '<td>' . ($key + 1) . '</td>';
+                                                echo '<td>' . htmlspecialchars((string) $value['aud_fecha_evento']) . '</td>';
+                                                echo '<td><span class="badge badge-info">' . htmlspecialchars((string) $value['aud_accion']) . '</span></td>';
+                                                echo '<td>' . htmlspecialchars((string) $value['aud_entidad_id']) . '</td>';
+                                                echo '<td>' . htmlspecialchars($usuarioTexto) . '</td>';
+                                                echo '<td>' . htmlspecialchars((string) ($value['aud_ip_origen'] ?? '')) . '</td>';
+                                                echo '<td>' . htmlspecialchars($detalleTexto) . '</td>';
+                                                echo '</tr>';
                                             }
-
-                                            echo '<tr>';
-                                            echo '<td>' . ($key + 1) . '</td>';
-                                            echo '<td>' . htmlspecialchars((string) $value['aud_fecha_evento']) . '</td>';
-                                            echo '<td><span class="badge badge-info">' . htmlspecialchars((string) $value['aud_accion']) . '</span></td>';
-                                            echo '<td>' . htmlspecialchars((string) $value['aud_entidad_id']) . '</td>';
-                                            echo '<td>' . htmlspecialchars($usuarioTexto) . '</td>';
-                                            echo '<td>' . htmlspecialchars((string) ($value['aud_ip_origen'] ?? '')) . '</td>';
-                                            echo '<td>' . htmlspecialchars($detalleTexto) . '</td>';
-                                            echo '</tr>';
+                                        } else {
+                                            echo '<tr><td colspan="7" class="text-center text-muted">No hay eventos de auditoria para mostrar</td></tr>';
                                         }
-                                    } else {
-                                        echo '<tr><td colspan="7" class="text-center text-muted">No hay eventos de auditoria para mostrar</td></tr>';
-                                    }
-                                    ?>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Fecha</th>
-                                        <th>Accion</th>
-                                        <th>Registro</th>
-                                        <th>Usuario</th>
-                                        <th>IP</th>
-                                        <th>Detalle</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                        ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th style="width:10px">#</th>
+                                            <th>Fecha</th>
+                                            <th>Accion</th>
+                                            <th>Registro</th>
+                                            <th>Usuario</th>
+                                            <th>IP</th>
+                                            <th>Detalle</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>                                
+                            </div>
+                            
                         </div>
                     </div>
                 </div>

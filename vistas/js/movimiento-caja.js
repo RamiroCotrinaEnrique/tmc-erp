@@ -1,4 +1,117 @@
 $(document).ready(function () {
+  var idiomaDataTable = {
+    lengthMenu: "Mostrar _MENU_ registros",
+    zeroRecords: "No se encontraron resultados",
+    info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+    infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+    infoFiltered: "(filtrado de un total de _MAX_ registros)",
+    sSearch: "Buscar:",
+    oPaginate: {
+      sFirst: "Primero",
+      sLast: "Último",
+      sNext: "Siguiente",
+      sPrevious: "Anterior"
+    },
+    sProcessing: "Procesando..."
+  };
+
+  function recalcularTablasVisibles() {
+    if (!$.fn.dataTable) {
+      return;
+    }
+
+    var apiTablas = $.fn.dataTable.tables({ visible: true, api: true });
+    if (apiTablas && typeof apiTablas.columns === "function") {
+      apiTablas.columns.adjust();
+      if (apiTablas.responsive && typeof apiTablas.responsive.recalc === "function") {
+        apiTablas.responsive.recalc();
+      }
+    }
+  }
+
+  function inicializarTablaExpandible(selector, conBotones) {
+    if (!$.fn.DataTable) {
+      return;
+    }
+
+    var $tabla = $(selector);
+    if (!$tabla.length || $.fn.DataTable.isDataTable($tabla)) {
+      return;
+    }
+
+    $tabla.addClass("nowrap");
+
+    var configuracion = {
+      language: idiomaDataTable,
+      responsive: {
+        details: {
+          type: "column",
+          target: 0
+        }
+      },
+      autoWidth: false,
+      columnDefs: [
+        {
+          className: "dtr-control",
+          orderable: false,
+          targets: 0
+        },
+        {
+          responsivePriority: 1,
+          targets: 0
+        },
+        {
+          responsivePriority: 2,
+          targets: -1
+        }
+      ],
+      dom: conBotones ? "Bfrtilp" : "frtip"
+    };
+
+    if (conBotones) {
+      configuracion.buttons = [
+        {
+          extend: "copy",
+          text: '<i class="fa fa-file-excel-o" aria-hidden="true"></i> Copiar',
+          titleAttr: "Copiar",
+          className: "btn btn-dark"
+        },
+        {
+          extend: "excelHtml5",
+          text: '<i class="fas fa-file-excel"></i> Excel',
+          titleAttr: "Exportar a Excel",
+          className: "btn btn-success"
+        },
+        {
+          extend: "pdfHtml5",
+          text: '<i class="fas fa-file-pdf"></i> PDF',
+          titleAttr: "Exportar a PDF",
+          className: "btn btn-danger"
+        },
+        {
+          extend: "csv",
+          text: '<i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV',
+          titleAttr: "Exportar a CSV",
+          className: "btn btn-success"
+        },
+        {
+          extend: "print",
+          text: '<i class="fa fa-print"></i> Imprimir',
+          titleAttr: "Imprimir",
+          className: "btn btn-info"
+        },
+        {
+          extend: "colvis",
+          text: '<i class="fa fa-compress"></i> Visibilidad',
+          titleAttr: "Visibilidad",
+          className: "btn btn-light"
+        }
+      ];
+    }
+
+    $tabla.DataTable(configuracion);
+  }
+
   function inicializarTablasPorSerie() {
     if (!$.fn.DataTable) {
       return;
@@ -11,72 +124,23 @@ $(document).ready(function () {
         return;
       }
 
-      $tabla.DataTable({
-        language: {
-          lengthMenu: "Mostrar _MENU_ registros",
-          zeroRecords: "No se encontraron resultados",
-          info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-          infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-          infoFiltered: "(filtrado de un total de _MAX_ registros)",
-          sSearch: "Buscar:",
-          oPaginate: {
-            sFirst: "Primero",
-            sLast: "Último",
-            sNext: "Siguiente",
-            sPrevious: "Anterior"
-          },
-          sProcessing: "Procesando..."
-        },
-        responsive: true,
-        autoWidth: false,
-        dom: "Bfrtilp",
-        buttons: [
-          {
-            extend: "copy",
-            text: '<i class="fa fa-file-excel-o" aria-hidden="true"></i> Copiar',
-            titleAttr: "Copiar",
-            className: "btn btn-dark"
-          },
-          {
-            extend: "excelHtml5",
-            text: '<i class="fas fa-file-excel"></i> Excel',
-            titleAttr: "Exportar a Excel",
-            className: "btn btn-success"
-          },
-          {
-            extend: "pdfHtml5",
-            text: '<i class="fas fa-file-pdf"></i> PDF',
-            titleAttr: "Exportar a PDF",
-            className: "btn btn-danger"
-          },
-          {
-            extend: "csv",
-            text: '<i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV',
-            titleAttr: "Exportar a CSV",
-            className: "btn btn-success"
-          },
-          {
-            extend: "print",
-            text: '<i class="fa fa-print"></i> Imprimir',
-            titleAttr: "Imprimir",
-            className: "btn btn-info"
-          },
-          {
-            extend: "colvis",
-            text: '<i class="fa fa-compress"></i> Visibilidad',
-            titleAttr: "Visibilidad",
-            className: "btn btn-light"
-          }
-        ]
-      });
+      inicializarTablaExpandible($tabla, true);
     });
 
     $('a[data-toggle="tab"][href^="#serie-panel-"]').on("shown.bs.tab", function () {
-      $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust().responsive.recalc();
+      recalcularTablasVisibles();
     });
   }
 
   inicializarTablasPorSerie();
+  inicializarTablaExpandible("#tablaPapeleraMovimientos", false);
+  inicializarTablaExpandible("#tablaAuditoriaMovimientoCaja", false);
+
+  $(document).on("click", '[data-card-widget="collapse"]', function () {
+    setTimeout(function () {
+      recalcularTablasVisibles();
+    }, 350);
+  });
 
   var $tablaDetalle = $("#detalleMovimiento");
   var $btnAgregarDetalle = $("#btnAgregarDetalle");
