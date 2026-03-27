@@ -126,37 +126,37 @@ class ImprimirOptPDF
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(34, 7.5, utf8_decode('OPERACIÓN :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(156, 7.5, utf8_decode($respuestaCentroCosto["cenco_nombre"]), 1, 1, 'L');
+        $pdf->Cell(156, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaCentroCosto["cenco_nombre"] ?? "")), 154), 1, 1, 'L');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(47, 7.5, utf8_decode('PLACA :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(48, 7.5, utf8_decode($respuestaVehiculo["vehic_placa"]), 1, 0, 'C');
+        $pdf->Cell(48, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaVehiculo["vehic_placa"] ?? "")), 46), 1, 0, 'C');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(47, 7.5, utf8_decode('FECHA :'), 1, 0, 'C');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(48, 7.5, utf8_decode($respuestaOpt["opt_fecha"]), 1, 1, 'C');
+        $pdf->Cell(48, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_fecha"] ?? "")), 46), 1, 1, 'C');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(34, 7.5, utf8_decode('CLIENTE :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(156, 7.5, utf8_decode($respuestaOpt["opt_cliente"]), 1, 1, 'L');
+        $pdf->Cell(156, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_cliente"] ?? "")), 154), 1, 1, 'L');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(34, 7.5, utf8_decode('LUGAR :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(156, 7.5, utf8_decode($respuestaOpt["opt_lugar"]), 1, 1, 'L');
+        $pdf->Cell(156, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_lugar"] ?? "")), 154), 1, 1, 'L');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(55, 7.5, utf8_decode('PERSONAL OBSERVADO :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(135, 7.5, utf8_decode($respuestaOpt["opt_observado"]), 1, 1, 'L');
+        $pdf->Cell(135, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_observado"] ?? "")), 133), 1, 1, 'L');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(34, 7.5, utf8_decode('OBSERVADOR :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(156, 7.5, utf8_decode($respuestaOpt["opt_observador"]), 1, 1, 'L');
+        $pdf->Cell(156, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_observador"] ?? "")), 154), 1, 1, 'L');
 
         $pdf->Ln(3);
         $pdf->SetFont('Arial', 'B', 11);
@@ -166,12 +166,12 @@ class ImprimirOptPDF
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(47, 7.5, utf8_decode('TIPO DE HALAZGO :'), 1, 0, 'L');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(48, 7.5, utf8_decode($respuestaOpt["opt_tipo_hallazgo"]), 1, 0, 'C');
+        $pdf->Cell(48, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_tipo_hallazgo"] ?? "")), 46), 1, 0, 'C');
 
         $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(47, 7.5, utf8_decode('RELACIONADO CON :'), 1, 0, 'C');
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(48, 7.5, utf8_decode($respuestaOpt["opt_relacionado"]), 1, 1, 'C');
+        $pdf->Cell(48, 7.5, $this->ajustarTextoAncho($pdf, utf8_decode((string) ($respuestaOpt["opt_relacionado"] ?? "")), 46), 1, 1, 'C');
 
         //$pdf-> imprimirFilaDobleColumna($pdf, 'DESCRIPCIÓN DE OBSERVACIÓN :', $texto);
         $this->imprimirFilaDobleColumna($pdf, 'DESCRIPCIÓN DE OBSERVACIÓN :', $respuestaOpt["opt_decripcion_observacion"]);
@@ -891,6 +891,25 @@ class ImprimirOptPDF
         $pdf->SetXY($x + $anchoCol1, $y);
         $pdf->SetFont('Arial', '', 9);
         $pdf->MultiCell($anchoCol2, $altoLinea, utf8_decode($contenido), 1, 'L');
+    }
+
+    private function ajustarTextoAncho($pdf, $texto, $anchoDisponible)
+    {
+        $texto = trim((string) $texto);
+        if ($texto === "") {
+            return "";
+        }
+
+        if ($pdf->GetStringWidth($texto) <= $anchoDisponible) {
+            return $texto;
+        }
+
+        $sufijo = "...";
+        while ($texto !== "" && $pdf->GetStringWidth($texto . $sufijo) > $anchoDisponible) {
+            $texto = substr($texto, 0, -1);
+        }
+
+        return $texto === "" ? $sufijo : $texto . $sufijo;
     }
 } //FinClase
 

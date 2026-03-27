@@ -216,6 +216,7 @@ class ImprimirMovimientoCajaPDF
         $wItem = 20;
         $wDesc = 130;
         $wImp = 38;
+        $maxLineasDescripcion = 3;
 
         $pdf->SetXY($x, $y);
         $pdf->SetFont("Arial", "", 10);
@@ -237,13 +238,25 @@ class ImprimirMovimientoCajaPDF
             $descripcion = $item ? (string) ($item["deta_movi_descripcion"] ?? "") : "";
             $importe = $item ? (float) ($item["deta_movi_importe"] ?? 0) : null;
 
-            $pdf->SetX($x);
+            $descripcionPdf = utf8_decode($descripcion);
+            $descripcionAjustada = $this->ajustarTextoDescripcion($pdf, $wDesc, $descripcionPdf, $maxLineasDescripcion);
+            $descripcionPdf = $descripcionAjustada["texto"];
+            $lineasDescripcion = $descripcionAjustada["lineas"];
+            $altoFila = $h * max(1, $lineasDescripcion);
+            $yFila = $pdf->GetY();
+
             $pdf->SetFont("Arial", "", 9.5);
-            $pdf->Cell($wItem, $h, utf8_decode($numeroItem), 1, 0, "C");
-            $pdf->Cell($wDesc, $h, utf8_decode($this->limitarTexto($descripcion, 80)), 1, 0, "L");
+            $pdf->SetXY($x, $yFila);
+            $pdf->Cell($wItem, $altoFila, utf8_decode($numeroItem), 1, 0, "C");
+
+            $pdf->SetXY($x + $wItem, $yFila);
+            $pdf->MultiCell($wDesc, $h, $descripcionPdf, 1, "L");
 
             $textoImporte = $importe === null ? "" : $simbolo . " " . number_format($importe, 2, ".", ",");
-            $pdf->Cell($wImp, $h, $textoImporte, 1, 1, "R");
+            $pdf->SetXY($x + $wItem + $wDesc, $yFila);
+            $pdf->Cell($wImp, $altoFila, $textoImporte, 1, 0, "R");
+
+            $pdf->SetXY($x, $yFila + $altoFila);
         }
 
         $total = (float) ($movimiento["movi_total"] ?? 0);
@@ -337,6 +350,115 @@ private function dibujarFirmas($pdf, $movimiento, $yFirmas)
             return $texto;
         }
         return substr($texto, 0, $maxLength - 3) . "...";
+    }
+
+    private function calcularNumeroLineas($pdf, $ancho, $texto)
+    {
+        // Calcula lineas segun ancho disponible usando metodos publicos de FPDF.
+        $texto = str_replace("\r", "", trim((string) $texto));
+        if ($texto === "") {
+            return 1;
+        }
+
+        $maxAncho = max(1, (float) $ancho - 2);
+        $lineas = 0;
+        $parrafos = explode("\n", $texto);
+
+        foreach ($parrafos as $parrafo) {
+            $parrafo = trim($parrafo);
+            if ($parrafo === "") {
+                $lineas++;
+                continue;
+            }
+
+            $actual = "";
+            $palabras = preg_split('/\s+/', $parrafo);
+
+            foreach ($palabras as $palabra) {
+                if ($palabra === "") {
+                    continue;
+                }
+
+                $candidato = $actual === "" ? $palabra : $actual . " " . $palabra;
+                if ($pdf->GetStringWidth($candidato) <= $maxAncho) {
+                    $actual = $candidato;
+                    continue;
+                }
+
+                if ($actual !== "") {
+                    $lineas++;
+                    $actual = "";
+                }
+
+                if ($pdf->GetStringWidth($palabra) <= $maxAncho) {
+                    $actual = $palabra;
+                    continue;
+                }
+
+                $fragmento = "";
+                $chars = str_split($palabra);
+                foreach ($chars as $char) {
+                    $test = $fragmento . $char;
+                    if ($pdf->GetStringWidth($test) <= $maxAncho) {
+                        $fragmento = $test;
+                    } else {
+                        if ($fragmento !== "") {
+                            $lineas++;
+                        }
+                        $fragmento = $char;
+                    }
+                }
+                $actual = $fragmento;
+            }
+
+            $lineas += ($actual !== "") ? 1 : 0;
+        }
+
+        return max(1, $lineas);
+    }
+
+    private function ajustarTextoDescripcion($pdf, $ancho, $texto, $maxLineas)
+    {
+        $texto = trim((string) $texto);
+        $maxLineas = max(1, (int) $maxLineas);
+
+        if ($texto === "") {
+            return array("texto" => "", "lineas" => 1);
+        }
+
+        $lineasActuales = $this->calcularNumeroLineas($pdf, $ancho, $texto);
+        if ($lineasActuales <= $maxLineas) {
+            return array("texto" => $texto, "lineas" => $lineasActuales);
+        }
+
+        $textoPlano = preg_replace('/\s+/', ' ', str_replace(array("\r", "\n"), ' ', $texto));
+        $textoPlano = trim((string) $textoPlano);
+
+        $izq = 1;
+        $der = strlen($textoPlano);
+        $mejor = "";
+
+        while ($izq <= $der) {
+            $mid = (int) floor(($izq + $der) / 2);
+            $candidato = rtrim(substr($textoPlano, 0, $mid)) . "...";
+            $lineas = $this->calcularNumeroLineas($pdf, $ancho, $candidato);
+
+            if ($lineas <= $maxLineas) {
+                $mejor = $candidato;
+                $izq = $mid + 1;
+            } else {
+                $der = $mid - 1;
+            }
+        }
+
+        if ($mejor === "") {
+            $mejor = "...";
+        }
+
+        return array(
+            "texto" => $mejor,
+            "lineas" => $this->calcularNumeroLineas($pdf, $ancho, $mejor)
+        );
     }
 
     private function formatearFechaLarga($fecha)

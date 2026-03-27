@@ -39,6 +39,18 @@ $(document).ready(function () {
       return;
     }
 
+    // DataTables no soporta filas de datos con colspan en tbody.
+    // Si existen placeholders de "sin datos", se eliminan para evitar _DT_CellIndex.
+    $tabla.find("tbody tr").each(function () {
+      var $celdas = $(this).children("td, th");
+      if ($celdas.length === 1) {
+        var colspan = parseInt($celdas.eq(0).attr("colspan") || "1", 10);
+        if (colspan > 1) {
+          $(this).remove();
+        }
+      }
+    });
+
     $tabla.addClass("nowrap");
 
     var configuracion = {

@@ -211,8 +211,6 @@
                                                 </td>';
                                                 echo '</tr>';
                                             }
-                                        } else {
-                                            echo '<tr><td colspan="11" class="text-center text-muted">No hay movimientos en la papelera</td></tr>';
                                         }
                                         ?>
                                     </tbody>
@@ -307,8 +305,6 @@
                                                 echo '<td>' . htmlspecialchars($detalleTexto) . '</td>';
                                                 echo '</tr>';
                                             }
-                                        } else {
-                                            echo '<tr><td colspan="7" class="text-center text-muted">No hay eventos de auditoria para mostrar</td></tr>';
                                         }
                                         ?>
                                     </tbody>
