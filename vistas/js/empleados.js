@@ -32,6 +32,7 @@ $(document).ready(function() {
     });
 });
 
+
 // Convierte fechas devueltas por el servidor (YYYY-MM-DD o YYYY-MM-DD HH:MM:SS)
 function formatServerDateToDisplay(dateStr) {
     if (!dateStr) return '';

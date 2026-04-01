@@ -93,7 +93,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive"> 
                                 <table id="tablaPapeleraAreas" class="table table-bordered table-striped tablas">
                                     <thead>
                                         <tr>
@@ -150,8 +149,7 @@
                                             <?php } ?>
                                         </tr>
                                     </tfoot>
-                                </table>
-                            </div>                            
+                                </table>                           
                         </div>
                     </div>
                 </div>

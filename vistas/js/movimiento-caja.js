@@ -145,14 +145,6 @@ $(document).ready(function () {
   }
 
   inicializarTablasPorSerie();
-  inicializarTablaExpandible("#tablaPapeleraMovimientos", false);
-  inicializarTablaExpandible("#tablaAuditoriaMovimientoCaja", false);
-
-  $(document).on("click", '[data-card-widget="collapse"]', function () {
-    setTimeout(function () {
-      recalcularTablasVisibles();
-    }, 350);
-  });
 
   var $tablaDetalle = $("#detalleMovimiento");
   var $btnAgregarDetalle = $("#btnAgregarDetalle");

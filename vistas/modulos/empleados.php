@@ -134,7 +134,7 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <table id="tablaPapeleraEmpleados" class="table table-bordered table-striped tablas tablaResponsivaGeneral">
+                    <table id="tablaPapeleraEmpleados" class="table table-bordered table-striped tablas">
                       <thead class="text-center">
                         <tr>
                           <th style="width:10px">#</th>
@@ -215,9 +215,9 @@
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
-                        </div>
+                        </div> 
                         <div class="card-body"> 
-                            <table id="tablaAuditoriaEmpleados" class="table table-bordered table-striped tablas ">
+                            <table id="tablaAuditoriaEmpleados" class="table table-bordered table-striped tablas">
                                   <thead>
                                       <tr>
                                           <th style="width:10px">#</th>

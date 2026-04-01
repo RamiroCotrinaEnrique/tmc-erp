@@ -60,12 +60,6 @@ $(document).ready(function () {
   });
 });
 
-$(document).ready(function () {
-  $("#tablaAuditoriaEmpleados").DataTable({      
-    //para usar los botones
-    responsive: "true",
-  });
-});
 
 //Initialize Select2 Elements
 
@@ -150,3 +144,141 @@ $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
     //$('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
     //Money Euro
     $('[data-mask]').inputmask()
+
+// =========================
+// DataTables - Responsive y Textos en Español
+// =========================
+
+$(document).ready(function () {
+    
+    // Esta sección inicializa y mantiene responsivas las tablas:
+    // - Papelera 
+    // - Auditoría  
+    if (!$.fn.DataTable) {
+        return;
+    }
+
+    // Textos de DataTables en español.
+    var idiomaDataTable = {
+        lengthMenu: "Mostrar _MENU_ registros",
+        zeroRecords: "No se encontraron resultados",
+        info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+        infoFiltered: "(filtrado de un total de _MAX_ registros)",
+        sSearch: "Buscar:",
+        oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior"
+        },
+        sProcessing: "Procesando..."
+    };
+
+    // Recalcula anchos y responsive cuando una tabla cambia de visibilidad.
+    function recalcularTablasVisibles() {
+        if (!$.fn.dataTable) {
+            return;
+        }
+
+        var apiTablas = $.fn.dataTable.tables({ visible: true, api: true });
+        if (apiTablas && typeof apiTablas.columns === "function") {
+            apiTablas.columns.adjust();
+            if (apiTablas.responsive && typeof apiTablas.responsive.recalc === "function") {
+                apiTablas.responsive.recalc();
+            }
+        }
+    }
+
+    // Inicializa una tabla con comportamiento responsive por columna.
+    function inicializarTablaExpandible(selector) {
+        var $tabla = $(selector);
+
+        if (!$tabla.length || $.fn.DataTable.isDataTable($tabla)) {
+            return;
+        }
+
+        // Evita errores _DT_CellIndex cuando exista una fila placeholder con colspan.
+        $tabla.find("tbody tr").each(function () {
+            var $celdas = $(this).children("td, th");
+            if ($celdas.length === 1) {
+                var colspan = parseInt($celdas.eq(0).attr("colspan") || "1", 10);
+                if (colspan > 1) {
+                    $(this).remove();
+                }
+            }
+        });
+
+        $tabla.addClass("nowrap");
+
+        // Configuración enfocada en autoajuste y expansión en móviles.
+        $tabla.DataTable({
+            language: idiomaDataTable,
+            responsive: {
+                details: {
+                    type: "column",
+                    target: 0
+                }
+            },
+            autoWidth: false,
+            dom: "frtip",
+            columnDefs: [
+                {
+                    className: "dtr-control",
+                    orderable: false,
+                    targets: 0
+                },
+                {
+                    responsivePriority: 1,
+                    targets: 0
+                },
+                {
+                    responsivePriority: 2,
+                    targets: -1
+                }
+            ]
+        });
+    }
+
+    // Inicialización de tablas del módulo Empleados.
+    inicializarTablaExpandible("#tablaPapeleraEmpleados");
+    inicializarTablaExpandible("#tablaAuditoriaEmpleados");
+
+    // Inicialización de tablas del módulo Áreas.
+    inicializarTablaExpandible("#tablaPapeleraAreas");
+    inicializarTablaExpandible("#tablaAuditoriaAreas");
+
+    // Inicialización de tablas del módulo Cargos.
+    inicializarTablaExpandible("#tablaPapeleraCargos");
+    inicializarTablaExpandible("#tablaAuditoriaCargos");
+
+    // Inicialización de tablas del módulo Centro de Costo.
+    inicializarTablaExpandible("#tablaPapeleraCentroCosto");
+    inicializarTablaExpandible("#tablaAuditoriaCentroCostos");
+
+    // Inicialización de tablas del módulo Empresas.
+    inicializarTablaExpandible("#tablaPapeleraEmpresas");
+    inicializarTablaExpandible("#tablaAuditoriaEmpresas");
+
+    // Inicialización de tablas del módulo Movimiento de Caja.
+    inicializarTablaExpandible("#tablaPapeleraHojaLiquidacion");
+    inicializarTablaExpandible("#tablaAuditoriaHojaLiquidacion");
+
+    // Inicialización de tablas del módulo Movimiento de Caja.
+    inicializarTablaExpandible("#tablaPapeleraMovimientos");
+    inicializarTablaExpandible("#tablaAuditoriaMovimientoCaja");
+
+     // Inicialización de tablas del módulo Opt.
+    inicializarTablaExpandible("#tablaPapeleraOpt");
+    inicializarTablaExpandible("#tablaAuditoriaOpts");
+
+     // Inicialización de tablas del módulo Usuarios.
+    inicializarTablaExpandible("#tablaPapelera");
+
+    // Cuando se expande/colapsa un card, DataTables debe recalcular columnas.
+    $(document).on("click", '[data-card-widget="collapse"]', function () {
+        setTimeout(function () {
+            recalcularTablasVisibles();
+        }, 350);
+    });
+});

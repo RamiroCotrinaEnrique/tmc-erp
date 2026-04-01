@@ -24,12 +24,24 @@ class ModeloMovimientoCaja {
     -------------------------------------*/
     static public function mdlMostrarMovimientoCaja($tabla, $item, $valor) {
         if ($item != null) {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND movi_fecha_delete IS NULL");
+            $stmt = Conexion::conectar()->prepare(
+                "SELECT m.*, TRIM(CONCAT_WS(' ', e.emple_apellido_paterno, e.emple_apellido_materno, e.emple_nombres)) AS movi_empleado_nombre
+                 FROM $tabla m
+                 LEFT JOIN empleados e ON e.emple_id = m.movi_emple_id
+                 WHERE m.$item = :$item
+                   AND m.movi_fecha_delete IS NULL"
+            );
             $stmt->bindParam(':' . $item, $valor, PDO::PARAM_STR);
             $stmt->execute();
             $respuesta = $stmt->fetch();
         } else {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE movi_fecha_delete IS NULL ORDER BY movi_id DESC");
+            $stmt = Conexion::conectar()->prepare(
+                "SELECT m.*, TRIM(CONCAT_WS(' ', e.emple_apellido_paterno, e.emple_apellido_materno, e.emple_nombres)) AS movi_empleado_nombre
+                 FROM $tabla m
+                 LEFT JOIN empleados e ON e.emple_id = m.movi_emple_id
+                 WHERE m.movi_fecha_delete IS NULL
+                 ORDER BY m.movi_id DESC"
+            );
             $stmt->execute();
             $respuesta = $stmt->fetchAll();
         }
@@ -307,10 +319,11 @@ class ModeloMovimientoCaja {
     -------------------------------------*/
     static public function mdlMostrarMovimientoCajaEliminados() {
         $stmt = Conexion::conectar()->prepare(
-            'SELECT *
-             FROM movimientos
-             WHERE movi_fecha_delete IS NOT NULL
-             ORDER BY movi_fecha_delete DESC'
+            "SELECT m.*, TRIM(CONCAT_WS(' ', e.emple_apellido_paterno, e.emple_apellido_materno, e.emple_nombres)) AS movi_empleado_nombre
+             FROM movimientos m
+             LEFT JOIN empleados e ON e.emple_id = m.movi_emple_id
+             WHERE m.movi_fecha_delete IS NOT NULL
+             ORDER BY m.movi_fecha_delete DESC"
         );
 
         $stmt->execute();

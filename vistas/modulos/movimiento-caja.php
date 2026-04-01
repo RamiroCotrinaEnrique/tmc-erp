@@ -109,7 +109,7 @@
                                                                 <td><?php echo htmlspecialchars($value['movi_numero']); ?></td>
                                                                 <td><?php echo htmlspecialchars($value['movi_moneda']); ?></td>
                                                                 <td><?php echo htmlspecialchars($value['movi_fecha']); ?></td>
-                                                                <td><?php echo htmlspecialchars($value['movi_emple_id']); ?></td>
+                                                                <td><?php echo htmlspecialchars(!empty($value['movi_empleado_nombre']) ? $value['movi_empleado_nombre'] : ('ID ' . $value['movi_emple_id'])); ?></td>
                                                                 <td><?php echo htmlspecialchars($value['movi_total']); ?></td>
                                                                 <td>
                                                                     <div class="btn-group">
@@ -166,7 +166,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive"> 
                                 <table id="tablaPapeleraMovimientos" class="table table-bordered table-striped tablas">
                                     <thead>
                                         <tr>
@@ -189,6 +188,7 @@
                                         if($movimientosEliminados && count($movimientosEliminados) > 0){
                                             foreach($movimientosEliminados as $key => $value){
                                                 $nombreMovimiento = trim($value['movi_tipo'].' '.$value['movi_serie'].'-'.$value['movi_numero']);
+                                                $nombreEmpleado = !empty($value['movi_empleado_nombre']) ? $value['movi_empleado_nombre'] : ('ID ' . $value['movi_emple_id']);
                                                 echo '<tr>';
                                                 echo '<td>'.($key+1).'</td>';
                                                 echo '<td>'.htmlspecialchars($value['movi_tipo']).'</td>';
@@ -196,7 +196,7 @@
                                                 echo '<td>'.htmlspecialchars($value['movi_numero']).'</td>';
                                                 echo '<td>'.htmlspecialchars($value['movi_moneda']).'</td>';
                                                 echo '<td>'.htmlspecialchars($value['movi_fecha']).'</td>';
-                                                echo '<td>'.htmlspecialchars($value['movi_emple_id']).'</td>';
+                                                echo '<td>'.htmlspecialchars($nombreEmpleado).'</td>';
                                                 echo '<td>'.htmlspecialchars($value['movi_total']).'</td>';
                                                 echo '<td>'.htmlspecialchars($value['movi_fecha_delete']).'</td>';
                                                 echo '<td>
@@ -229,9 +229,7 @@
                                             <th>Depurar</th>
                                         </tr>
                                     </tfoot>
-                                </table>
-                                
-                            </div>                            
+                                </table>                         
                         </div>
                     </div>
                 </div>
@@ -249,7 +247,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive"> 
                                 <table id="tablaAuditoriaMovimientoCaja" class="table table-bordered table-striped tablas">
                                     <thead>
                                         <tr>
@@ -319,9 +316,7 @@
                                             <th>Detalle</th>
                                         </tr>
                                     </tfoot>
-                                </table>                                
-                            </div>
-                            
+                                </table>                                                          
                         </div>
                     </div>
                 </div>
