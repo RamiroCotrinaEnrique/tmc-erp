@@ -77,6 +77,46 @@ INSERT INTO empresas
 VALUES 
 (1, '20510976887', 'REPARTO PERU S.A.C.', 'REPARTO PERU', 'Av. Manuel de la Torre Nro. 183 (Frente a la Reniec Santa Anita)', '99999999', 'sistemas@repartoperu.com', '2024-03-15 18:05:49', NULL, NULL);
 
+CREATE TABLE resumen_caja (
+  resc_id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  resc_fecha date NOT NULL,
+  resc_anio smallint NOT NULL,
+  resc_mes tinyint NOT NULL,
+  resc_dia tinyint NOT NULL,
+  resc_dni varchar(20) NOT NULL,
+  resc_responsable varchar(180) NOT NULL,
+  resc_observacion text NULL,
+  resc_saldo_inicial decimal(10,2) NOT NULL DEFAULT 0.00,
+  resc_total_ingresos decimal(10,2) NOT NULL DEFAULT 0.00,
+  resc_total_egresos decimal(10,2) NOT NULL DEFAULT 0.00,
+  resc_saldo_final decimal(10,2) NOT NULL DEFAULT 0.00,
+  resc_total_items int(11) NOT NULL DEFAULT 0,
+  resc_fecha_create timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  resc_fecha_update datetime NULL,
+  resc_fecha_delete datetime NULL,
+  PRIMARY KEY (resc_id)
+);
+
+CREATE TABLE resumen_caja_detalle (
+  rescd_id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  rescd_resumen_id int(10) unsigned NOT NULL,
+  rescd_item int(11) NOT NULL,
+  rescd_movimiento_id int(11) NULL,
+  rescd_tipo_movimiento varchar(10) NOT NULL,
+  rescd_fecha_documento date NOT NULL,
+  rescd_responsable varchar(180) NOT NULL,
+  rescd_serie varchar(20) NULL,
+  rescd_numero varchar(20) NULL,
+  rescd_tipo_doc varchar(50) NULL,
+  rescd_nro_doc varchar(50) NULL,
+  rescd_razon_social varchar(200) NULL,
+  rescd_concepto varchar(255) NOT NULL,
+  rescd_ingreso decimal(10,2) NOT NULL DEFAULT 0.00,
+  rescd_egreso decimal(10,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (rescd_id),
+  CONSTRAINT fk_resumen_caja_detalle_resumen FOREIGN KEY (rescd_resumen_id) REFERENCES resumen_caja(resc_id) ON DELETE CASCADE
+);
+
 -- TABLA VEHÍCULOS
 CREATE TABLE vehiculos (
     vehic_id int(11) NOT NULL AUTO_INCREMENT,    
@@ -431,6 +471,9 @@ CREATE TABLE detalle_movimiento (
     deta_movi_id INT AUTO_INCREMENT PRIMARY KEY,
     deta_movi_movimiento_id INT,
     deta_movi_item INT,
+  deta_movi_tipo_doc VARCHAR(50),
+  deta_movi_nro_doc VARCHAR(50),
+  deta_movi_razon_social VARCHAR(200),
     deta_movi_descripcion VARCHAR(255),
     deta_movi_importe DECIMAL(10,2),
     FOREIGN KEY (deta_movi_movimiento_id) REFERENCES movimientos(movi_id) ON DELETE CASCADE

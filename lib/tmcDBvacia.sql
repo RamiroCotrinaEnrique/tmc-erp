@@ -104,6 +104,9 @@ CREATE TABLE `detalle_movimiento` (
   `deta_movi_id` int(11) NOT NULL,
   `deta_movi_movimiento_id` int(11) DEFAULT NULL,
   `deta_movi_item` int(11) DEFAULT NULL,
+  `deta_movi_tipo_doc` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deta_movi_nro_doc` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deta_movi_razon_social` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deta_movi_descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deta_movi_importe` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -217,6 +220,55 @@ CREATE TABLE `movimientos` (
   `movi_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `movi_fecha_update` datetime DEFAULT NULL,
   `movi_fecha_delete` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `resumen_caja`
+--
+
+CREATE TABLE `resumen_caja` (
+  `resc_id` int(10) unsigned NOT NULL,
+  `resc_fecha` date NOT NULL,
+  `resc_anio` smallint(6) NOT NULL,
+  `resc_mes` tinyint(4) NOT NULL,
+  `resc_dia` tinyint(4) NOT NULL,
+  `resc_dni` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `resc_responsable` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `resc_observacion` text COLLATE utf8mb4_unicode_ci,
+  `resc_saldo_inicial` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `resc_total_ingresos` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `resc_total_egresos` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `resc_saldo_final` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `resc_total_items` int(11) NOT NULL DEFAULT '0',
+  `resc_fecha_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `resc_fecha_update` datetime DEFAULT NULL,
+  `resc_fecha_delete` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `resumen_caja_detalle`
+--
+
+CREATE TABLE `resumen_caja_detalle` (
+  `rescd_id` int(10) unsigned NOT NULL,
+  `rescd_resumen_id` int(10) unsigned NOT NULL,
+  `rescd_item` int(11) NOT NULL,
+  `rescd_movimiento_id` int(11) DEFAULT NULL,
+  `rescd_tipo_movimiento` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rescd_fecha_documento` date NOT NULL,
+  `rescd_responsable` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rescd_serie` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rescd_numero` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rescd_tipo_doc` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rescd_nro_doc` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rescd_razon_social` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rescd_concepto` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rescd_ingreso` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `rescd_egreso` decimal(10,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

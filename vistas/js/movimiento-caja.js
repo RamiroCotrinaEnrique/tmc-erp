@@ -197,7 +197,7 @@ $(document).ready(function () {
       '    <input type="text" class="form-control form-control-sm input-detalle-item" name="detalle_item[]" readonly>',
       '  </td>',
       '  <td>',
-      '    <input type="text" class="form-control form-control-sm" name="detalle_descripcion[]" placeholder="Ingrese descripción" required>',
+      '    <input type="text" class="form-control form-control-sm" name="detalle_descripcion[]" placeholder="Ingrese descripci\u00f3n" required>',
       '  </td>',
       '  <td style="width: 180px;">',
       '    <input type="number" class="form-control form-control-sm input-detalle-importe" name="detalle_importe[]" min="0" step="0.01" placeholder="0.00" required>',
@@ -248,7 +248,8 @@ $(document).ready(function () {
       $ultimaFila.find('input[name="inputEditDetalleDescripcion[]"]').val(descripcion);
     }
     if (typeof importe !== "undefined") {
-      $ultimaFila.find('input[name="inputEditDetalleImporte[]"]').val(parseFloat(importe).toFixed(2));
+      var importeNumero = parseFloat(importe);
+      $ultimaFila.find('input[name="inputEditDetalleImporte[]"]').val(Number.isNaN(importeNumero) ? "" : importeNumero.toFixed(2));
     }
 
     actualizarDetalleEdit();
@@ -380,7 +381,10 @@ $(document).ready(function () {
           success: function (detalles) {
             if (Array.isArray(detalles) && detalles.length > 0) {
               detalles.forEach(function (detalle) {
-                agregarFilaDetalleEdit(detalle.deta_movi_descripcion, detalle.deta_movi_importe);
+                agregarFilaDetalleEdit(
+                  detalle.deta_movi_descripcion,
+                  detalle.deta_movi_importe
+                );
               });
             } else {
               agregarFilaDetalleEdit("", "");

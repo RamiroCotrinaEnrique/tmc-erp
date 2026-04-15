@@ -170,8 +170,8 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
 
                 <?php
                 $puedeMovimientoCaja = tmcUsuarioPuedeAccederModulo($perfilActual, 'movimiento-caja');
-                $puedeRendicionCajaChica = tmcUsuarioPuedeAccederModulo($perfilActual, 'rendicion-caja-chica');
-                if ($puedeMovimientoCaja || $puedeRendicionCajaChica) { ?>
+                $puedeResumenCaja = tmcUsuarioPuedeAccederModulo($perfilActual, 'resumen-caja');
+                if ($puedeMovimientoCaja || $puedeResumenCaja) { ?>
                 <li class="nav-header">GESTIÓN TESORERÍA</li>
 
                 <?php if ($puedeMovimientoCaja) { ?>
@@ -183,11 +183,11 @@ $sidebarNavClass = function ($rutaMenu) use ($rutaActual) {
                 </li>
                 <?php } ?>
 
-                <?php if ($puedeRendicionCajaChica) { ?>
+                <?php if ($puedeResumenCaja) { ?>
                 <li class="nav-item">
-                    <a href="rendicion-caja-chica" class="<?php echo $sidebarNavClass('rendicion-caja-chica'); ?>">
+                    <a href="resumen-caja" class="<?php echo $sidebarNavClass('resumen-caja'); ?>">
                         <i class="fa fa-users nav-icon"></i>
-                        <p>Rendición de Caja Chica</p>
+                        <p>Resumen de Caja</p>
                     </a>
                 </li>
                 <?php } ?>

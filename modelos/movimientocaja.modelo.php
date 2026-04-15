@@ -4,6 +4,26 @@ require_once __DIR__ . '/../config/conexion.php';
 
 class ModeloMovimientoCaja {
 
+    private static function mdlAsegurarColumnasDetalleMovimiento($cn) {
+        $columnasRequeridas = array(
+            'deta_movi_tipo_doc' => 'VARCHAR(50) NULL',
+            'deta_movi_nro_doc' => 'VARCHAR(50) NULL',
+            'deta_movi_razon_social' => 'VARCHAR(200) NULL'
+        );
+
+        foreach ($columnasRequeridas as $columna => $definicion) {
+            $stmt = $cn->prepare('SHOW COLUMNS FROM detalle_movimiento LIKE :columna');
+            $stmt->bindValue(':columna', $columna, PDO::PARAM_STR);
+            $stmt->execute();
+            $existe = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = null;
+
+            if (!$existe) {
+                $cn->exec('ALTER TABLE detalle_movimiento ADD COLUMN ' . $columna . ' ' . $definicion);
+            }
+        }
+    }
+
     static public function mdlObtenerMovimientoCajaPorId($idMovimiento) {
         $stmt = Conexion::conectar()->prepare(
             'SELECT *
@@ -76,8 +96,11 @@ class ModeloMovimientoCaja {
     LISTAR DETALLE POR MOVIMIENTO
     -------------------------------------*/
     static public function mdlMostrarDetalleMovimiento($movimientoId) {
-        $stmt = Conexion::conectar()->prepare(
-            'SELECT deta_movi_item, deta_movi_descripcion, deta_movi_importe
+        $cn = Conexion::conectar();
+        self::mdlAsegurarColumnasDetalleMovimiento($cn);
+
+        $stmt = $cn->prepare(
+            'SELECT deta_movi_item, deta_movi_tipo_doc, deta_movi_nro_doc, deta_movi_razon_social, deta_movi_descripcion, deta_movi_importe
              FROM detalle_movimiento
              WHERE deta_movi_movimiento_id = :movimiento_id
              ORDER BY deta_movi_item ASC'
@@ -100,6 +123,7 @@ class ModeloMovimientoCaja {
 
         try {
             $cn->beginTransaction();
+            self::mdlAsegurarColumnasDetalleMovimiento($cn);
 
             $stmtSerie = $cn->prepare(
                 'SELECT conf_seri_id, conf_seri_ultimo_numero
@@ -164,11 +188,17 @@ class ModeloMovimientoCaja {
                 'INSERT INTO detalle_movimiento (
                     deta_movi_movimiento_id,
                     deta_movi_item,
+                    deta_movi_tipo_doc,
+                    deta_movi_nro_doc,
+                    deta_movi_razon_social,
                     deta_movi_descripcion,
                     deta_movi_importe
                 ) VALUES (
                     :movimiento_id,
                     :item,
+                    :tipo_doc,
+                    :nro_doc,
+                    :razon_social,
                     :descripcion,
                     :importe
                 )'
@@ -176,11 +206,17 @@ class ModeloMovimientoCaja {
 
             foreach ($detalles as $index => $detalle) {
                 $item = $index + 1;
+                $tipoDoc = isset($detalle['tipo_doc']) ? trim((string) $detalle['tipo_doc']) : '';
+                $nroDoc = isset($detalle['nro_doc']) ? trim((string) $detalle['nro_doc']) : '';
+                $razonSocial = isset($detalle['razon_social']) ? trim((string) $detalle['razon_social']) : '';
                 $descripcion = $detalle['descripcion'];
                 $importe = round((float) $detalle['importe'], 2);
 
                 $stmtDet->bindParam(':movimiento_id', $movimientoId, PDO::PARAM_INT);
                 $stmtDet->bindParam(':item', $item, PDO::PARAM_INT);
+                $stmtDet->bindParam(':tipo_doc', $tipoDoc, PDO::PARAM_STR);
+                $stmtDet->bindParam(':nro_doc', $nroDoc, PDO::PARAM_STR);
+                $stmtDet->bindParam(':razon_social', $razonSocial, PDO::PARAM_STR);
                 $stmtDet->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
                 $stmtDet->bindParam(':importe', $importe, PDO::PARAM_STR);
                 $stmtDet->execute();
@@ -215,6 +251,7 @@ class ModeloMovimientoCaja {
 
         try {
             $cn->beginTransaction();
+            self::mdlAsegurarColumnasDetalleMovimiento($cn);
 
             $stmtActual = $cn->prepare(
                 'SELECT movi_tipo, movi_moneda, movi_serie, movi_numero
@@ -263,11 +300,17 @@ class ModeloMovimientoCaja {
                 'INSERT INTO detalle_movimiento (
                     deta_movi_movimiento_id,
                     deta_movi_item,
+                    deta_movi_tipo_doc,
+                    deta_movi_nro_doc,
+                    deta_movi_razon_social,
                     deta_movi_descripcion,
                     deta_movi_importe
                 ) VALUES (
                     :movimiento_id,
                     :item,
+                    :tipo_doc,
+                    :nro_doc,
+                    :razon_social,
                     :descripcion,
                     :importe
                 )'
@@ -275,11 +318,17 @@ class ModeloMovimientoCaja {
 
             foreach ($detalles as $index => $detalle) {
                 $item = $index + 1;
+                $tipoDoc = isset($detalle['tipo_doc']) ? trim((string) $detalle['tipo_doc']) : '';
+                $nroDoc = isset($detalle['nro_doc']) ? trim((string) $detalle['nro_doc']) : '';
+                $razonSocial = isset($detalle['razon_social']) ? trim((string) $detalle['razon_social']) : '';
                 $descripcion = $detalle['descripcion'];
                 $importe = round((float) $detalle['importe'], 2);
 
                 $stmtInsDet->bindParam(':movimiento_id', $datos['movi_id'], PDO::PARAM_INT);
                 $stmtInsDet->bindParam(':item', $item, PDO::PARAM_INT);
+                $stmtInsDet->bindParam(':tipo_doc', $tipoDoc, PDO::PARAM_STR);
+                $stmtInsDet->bindParam(':nro_doc', $nroDoc, PDO::PARAM_STR);
+                $stmtInsDet->bindParam(':razon_social', $razonSocial, PDO::PARAM_STR);
                 $stmtInsDet->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
                 $stmtInsDet->bindParam(':importe', $importe, PDO::PARAM_STR);
                 $stmtInsDet->execute();

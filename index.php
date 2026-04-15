@@ -10,6 +10,7 @@ require_once "controladores/areas.controlador.php";
 require_once "controladores/cargos.controlador.php";
 require_once "controladores/empleados.controlador.php";
 require_once "controladores/movimientocaja.controlador.php";
+require_once "controladores/resumencaja.controlador.php";
 require_once "controladores/hojaliquidacion.controlador.php";
 
 require_once "modelos/usuarios.modelo.php";
@@ -21,6 +22,7 @@ require_once "modelos/areas.modelo.php";
 require_once "modelos/cargos.modelo.php";
 require_once "modelos/empleados.modelo.php";
 require_once "modelos/movimientocaja.modelo.php";
+require_once "modelos/resumencaja.modelo.php";
 require_once "modelos/hojaliquidacion.modelo.php";
 
 
