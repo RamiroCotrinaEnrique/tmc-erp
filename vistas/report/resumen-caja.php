@@ -205,3 +205,7 @@ class ImprimirResumenCajaPDF {
     }
 }
 
+$reporteResumenCaja = new ImprimirResumenCajaPDF();
+$reporteResumenCaja->codigo = isset($_GET['codigo']) ? $_GET['codigo'] : 0;
+$reporteResumenCaja->generar();
+

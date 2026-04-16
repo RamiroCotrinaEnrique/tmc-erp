@@ -70,6 +70,26 @@ class ModeloMovimientoCaja {
         return $respuesta;
     }
 
+    static public function mdlMostrarMovimientoCajaPorRangoFechas($fechaInicial, $fechaFinal) {
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT m.*, TRIM(CONCAT_WS(' ', e.emple_apellido_paterno, e.emple_apellido_materno, e.emple_nombres)) AS movi_empleado_nombre
+             FROM movimientos m
+             LEFT JOIN empleados e ON e.emple_id = m.movi_emple_id
+             WHERE m.movi_fecha_delete IS NULL
+               AND DATE(m.movi_fecha) BETWEEN :fechaInicial AND :fechaFinal
+             ORDER BY m.movi_fecha ASC, m.movi_id ASC"
+        );
+
+        $stmt->bindParam(':fechaInicial', $fechaInicial, PDO::PARAM_STR);
+        $stmt->bindParam(':fechaFinal', $fechaFinal, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $respuesta = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = null;
+
+        return $respuesta;
+    }
+
     /*-------------------------------------
     LISTAR SERIES CONFIGURADAS POR TIPO Y MONEDA
     -------------------------------------*/

@@ -68,6 +68,86 @@ camposCalculoEditar.forEach(function(selector){
 
 calcularTotalesLiquidacion(false);
 
+var $btnRangoFechaHojaLiquidacion = $('#btnRangoFechaHojaLiquidacion');
+var $btnExportarHojaLiquidacionExcel = $('#btnExportarHojaLiquidacionExcel');
+var $labelRangoFechaHojaLiquidacion = $('#labelRangoFechaHojaLiquidacion');
+var fechaInicialHojaReporte = '';
+var fechaFinalHojaReporte = '';
+
+function formatearFechaIso(fechaMoment){
+    return fechaMoment.format('YYYY-MM-DD');
+}
+
+function actualizarEtiquetaRangoHoja(inicioMoment, finMoment){
+    if(!$labelRangoFechaHojaLiquidacion.length){
+        return;
+    }
+
+    $labelRangoFechaHojaLiquidacion.text(inicioMoment.format('DD/MM/YYYY') + ' - ' + finMoment.format('DD/MM/YYYY'));
+}
+
+if($btnRangoFechaHojaLiquidacion.length && typeof moment !== 'undefined' && $.fn.daterangepicker){
+    var inicioDefectoHoja = moment();
+    var finDefectoHoja = moment();
+
+    fechaInicialHojaReporte = formatearFechaIso(inicioDefectoHoja);
+    fechaFinalHojaReporte = formatearFechaIso(finDefectoHoja);
+    $labelRangoFechaHojaLiquidacion.text('Seleccione Rango Fecha');
+
+    $btnRangoFechaHojaLiquidacion.daterangepicker({
+        startDate: inicioDefectoHoja,
+        endDate: finDefectoHoja,
+        autoUpdateInput: false,
+        locale: {
+            format: 'DD/MM/YYYY',
+            separator: ' - ',
+            applyLabel: 'Aplicar',
+            cancelLabel: 'Cancelar',
+            fromLabel: 'Desde',
+            toLabel: 'Hasta',
+            customRangeLabel: 'Rango Personalizado',
+            daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+            monthNames: [
+                'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+            ],
+            firstDay: 1
+        },
+        ranges: {
+            'Hoy': [moment(), moment()],
+            'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Ultimos 7 dias': [moment().subtract(6, 'days'), moment()],
+            'Ultimos 30 dias': [moment().subtract(29, 'days'), moment()],
+            'Este mes': [moment().startOf('month'), moment().endOf('month')],
+            'Ultimo mes': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, function(start, end){
+        fechaInicialHojaReporte = formatearFechaIso(start);
+        fechaFinalHojaReporte = formatearFechaIso(end);
+        actualizarEtiquetaRangoHoja(start, end);
+    });
+}
+
+if($btnExportarHojaLiquidacionExcel.length){
+    $btnExportarHojaLiquidacionExcel.on('click', function(){
+        if(!fechaInicialHojaReporte || !fechaFinalHojaReporte){
+            swal({
+                type: 'warning',
+                title: 'Seleccione un rango de fecha antes de descargar.',
+                showConfirmButton: true,
+                confirmButtonText: 'Cerrar'
+            });
+            return;
+        }
+
+        var url = 'vistas/report/hoja-liquidacion-excel.php?fechaInicial=' +
+            encodeURIComponent(fechaInicialHojaReporte) + '&fechaFinal=' +
+            encodeURIComponent(fechaFinalHojaReporte);
+
+        window.open(url, '_blank');
+    });
+}
+
 /*=============================================
 IMPRIMIR HOJA DE LIQUIDACION
 =============================================*/

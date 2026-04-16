@@ -12,6 +12,10 @@ class ControladorMovimientoCaja {
         return ModeloMovimientoCaja::mdlMostrarMovimientoCaja($tabla, $item, $valor);
     }
 
+    static public function ctrMostrarMovimientoCajaPorRangoFechas($fechaInicial, $fechaFinal) {
+        return ModeloMovimientoCaja::mdlMostrarMovimientoCajaPorRangoFechas($fechaInicial, $fechaFinal);
+    }
+
     /*-------------------------------------
     LISTAR SERIES CONFIGURADAS
     -------------------------------------*/

@@ -20,10 +20,21 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card card-primary card-outline">
-                        <div class="card-header">
+                        <div class="card-header d-flex align-items-center flex-wrap">
                             <button class="btn color-fondo-personalizado" data-toggle="modal" data-target="#modalAgregarHojaLiquidacion">
                                 <i class="fa fa-plus" aria-hidden="true"></i> Agregar Hoja de Liquidacion
                             </button>
+
+                            <div class="mt-2 mt-md-0 ml-auto d-flex justify-content-end">
+                                <div class="btn-group" role="group" aria-label="Exportacion hoja liquidacion">
+                                    <button type="button" class="btn btn-default" id="btnRangoFechaHojaLiquidacion" style="margin-right: 35px;">
+                                        <i class="fa fa-calendar"></i> <span id="labelRangoFechaHojaLiquidacion">Rango Fecha</span>
+                                    </button>
+                                    <button type="button" class="btn btn-success" id="btnExportarHojaLiquidacionExcel" style="margin-right: 30px;">
+                                        <i class="fa fa-file-excel-o"></i> Descargar Excel
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <table id="example1" class="table table-bordered table-striped tablas">

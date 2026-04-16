@@ -14,6 +14,10 @@ class ControladorHojaLiquidacion {
         return ModeloHojaLiquidacion::mdlMostrarHojasLiquidacion($tabla, $item, $valor);
     }
 
+    static public function ctrMostrarHojasLiquidacionPorRangoFechas($fechaInicial, $fechaFinal) {
+        return ModeloHojaLiquidacion::mdlMostrarHojasLiquidacionPorRangoFechas($fechaInicial, $fechaFinal);
+    }
+
     public static function ctrCrearHojaLiquidacion() {
         if (!isset($_POST['nuevaFechaSalida'])) {
             return;

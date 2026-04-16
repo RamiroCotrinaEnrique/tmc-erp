@@ -146,6 +146,105 @@ $(document).ready(function () {
 
   inicializarTablasPorSerie();
 
+  var $btnRangoFechaMovimientoCaja = $("#btnRangoFechaMovimientoCaja");
+  var $btnExportarMovimientoCajaExcel = $("#btnExportarMovimientoCajaExcel");
+  var $labelRangoFechaMovimientoCaja = $("#labelRangoFechaMovimientoCaja");
+  var fechaInicialReporte = "";
+  var fechaFinalReporte = "";
+
+  function formatearFechaIso(fechaMoment) {
+    return fechaMoment.format("YYYY-MM-DD");
+  }
+
+  function actualizarEtiquetaRango(inicioMoment, finMoment) {
+    if (!$labelRangoFechaMovimientoCaja.length) {
+      return;
+    }
+
+    var texto = inicioMoment.format("DD/MM/YYYY") + " - " + finMoment.format("DD/MM/YYYY");
+    $labelRangoFechaMovimientoCaja.text(texto);
+  }
+
+  if ($btnRangoFechaMovimientoCaja.length && typeof moment !== "undefined" && $.fn.daterangepicker) {
+    var inicioDefecto = moment();
+    var finDefecto = moment();
+
+    fechaInicialReporte = formatearFechaIso(inicioDefecto);
+    fechaFinalReporte = formatearFechaIso(finDefecto);
+
+    if ($labelRangoFechaMovimientoCaja.length) {
+      $labelRangoFechaMovimientoCaja.text("Seleccione Rango Fecha");
+    }
+
+    $btnRangoFechaMovimientoCaja.daterangepicker(
+      {
+        startDate: inicioDefecto,
+        endDate: finDefecto,
+        autoUpdateInput: false,
+        locale: {
+          format: "DD/MM/YYYY",
+          separator: " - ",
+          applyLabel: "Aplicar",
+          cancelLabel: "Cancelar",
+          fromLabel: "Desde",
+          toLabel: "Hasta",
+          customRangeLabel: "Rango Personalizado",
+          daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+          monthNames: [
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre"
+          ],
+          firstDay: 1
+        },
+        ranges: {
+          Hoy: [moment(), moment()],
+          Ayer: [moment().subtract(1, "days"), moment().subtract(1, "days")],
+          "Ultimos 7 dias": [moment().subtract(6, "days"), moment()],
+          "Ultimos 30 dias": [moment().subtract(29, "days"), moment()],
+          "Este mes": [moment().startOf("month"), moment().endOf("month")],
+          "Ultimo mes": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+        }
+      },
+      function (start, end) {
+        fechaInicialReporte = formatearFechaIso(start);
+        fechaFinalReporte = formatearFechaIso(end);
+        actualizarEtiquetaRango(start, end);
+      }
+    );
+  }
+
+  if ($btnExportarMovimientoCajaExcel.length) {
+    $btnExportarMovimientoCajaExcel.on("click", function () {
+      if (!fechaInicialReporte || !fechaFinalReporte) {
+        swal({
+          type: "warning",
+          title: "Seleccione un rango de fecha antes de descargar.",
+          showConfirmButton: true,
+          confirmButtonText: "Cerrar"
+        });
+        return;
+      }
+
+      var url =
+        "vistas/report/report-caja-excel.php?fechaInicial=" +
+        encodeURIComponent(fechaInicialReporte) +
+        "&fechaFinal=" +
+        encodeURIComponent(fechaFinalReporte);
+
+      window.open(url, "_blank");
+    });
+  }
+
   var $tablaDetalle = $("#detalleMovimiento");
   var $btnAgregarDetalle = $("#btnAgregarDetalle");
   var $totalDetalleReferencial = $("#totalDetalleReferencial");

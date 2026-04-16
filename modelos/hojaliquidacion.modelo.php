@@ -26,6 +26,30 @@ class ModeloHojaLiquidacion {
         return $stmt->fetchAll();
     }
 
+    static public function mdlMostrarHojasLiquidacionPorRangoFechas($fechaInicial, $fechaFinal) {
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT h.*, 
+                    vt.vehic_placa AS hoja_tracto_placa,
+                    vv.vehic_placa AS hoja_tolva_placa,
+                    TRIM(CONCAT_WS(' ', e.emple_apellido_paterno, e.emple_apellido_materno, e.emple_nombres)) AS hoja_empleado_nombre,
+                    CONCAT(COALESCE(c.cenco_codigo, ''), ' ', COALESCE(c.cenco_nombre, '')) AS hoja_operacion_label
+             FROM hoja_liquidacion h
+             LEFT JOIN vehiculos vt ON vt.vehic_id = h.hoja_vehic_tracto_id
+             LEFT JOIN vehiculos vv ON vv.vehic_id = h.hoja_vehic_tolva_id
+             LEFT JOIN empleados e ON e.emple_id = h.hoja_empleado_id
+             LEFT JOIN centro_costo c ON c.cenco_id = h.hoja_operacion
+                         WHERE h.hoja_fecha_delete IS NULL
+                             AND DATE(h.hoja_fecha_create) BETWEEN :fechaInicial AND :fechaFinal
+                         ORDER BY h.hoja_fecha_create ASC, h.hoja_id ASC"
+        );
+
+        $stmt->bindParam(':fechaInicial', $fechaInicial, PDO::PARAM_STR);
+        $stmt->bindParam(':fechaFinal', $fechaFinal, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     static public function mdlObtenerHojaLiquidacionPorId($tabla, $id) {
         $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE hoja_id = :hoja_id LIMIT 1");
         $stmt->bindParam(':hoja_id', $id, PDO::PARAM_INT);
